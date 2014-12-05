@@ -67,8 +67,6 @@
 (add-to-list 'auto-mode-alist '(".vim\\(rc\\)?$" . vimrc-mode))
 (require 'gitconfig)
 
-(require 'elixir-mode)
-
 (require 'wgrep)
 (autoload 'wgrep-agp-setup "wgrep-ag")
 (add-hook 'ag-mode-hook 'wgrep-ag-setup)
