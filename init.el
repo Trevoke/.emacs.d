@@ -1,6 +1,3 @@
-;; Don't show me the splash screen
-(setq inhibit-splash-screen t)
-
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
 (require 'pallet)
@@ -56,7 +53,6 @@
 (global-set-key (kbd "C-x m") 'smex-major-mode-commands)
 (setq smex-auto-update t)
 
-
 (require 'smartparens-config)
 
 (require 'expand-region)
@@ -88,8 +84,6 @@
 
 (global-set-key (kbd "\C-c g") 'magit-status)
 (global-set-key (kbd "C-h z") 'zeal-at-point)
-
-(prefer-coding-system 'utf-8)
 
 (require 'org-octopress)
 (setq org-octopress-directory-top       "~/devel/trevoke.github.io/source")
