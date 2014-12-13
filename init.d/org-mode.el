@@ -1,5 +1,9 @@
 (add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
 
+(setq org-directory "~/Google Drive/notes")
+(setq org-default-notes-file (concat org-directory "/notes.org.txt"))
+(define-key global-map "\C-cc" 'org-capture)
+
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)

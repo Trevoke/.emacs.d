@@ -1,7 +1,7 @@
 ;; Don't show me the splash screen
 (setq inhibit-splash-screen t)
 
-(setq initial-scratch-message ";; Scratch buffer")
+(setq initial-scratch-message nil)
 
 (tool-bar-mode -1)
 
