@@ -1,0 +1,4 @@
+#name script template handlebar
+# --
+<script type="text/x-handlebars" id="$0">
+</script>
