@@ -11,6 +11,11 @@
 (setq org-startup-indented t)
 (setq org-log-done 'time)
 
+(setq org-todo-keywords '( "TODO(t)" "WAIT(w!)" "|" "DONE" "CANCELED(c!)"))
+(setq org-tag-alist '(("@home" . ?h) ("@work" . ?w) ("family") ("wdi") ("strategy")  ("weiqi") ("ruby") ("lisp") ("emacs")))
+
+(setq org-mobile-directory "~/Dropbox/orgnotes")
+(setq org-mobile-inbox-for-pull "~/Google Drive/notes/from-mobile.org")
 
 ;;; orgtbl-to-gfm conversion function
 ;; Usage Example:

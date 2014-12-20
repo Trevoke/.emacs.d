@@ -1,14 +1,15 @@
+(defun stag-code-modes-hook ()
+  (linum-mode t)
+  (ggtags-mode)
+  (add-hook 'before-save-hook 'whitespace-cleanup)
+  (local-set-key "\C-m" 'newline-and-indent))
+
+
 (defun what-face (pos)
   (interactive "d")
   (let ((face (or (get-char-property pos 'read-face-name)
 		  (get-char-property pos 'face))))
     (if face (message "Face: %s" face) (message "No face at %d" pos))))
-
-(defun stag-code-modes-hook ()
-  (linum-mode t)
-  (add-hook 'before-save-hook 'whitespace-cleanup)
-  (ctags-auto-update-mode)
-  (local-set-key "\C-m" 'newline-and-indent))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Custom splitting functions ;;

@@ -59,8 +59,6 @@
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "C--") 'er/contract-region)
 
-(require 'vimrc-mode)
-(add-to-list 'auto-mode-alist '(".vim\\(rc\\)?$" . vimrc-mode))
 (require 'gitconfig)
 
 (require 'wgrep)
