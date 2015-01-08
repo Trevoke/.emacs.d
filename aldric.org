@@ -1,0 +1,29 @@
+#+TITLE: Trevoke's emacs config
+#+OPTIONS: toc:4 h:4
+
+* Configuration
+** About
+<<babel-init>>
+Some text belongs here
+** Personal information
+#+begin_src emacs-lisp
+(setq user-full-name "Aldric Giacomoni"
+      user-mail-address "trevoke@gmail.com")
+#+end_src
+** Additional paths
+This is mostly necessary for things not handled by Cask (which we'll see later down the line)
+Themes
+#+begin_src emacs-lisp
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+#+end_src
+Packages
+#+begin_src emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/packages")
+#+end_src
+** Emacs changes from customization system
+I don't want these changes anywhere near this file.
+Mostly I use them for the local default font settings.
+#+begin_src emacs-lisp
+(setq custom-file
+      (concat stag-init-dir "/init-custom.el"))
+#+end_src
