@@ -1,3 +1,4 @@
+(setq org-src-fontify-natively t)
 (add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
 
 (setq org-directory "~/Google Drive/notes")
