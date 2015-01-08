@@ -1,6 +1,7 @@
 (source gnu)
 (source marmalade)
 (source melpa)
+(source melpa-stable)
 
 (depends-on "ac-inf-ruby")
 (depends-on "ag")
@@ -25,6 +26,7 @@
 (depends-on "flx")
 (depends-on "flx-ido")
 (depends-on "font-utils")
+(depends-on "ggtags")
 (depends-on "git-commit-mode")
 (depends-on "git-rebase-mode")
 (depends-on "git-timemachine")
