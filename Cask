@@ -55,7 +55,6 @@
 (depends-on "nodejs-repl")
 (depends-on "org")
 (depends-on "org-mac-link")
-(depends-on "org-octopress")
 (depends-on "package-build")
 (depends-on "pallet")
 (depends-on "paradox")
@@ -87,4 +86,3 @@
 (depends-on "web-mode")
 (depends-on "wgrep")
 (depends-on "wgrep-ag")
-(depends-on "zeal-at-point")

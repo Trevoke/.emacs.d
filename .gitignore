@@ -1,3 +1,5 @@
+emacs.secrets
+init-custom.el
 .cask
 .recentf
 .saved-places

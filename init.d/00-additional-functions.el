@@ -33,6 +33,7 @@
 (defun stag-insert-line-below ()
   "Insert and auto-indent line below cursor, like in vim."
   (interactive)
+  (move-end-of-line 1)
   (open-line 1)
   (next-line)
   (indent-for-tab-command))

@@ -2,28 +2,244 @@
 #+OPTIONS: toc:4 h:4
 
 * Configuration
-** About
+** TODO About (actually put text in here)
 <<babel-init>>
 Some text belongs here
 ** Personal information
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq user-full-name "Aldric Giacomoni"
       user-mail-address "trevoke@gmail.com")
-#+end_src
+#+END_SRC
 ** Additional paths
 This is mostly necessary for things not handled by Cask (which we'll see later down the line)
-Themes
-#+begin_src emacs-lisp
+*** Themes
+#+BEGIN_SRC emacs-lisp
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-#+end_src
-Packages
-#+begin_src emacs-lisp
+#+END_SRC
+*** Packages
+#+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/packages")
-#+end_src
+#+END_SRC
+*** TODO Secrets (configure paradox)
+API keys, passwords, etc are kept in here. This file is .gitignored.
+#+BEGIN_SRC emacs-lisp
+(load "~/.emacs.d/emacs.secrets" t)
+#+END_SRC
+** General emacs config (no external packages)
+*** Yes/No => y/n
+#+BEGIN_SRC emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+*** Visual choices
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-splash-screen t)
+(setq initial-scratch-message nil)
+(show-paren-mode t)
+(setq show-paren-delay 0)
+(global-hl-line-mode t)
+(setq column-number-mode t)
+(setq ring-bell-function 'ignore)
+(setq visible-bell t)
+#+END_SRC
+*** Backups
+Centralize emacs backups.
+#+BEGIN_SRC emacs-lisp
+(setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+#+END_SRC
+And I'm not super-worried about old backups and other such things, so I'll just tell emacs to stop worrying about it.
+#+BEGIN_SRC emacs-lisp
+(setq delete-old-versions -1)
+(setq version-control t)
+(setq vc-make-backup-files t)
+(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+#+END_SRC
+*** History
+Stolen from http://www.wisdomandwonder.com/wordpress/wp-content/uploads/2014/03/C3F.html#sec-10-3-2
+#+BEGIN_SRC emacs-lisp
+(setq savehist-file "~/.emacs.d/savehist")
+(savehist-mode 1)
+(setq history-length t)
+(setq history-delete-duplicates t)
+(setq savehist-save-minibuffer-history 1)
+(setq savehist-additional-variables
+      '(kill-ring
+        search-ring
+        regexp-search-ring))
+#+END_SRC
+*** TODO Window config (Put OSX stuff somewhere else)
+I don't really care about any of the extra details - emacs helps me out enough in other ways.
+#+BEGIN_SRC emacs-lisp
+(when window-system
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1))
+#+END_SRC
+
+Although of course if you're on OSX, at least the menu bar can be enabled since the mighty OSX top bar won't ever disappear.
+And I've also added other OSX-specific stuff here... For now.
+#+BEGIN_SRC emacs-lisp
+(when (memq window-system '(mac ns))
+  (exec-path-from-shell-initialize)
+  (setq ns-use-srgb-colorspace t)
+  (menu-bar-mode t))
+#+END_SRC
+*** Interacting with text
+**** Redefine kill-region and backward-kill-word
+Because ... I'm used to being in a shell, you know?
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-w") 'backward-kill-word)
+(global-set-key (kbd "C-x C-k") 'kill-region)
+#+END_SRC
+**** Move down real line by real line
+#+BEGIN_SRC emacs-lisp
+(setq line-move-visual nil)
+#+END_SRC
+**** Sentences end with a single space
+#+BEGIN_SRC emacs-lisp
+(setq sentence-end-double-space nil)
+#+END_SRC
+*** UTF-8
+#+BEGIN_SRC emacs-lisp
+;; Activate UTF-8 mode:
+(setq locale-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+
+;; 2013-12-10 IRC #Emacs
+(set-clipboard-coding-system 'utf-8)
+
+;; http://www.masteringemacs.org/articles/2012/08/09/working-coding-systems-unicode-emacs/
+;; in addition to the lines above:
+
+(set-default-coding-systems 'utf-8)
+;; backwards compatibility as default-buffer-file-coding-system
+;; is deprecated in 23.2.
+(if (boundp 'buffer-file-coding-system)
+    (setq-default buffer-file-coding-system 'utf-8)
+  (setq default-buffer-file-coding-system 'utf-8))
+;; Treat clipboard input as UTF-8 string first; compound text next, etc.
+(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+#+END_SRC
+*** Buffer management
+I like unique buffer names. Enter uniquify.
+#+BEGIN_SRC emacs-lisp
+(setq
+  uniquify-buffer-name-style 'post-forward
+  uniquify-separator ":")
+#+END_SRC
+Also, ibuffer is nicer than plain-old buffer window
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
+(setq ibuffer-default-sorting-mode 'major-mode)
+#+END_SRC
+** Calendar, dates, times
+#+BEGIN_SRC emacs-lisp
+(setq calendar-week-start-day 1) ;; Monday
+#+END_SRC
+** File system browsing (dired)
+#+BEGIN_SRC emacs-lisp
+(setq-default dired-listing-switches "-alhv")
+#+END_SRC
+** Package manglement
+I use Cask. I enjoy the declarative, Gemfile- or puppet-like approach.
+#+BEGIN_SRC emacs-lisp
+(require 'cask "~/.cask/cask.el")
+(cask-initialize)
+(require 'pallet)
+#+END_SRC
+** Interacting with emacs
+*** Interface
+I use IDO and I like it a lot. flx-ido, especially, is basically heaven.
+#+BEGIN_SRC emacs-lisp
+;; (require 'flx-ido) TODO reenable if necessary
+(ido-mode 1)
+(ido-ubiquitous 1)
+(ido-vertical-mode 1)
+(flx-ido-mode 1)
+(setq ido-use-faces nil) ;; disable ido faces to see flx highlights
+#+END_SRC emacs-lisp
+*** Fuzzy matching
+Enter smex. I like typing "plp" to get to "package-list-packages".
+#+BEGIN_SRC emacs-lisp
+(smex-initialize)
+(global-set-key (kbd "C-x C-m") 'smex)
+(global-set-key (kbd "C-x m") 'smex-major-mode-commands)
+(setq smex-auto-update t)
+#+END_SRC
+** Packages
+*** Smart mode line
+#+BEGIN_SRC emacs-lisp
+(setq sml/theme 'dark)
+(sml/setup)
+#+END_SRC
+*** Expand region
+One of the features that makes IDEA's editors awesome is the way you can expand selection. This plugin replicates the feature.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-=") 'er/expand-region)
+(global-set-key (kbd "C--") 'er/contract-region)
+#+END_SRC
+*** Wgrep-ag
+Sometimes after you've found a bunch of things, you want to edit.. Kind of a find-and-replace sort of deal, maybe?
+#+BEGIN_SRC emacs-lisp
+(autoload 'wgrep-agp-setup "wgrep-ag")
+(add-hook 'ag-mode-hook 'wgrep-ag-setup)
+#+END_SRC
+*** Guide key
+emacs is awesome. It's also crazy, crazy full-featured. This plugin lets you examine what's behind the door of a key prefix.
+#+BEGIN_SRC emacs-lisp
+(setq guide-key/guide-key-sequence
+      '("C-x r" "C-x 4" "C-h" "C-c"
+              "C-x" "C-x a" "C-x C-a" "C-x 8"
+              "C-u" "C-u C-x"
+        ))
+(guide-key-mode 1)
+#+END_SRC
+*** Snippets
+Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
+#+BEGIN_SRC emacs-lisp
+(yas-global-mode 1)
+#+END_SRC
+*** Git
+Magit for the win.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "\C-c g") 'magit-status)
+#+END_SRC
+*** Playing MUDs
+#+BEGIN_SRC emacs-lisp
+(autoload 'mu-open "mu" "Play on MUSHes and MUDs" t)
+(add-hook 'mu-connection-mode-hook 'ansi-color-for-comint-mode-on)
+(custom-set-variables
+ '(mu-worlds (quote (["Discworld" "discworld.starturtle.net" 4242 "" ""]))))
+#+END_SRC
+*** Auto completion
+#+BEGIN_SRC emacs-lisp
+(eval-after-load 'auto-complete
+  '(add-to-list 'ac-modes 'inf-ruby-mode))
+(add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable)
+
+(eval-after-load 'inf-ruby
+  '(define-key inf-ruby-mode-map (kbd "TAB") 'auto-complete))
+
+(require 'auto-complete-config)
+(ac-config-default)
+#+END_SRC emacs-lisp
 ** Emacs changes from customization system
-I don't want these changes anywhere near this file.
-Mostly I use them for the local default font settings.
-#+begin_src emacs-lisp
-(setq custom-file
-      (concat stag-init-dir "/init-custom.el"))
-#+end_src
+Mostly I use this for a machine-dependent default font settings.
+This file is .gitignored.
+
+#+BEGIN_SRC emacs-lisp
+(setq custom-file "~/.emacs.d/init-custom.el")
+#+END_SRC
+* Other stuff
+
+(require 'smartparens-config)
+
+(require 'expand-region)
+
+
+(require 'gitconfig)
+
+(require 'wgrep)
