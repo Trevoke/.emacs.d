@@ -86,3 +86,4 @@
 (depends-on "web-mode")
 (depends-on "wgrep")
 (depends-on "wgrep-ag")
+(depends-on "yasnippet")
