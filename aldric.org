@@ -119,6 +119,207 @@ Mew's config is in ~/.mew.el so you won't see it here. Nee-ner nee-ner nee-----n
 (setq op/site-main-title "Seven Steps")
 (setq op/site-sub-title "Words... words, they're all we have to go on! - Rosencrantz and Guildenstern are dead")
 #+END_SRC
+** Programming
+*** First, MY hook
+You know, just the stuff I want enabled in any code buffer.
+#+BEGIN_SRC emacs-lisp
+(defun stag-code-modes-hook ()
+  (projectile-mode)
+  (linum-mode t)
+  (smartparens-mode)
+  (auto-complete-mode)
+  (ggtags-mode)
+  (add-hook 'before-save-hook 'whitespace-cleanup)
+  (local-set-key "\C-m" 'newline-and-indent))
+#+END_SRC
+*** ctags
+#+BEGIN_SRC emacs-lisp
+(setq tags-revert-without-query t)
+(setq large-file-warning-threshold 30000000)
+(setq tags-case-fold-search nil)
+(defvar ctags-command "/usr/local/bin/ctags -R ")
+(global-set-key (kbd "<f7>") 'ctags-create-or-update-tags-table)
+(global-set-key (kbd "s-b") 'ctags-search)
+#+END_SRC
+*** C++
+#+BEGIN_SRC emacs-lisp
+(add-hook 'c++-mode-hook 'stag-code-modes-hook)
+#+END_SRC
+*** C#
+#+BEGIN_SRC emacs-lisp
+(defun stag-csharp-mode-hook ()
+  (setq c-basic-offset 4))
+
+(add-hook 'csharp-mode-hook 'stag-code-modes-hook)
+(add-hook 'csharp-mode-hook 'stag-csharp-mode-hook)
+
+#+END_SRC
+*** emacs lisp (gettin' meta in here)
+#+BEGIN_SRC emacs-lisp
+(add-hook 'lisp-mode-hook 'stag-code-modes-hook)
+(add-hook 'lisp-mode-hook 'paredit-mode)
+
+(add-hook 'emacs-lisp-mode-hook 'stag-code-modes-hook)
+(add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+
+(add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+(add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
+(add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
+#+END_SRC
+*** CSS
+#+BEGIN_SRC emacs-lisp
+(defun stag-all-css-modes ()
+  (css-mode)
+  (rainbow-mode))
+
+(add-to-list 'auto-mode-alist '("\\.css$" . stag-all-css-modes))
+(add-to-list 'auto-mode-alist '("\\.scss$" . stag-all-css-modes))
+#+END_SRC
+*** HTML
+Here are all the extensions where I want web-mode
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+#+END_SRC
+
+Also, I want to use auto-complete with the ac-html source when in web-mode
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'web-mode-ac-sources-alist
+             '("html" . (ac-source-html-attribute-value
+                         ac-source-html-tag
+                         ac-source-html-attribute)))
+#+END_SRC
+*** Javascript
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '(".js$" . js2-mode))
+(add-hook 'js2-mode-hook 'stag-code-modes-hook)
+(add-hook 'js2-mode-hook 'ac-js2-mode)
+#+END_SRC
+*** Markdown
+#+BEGIN_SRC emacs-lisp
+(add-hook 'markdown-mode-hook 'turn-on-orgtbl)
+#+END_SRC
+*** TODO Ruby (explain it all better)
+#+BEGIN_SRC emacs-lisp
+(defun stag-ruby-mode-hook ()
+  (robe-mode)
+  (ruby-refactor-mode-launch)
+  (inf-ruby-minor-mode)
+  (rvm-activate-corresponding-ruby))
+
+(add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook)
+(add-hook 'enh-ruby-mode-hook 'stag-code-modes-hook)
+(add-hook 'projectile-mode-hook 'projectile-rails-on)
+(add-to-list 'auto-mode-alist '("Guardfile" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '(".pryrc" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("Capfile" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("Gemfile" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("config.ru" . enh-ruby-mode))
+
+(require 'inf-ruby)
+(add-to-list 'inf-ruby-implementations '("pry" . "pry"))
+(setq inf-ruby-default-implementation "pry")
+(setq inf-ruby-first-prompt-pattern "^\\[[0-9]+\\] pry\\((.*)\\)> *")
+(setq inf-ruby-prompt-pattern "^\\[[0-9]+\\] pry\\((.*)\\)[>*\"'] *")
+#+END_SRC
+*** Shells
+#+BEGIN_SRC emacs-lisp
+(setq explicit-bash-args '("--noediting" "--login" "-i"))
+
+(require 'em-smart)
+
+(require 'bash-completion)
+(bash-completion-setup)
+
+(defadvice ansi-term (after advise-ansi-term-coding-system)
+    (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
+(ad-activate 'ansi-term)
+#+END_SRC
+*** Slime
+#+BEGIN_SRC emacs-lisp
+  (load (expand-file-name "~/quicklisp/slime-helper.el"))
+  ;; Replace "sbcl" with the path to your implementation
+  (setq inferior-lisp-program "clisp")
+#+END_SRC
+*** SQL
+auto-upcase SQL keywords as I type, please.
+#+BEGIN_SRC emacs-lisp
+(add-hook 'sql-mode-hook 'sqlup-mode)
+(add-hook 'sql-interactive-mode-hook 'sqlup-mode)
+#+END_SRC
+** Org-mode
+You could argue that this should be somewhere else, but heck, org-mode is a BIG part what I do with emacs...
+*** TODO Org-table to Github-flavored markdown table (Add keybinding for custom function)
+#+BEGIN_SRC emacs-lisp
+;;; orgtbl-to-gfm conversion function
+;; Usage Example:
+;;
+;; <!-- BEGIN RECEIVE ORGTBL ${1:YOUR_TABLE_NAME} -->
+;; <!-- END RECEIVE ORGTBL $1 -->
+;;
+;; <!--
+;; #+ORGTBL: SEND $1 orgtbl-to-gfm
+;; | $0 |
+;; -->
+
+(defun orgtbl-to-gfm (table params)
+  "Convert the Orgtbl mode TABLE to GitHub Flavored Markdown."
+  (let* ((alignment (mapconcat (lambda (x) (if x "|--:" "|---"))
+                               org-table-last-alignment ""))
+         (params2
+          (list
+           :splice t
+           :hline (concat alignment "|")
+           :lstart "| " :lend " |" :sep " | ")))
+    (orgtbl-to-generic table (org-combine-plists params2 params))))
+
+(defun stag-insert-org-to-md-table (table-name)
+  (interactive "*sEnter table name: ")
+  (insert "<!---
+#+ORGTBL: SEND " table-name " orgtbl-to-gfm
+
+-->
+<!--- BEGIN RECEIVE ORGTBL " table-name " -->
+<!--- END RECEIVE ORGTBL " table-name " -->")
+  (previous-line)
+  (previous-line)
+  (previous-line))
+
+#+END_SRC
+*** TODO Other stuff (break it down, explain it more)
+#+BEGIN_SRC emacs-lisp
+(setq org-src-fontify-natively t)
+(add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
+
+(setq org-directory "~/Google Drive/notes")
+(setq org-default-notes-file (concat org-directory "/notes.org.txt"))
+(define-key global-map "\C-cc" 'org-capture)
+
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cb" 'org-iswitchb)
+
+(setq org-startup-indented t)
+(setq org-log-done 'time)
+
+(setq org-todo-keywords '( "TODO(t)" "WAIT(w!)" "|" "DONE" "CANCELED(c!)"))
+(setq org-tag-alist '(("@home" . ?h) ("@work" . ?w) ("family") ("wdi") ("strategy")  ("weiqi") ("ruby") ("lisp") ("emacs")))
+
+(setq org-mobile-directory "~/Dropbox/orgnotes")
+(setq org-mobile-inbox-for-pull "~/Google Drive/notes/from-mobile.org")
+#+END_SRC
+*** Left mouse-click to org-cycle, too
+What? My hands aren't ALWAYS on the keyboard.
+#+BEGIN_SRC emacs-lisp
+(defun stag-click-to-cycle-org-visibility ()
+  (local-set-key [mouse-1] 'org-cycle))
+(add-hook 'org-mode-hook 'stag-click-to-cycle-org-visibility)
+#+END_SRC
 ** General emacs config (no external packages)
 *** Yes/No => y/n
 #+BEGIN_SRC emacs-lisp
@@ -323,201 +524,4 @@ The world begins with this function I found online somewhere. Before I kept trac
   (let ((face (or (get-char-property pos 'read-face-name)
                   (get-char-property pos 'face))))
     (if face (message "Face: %s" face) (message "No face at %d" pos))))
-#+END_SRC
-** Org-mode
-You could argue that this should be somewhere else, but heck, org-mode is a BIG part what I do with emacs...
-*** TODO Org-table to Github-flavored markdown table (Add keybinding for custom function)
-#+BEGIN_SRC emacs-lisp
-;;; orgtbl-to-gfm conversion function
-;; Usage Example:
-;;
-;; <!-- BEGIN RECEIVE ORGTBL ${1:YOUR_TABLE_NAME} -->
-;; <!-- END RECEIVE ORGTBL $1 -->
-;;
-;; <!--
-;; #+ORGTBL: SEND $1 orgtbl-to-gfm
-;; | $0 |
-;; -->
-
-(defun orgtbl-to-gfm (table params)
-  "Convert the Orgtbl mode TABLE to GitHub Flavored Markdown."
-  (let* ((alignment (mapconcat (lambda (x) (if x "|--:" "|---"))
-                               org-table-last-alignment ""))
-         (params2
-          (list
-           :splice t
-           :hline (concat alignment "|")
-           :lstart "| " :lend " |" :sep " | ")))
-    (orgtbl-to-generic table (org-combine-plists params2 params))))
-
-(defun stag-insert-org-to-md-table (table-name)
-  (interactive "*sEnter table name: ")
-  (insert "<!---
-#+ORGTBL: SEND " table-name " orgtbl-to-gfm
-
--->
-<!--- BEGIN RECEIVE ORGTBL " table-name " -->
-<!--- END RECEIVE ORGTBL " table-name " -->")
-  (previous-line)
-  (previous-line)
-  (previous-line))
-
-#+END_SRC
-*** TODO Other stuff (break it down, explain it more)
-#+BEGIN_SRC emacs-lisp
-(setq org-src-fontify-natively t)
-(add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
-
-(setq org-directory "~/Google Drive/notes")
-(setq org-default-notes-file (concat org-directory "/notes.org.txt"))
-(define-key global-map "\C-cc" 'org-capture)
-
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cb" 'org-iswitchb)
-
-(setq org-startup-indented t)
-(setq org-log-done 'time)
-
-(setq org-todo-keywords '( "TODO(t)" "WAIT(w!)" "|" "DONE" "CANCELED(c!)"))
-(setq org-tag-alist '(("@home" . ?h) ("@work" . ?w) ("family") ("wdi") ("strategy")  ("weiqi") ("ruby") ("lisp") ("emacs")))
-
-(setq org-mobile-directory "~/Dropbox/orgnotes")
-(setq org-mobile-inbox-for-pull "~/Google Drive/notes/from-mobile.org")
-#+END_SRC
-*** Left mouse-click to org-cycle, too
-What? My hands aren't ALWAYS on the keyboard.
-#+BEGIN_SRC emacs-lisp
-(defun stag-click-to-cycle-org-visibility ()
-  (local-set-key [mouse-1] 'org-cycle))
-(add-hook 'org-mode-hook 'stag-click-to-cycle-org-visibility)
-#+END_SRC
-** Programming
-*** First, MY hook
-You know, just the stuff I want enabled in any code buffer.
-#+BEGIN_SRC emacs-lisp
-(defun stag-code-modes-hook ()
-  (projectile-mode)
-  (linum-mode t)
-  (smartparens-mode)
-  (auto-complete-mode)
-  (ggtags-mode)
-  (add-hook 'before-save-hook 'whitespace-cleanup)
-  (local-set-key "\C-m" 'newline-and-indent))
-#+END_SRC
-*** ctags
-#+BEGIN_SRC emacs-lisp
-(setq tags-revert-without-query t)
-(setq large-file-warning-threshold 30000000)
-(setq tags-case-fold-search nil)
-(defvar ctags-command "/usr/local/bin/ctags -R ")
-(global-set-key (kbd "<f7>") 'ctags-create-or-update-tags-table)
-(global-set-key (kbd "s-b") 'ctags-search)
-#+END_SRC
-*** C#
-#+BEGIN_SRC emacs-lisp
-(defun stag-csharp-mode-hook ()
-  (setq c-basic-offset 4))
-
-(add-hook 'csharp-mode-hook 'stag-code-modes-hook)
-(add-hook 'csharp-mode-hook 'stag-csharp-mode-hook)
-
-#+END_SRC
-*** emacs lisp (gettin' meta in here)
-#+BEGIN_SRC emacs-lisp
-(add-hook 'lisp-mode-hook 'stag-code-modes-hook)
-(add-hook 'lisp-mode-hook 'paredit-mode)
-
-(add-hook 'emacs-lisp-mode-hook 'stag-code-modes-hook)
-(add-hook 'emacs-lisp-mode-hook 'paredit-mode)
-
-(add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
-(add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
-(add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
-#+END_SRC
-*** CSS
-#+BEGIN_SRC emacs-lisp
-(defun stag-all-css-modes ()
-  (css-mode)
-  (rainbow-mode))
-
-(add-to-list 'auto-mode-alist '("\\.css$" . stag-all-css-modes))
-(add-to-list 'auto-mode-alist '("\\.scss$" . stag-all-css-modes))
-#+END_SRC
-*** HTML
-Here are all the extensions where I want web-mode
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-#+END_SRC
-
-Also, I want to use auto-complete with the ac-html source when in web-mode
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'web-mode-ac-sources-alist
-             '("html" . (ac-source-html-attribute-value
-                         ac-source-html-tag
-                         ac-source-html-attribute)))
-#+END_SRC
-*** Javascript
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '(".js$" . js2-mode))
-(add-hook 'js2-mode-hook 'stag-code-modes-hook)
-(add-hook 'js2-mode-hook 'ac-js2-mode)
-#+END_SRC
-*** Markdown
-#+BEGIN_SRC emacs-lisp
-(add-hook 'markdown-mode-hook 'turn-on-orgtbl)
-#+END_SRC
-*** TODO Ruby (explain it all better)
-#+BEGIN_SRC emacs-lisp
-(defun stag-ruby-mode-hook ()
-  (robe-mode)
-  (ruby-refactor-mode-launch)
-  (inf-ruby-minor-mode)
-  (rvm-activate-corresponding-ruby))
-
-(add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook)
-(add-hook 'enh-ruby-mode-hook 'stag-code-modes-hook)
-(add-hook 'projectile-mode-hook 'projectile-rails-on)
-(add-to-list 'auto-mode-alist '("Guardfile" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '(".pryrc" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '("Capfile" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '("Gemfile" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '("config.ru" . enh-ruby-mode))
-
-(require 'inf-ruby)
-(add-to-list 'inf-ruby-implementations '("pry" . "pry"))
-(setq inf-ruby-default-implementation "pry")
-(setq inf-ruby-first-prompt-pattern "^\\[[0-9]+\\] pry\\((.*)\\)> *")
-(setq inf-ruby-prompt-pattern "^\\[[0-9]+\\] pry\\((.*)\\)[>*\"'] *")
-#+END_SRC
-*** Shells
-#+BEGIN_SRC emacs-lisp
-(setq explicit-bash-args '("--noediting" "--login" "-i"))
-
-(require 'em-smart)
-
-(require 'bash-completion)
-(bash-completion-setup)
-
-(defadvice ansi-term (after advise-ansi-term-coding-system)
-    (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
-(ad-activate 'ansi-term)
-#+END_SRC
-*** Slime
-#+BEGIN_SRC emacs-lisp
-  (load (expand-file-name "~/quicklisp/slime-helper.el"))
-  ;; Replace "sbcl" with the path to your implementation
-  (setq inferior-lisp-program "clisp")
-#+END_SRC
-*** SQL
-auto-upcase SQL keywords as I type, please.
-#+BEGIN_SRC emacs-lisp
-(add-hook 'sql-mode-hook 'sqlup-mode)
-(add-hook 'sql-interactive-mode-hook 'sqlup-mode)
 #+END_SRC
