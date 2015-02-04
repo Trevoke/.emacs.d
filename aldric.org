@@ -397,7 +397,10 @@ What? My hands aren't ALWAYS on the keyboard.
 You know, just the stuff I want enabled in any code buffer.
 #+BEGIN_SRC emacs-lisp
 (defun stag-code-modes-hook ()
+  (projectile-mode)
   (linum-mode t)
+  (smartparens-mode)
+  (auto-complete-mode)
   (ggtags-mode)
   (add-hook 'before-save-hook 'whitespace-cleanup)
   (local-set-key "\C-m" 'newline-and-indent))
@@ -442,8 +445,8 @@ You know, just the stuff I want enabled in any code buffer.
 (add-to-list 'auto-mode-alist '("\\.scss$" . stag-all-css-modes))
 #+END_SRC
 *** HTML
+Here are all the extensions where I want web-mode
 #+BEGIN_SRC emacs-lisp
-;; (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
@@ -452,10 +455,19 @@ You know, just the stuff I want enabled in any code buffer.
 (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 #+END_SRC
+
+Also, I want to use auto-complete with the ac-html source when in web-mode
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'web-mode-ac-sources-alist
+             '("html" . (ac-source-html-attribute-value
+                         ac-source-html-tag
+                         ac-source-html-attribute)))
+#+END_SRC
 *** Javascript
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '(".js$" . js2-mode))
 (add-hook 'js2-mode-hook 'stag-code-modes-hook)
+(add-hook 'js2-mode-hook 'ac-js2-mode)
 #+END_SRC
 *** Markdown
 #+BEGIN_SRC emacs-lisp
@@ -464,11 +476,8 @@ You know, just the stuff I want enabled in any code buffer.
 *** TODO Ruby (explain it all better)
 #+BEGIN_SRC emacs-lisp
 (defun stag-ruby-mode-hook ()
-  (projectile-mode)
   (robe-mode)
   (ruby-refactor-mode-launch)
-  (smartparens-mode)
-  (auto-complete-mode)
   (inf-ruby-minor-mode)
   (rvm-activate-corresponding-ruby))
 
