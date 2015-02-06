@@ -38,6 +38,7 @@ I use Cask. I enjoy the declarative, Gemfile- or puppet-like approach.
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
 (require 'pallet)
+(pallet-mode t)
 #+END_SRC
 ** Packages
 *** Smart mode line
@@ -218,7 +219,7 @@ Also, I want to use auto-complete with the ac-html source when in web-mode
   (robe-mode)
   (ruby-refactor-mode-launch)
   (inf-ruby-minor-mode)
-  (rvm-activate-corresponding-ruby))
+  (rbenv-use-corresponding))
 
 (add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook)
 (add-hook 'enh-ruby-mode-hook 'stag-code-modes-hook)
