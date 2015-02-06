@@ -25,6 +25,13 @@ API keys, passwords, etc are kept in here. This file is .gitignored.
 #+BEGIN_SRC emacs-lisp
 (load "~/.emacs.d/emacs.secrets" t)
 #+END_SRC
+** Customizations from customization system
+Keeping these separate makes life easier: they get modified when I load a theme and such, and I don't need that kind of hassle when maintaining my actual configuration, you know?
+In addition, I do keep some somewhat computer-specific stuff in there, like the font, and it's just easier to have this separated there.
+#+BEGIN_SRC emacs-lisp
+(setq custom-file "~/.emacs-custom.el")
+(load custom-file)
+#+END_SRC
 ** Package manglement
 I use Cask. I enjoy the declarative, Gemfile- or puppet-like approach.
 #+BEGIN_SRC emacs-lisp
@@ -189,6 +196,7 @@ Here are all the extensions where I want web-mode
 
 Also, I want to use auto-complete with the ac-html source when in web-mode
 #+BEGIN_SRC emacs-lisp
+(require 'web-mode)
 (add-to-list 'web-mode-ac-sources-alist
              '("html" . (ac-source-html-attribute-value
                          ac-source-html-tag
@@ -313,6 +321,7 @@ You could argue that this should be somewhere else, but heck, org-mode is a BIG 
 (setq org-mobile-directory "~/Dropbox/orgnotes")
 (setq org-mobile-inbox-for-pull "~/Google Drive/notes/from-mobile.org")
 #+END_SRC
+
 *** Left mouse-click to org-cycle, too
 What? My hands aren't ALWAYS on the keyboard.
 #+BEGIN_SRC emacs-lisp
