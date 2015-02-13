@@ -140,14 +140,11 @@ You know, just the stuff I want enabled in any code buffer.
   (add-hook 'before-save-hook 'whitespace-cleanup)
   (local-set-key "\C-m" 'newline-and-indent))
 #+END_SRC
-*** ctags
+*** ggtags
+This is the ggtags plugin, which uses GNU Global.
 #+BEGIN_SRC emacs-lisp
-(setq tags-revert-without-query t)
-(setq large-file-warning-threshold 30000000)
 (setq tags-case-fold-search nil)
-(defvar ctags-command "/usr/local/bin/ctags -R ")
-(global-set-key (kbd "<f7>") 'ctags-create-or-update-tags-table)
-(global-set-key (kbd "s-b") 'ctags-search)
+(global-set-key (kbd "<f7>") 'ggtags-create-tags)
 #+END_SRC
 *** C++
 #+BEGIN_SRC emacs-lisp
@@ -216,7 +213,6 @@ Also, I want to use auto-complete with the ac-html source when in web-mode
 *** TODO Ruby (explain it all better)
 #+BEGIN_SRC emacs-lisp
 (defun stag-ruby-mode-hook ()
-  (robe-mode)
   (ruby-refactor-mode-launch)
   (inf-ruby-minor-mode)
   (rbenv-use-corresponding))
