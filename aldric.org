@@ -78,6 +78,12 @@ Magit for the win.
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "\C-c g") 'magit-status)
 #+END_SRC
+*** Default text scale
+This handy little package increases the size of the font in the whole frame.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-x C-=") 'default-text-scale-increase)
+(global-set-key (kbd "C-x C--") 'default-text-scale-decrease)
+#+END_SRC
 *** Playing MUDs
 #+BEGIN_SRC emacs-lisp
 (autoload 'mu-open "mu" "Play on MUSHes and MUDs" t)

@@ -25,6 +25,7 @@
 (depends-on "d-mode")
 (depends-on "darcula-theme")
 (depends-on "dash")
+(depends-on "default-text-scale")
 (depends-on "discover")
 (depends-on "ecukes")
 (depends-on "emmet-mode")
