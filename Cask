@@ -87,6 +87,7 @@
 (depends-on "railscasts-theme")
 (depends-on "rainbow-mode")
 (depends-on "rbenv")
+(depends-on "rich-minority")
 (depends-on "robe")
 (depends-on "rspec-mode")
 (depends-on "ruby-hash-syntax")
