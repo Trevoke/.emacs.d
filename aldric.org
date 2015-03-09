@@ -222,7 +222,8 @@ Also, I want to use auto-complete with the ac-html source when in web-mode
   (ruby-refactor-mode-launch)
   (inf-ruby-minor-mode)
   (rbenv-use-corresponding))
-
+(add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
+(add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 (add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook)
 (add-hook 'enh-ruby-mode-hook 'stag-code-modes-hook)
 (add-hook 'projectile-mode-hook 'projectile-rails-on)
@@ -264,7 +265,7 @@ auto-upcase SQL keywords as I type, please.
 (add-hook 'sql-interactive-mode-hook 'sqlup-mode)
 #+END_SRC
 ** Org-mode
-You could argue that this should be somewhere else, but heck, org-mode is a BIG part what I do with emacs...
+You could argue that this should be somewhere else, but heck, org-mode is a BIG part of what I do with emacs...
 *** TODO Org-table to Github-flavored markdown table (Add keybinding for custom function)
 #+BEGIN_SRC emacs-lisp
 ;;; orgtbl-to-gfm conversion function
@@ -318,7 +319,7 @@ You could argue that this should be somewhere else, but heck, org-mode is a BIG 
 (setq org-startup-indented t)
 (setq org-log-done 'time)
 
-(setq org-todo-keywords '( "TODO(t)" "WAIT(w!)" "|" "DONE" "CANCELED(c!)"))
+(setq org-todo-keywords '( "TODO(t)" "WAIT(w)" "|" "DONE" "CANCELED(c)"))
 (setq org-tag-alist '(("@home" . ?h) ("@work" . ?w) ("family") ("wdi") ("strategy")  ("weiqi") ("ruby") ("lisp") ("emacs")))
 
 (setq org-mobile-directory "~/Dropbox/orgnotes")
