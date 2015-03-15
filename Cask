@@ -70,6 +70,7 @@
 (depends-on "org-beautify-theme")
 (depends-on "org-mac-link")
 (depends-on "org-page")
+(depends-on "ox-ioslide")
 (depends-on "package-build")
 (depends-on "pallet")
 (depends-on "paradox")
@@ -105,4 +106,5 @@
 (depends-on "web-mode")
 (depends-on "wgrep")
 (depends-on "wgrep-ag")
+(depends-on "yaml-mode")
 (depends-on "yasnippet")
