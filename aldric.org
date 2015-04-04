@@ -2,9 +2,9 @@
 #+OPTIONS: toc:4 h:4
 
 * Configuration
-** TODO About (actually put text in here)
+** About (actually put text in here)
 <<babel-init>>
-Some text belongs here
+I came to emacs after vim and Rubymine. I love how it's all buffers.
 ** Personal information
 #+BEGIN_SRC emacs-lisp
 (setq user-full-name "Aldric Giacomoni"
@@ -49,8 +49,14 @@ I use Cask. I enjoy the declarative, Gemfile- or puppet-like approach.
 *** Expand region
 One of the features that makes IDEA's editors awesome is the way you can expand selection. This plugin replicates the feature.
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-=") 'er/expand-region)
-(global-set-key (kbd "C--") 'er/contract-region)
+(global-set-key (kbd "C-c <up>") 'er/expand-region)
+(global-set-key (kbd "C-c <down>") 'er/contract-region)
+#+END_SRC
+*** projectile-mode
+#+BEGIN_SRC emacs-lisp
+(require 'projectile)
+(projectile-global-mode)
+(setq projectile-completion-system 'grizzl)
 #+END_SRC
 *** Wgrep-ag
 Sometimes after you've found a bunch of things, you want to edit.. Kind of a find-and-replace sort of deal, maybe?
@@ -63,10 +69,15 @@ emacs is awesome. It's also crazy, crazy full-featured. This plugin lets you exa
 #+BEGIN_SRC emacs-lisp
 (setq guide-key/guide-key-sequence
       '("C-x r" "C-x 4" "C-h" "C-c"
-              "C-x" "C-x a" "C-x C-a" "C-x 8"
-              "C-u" "C-u C-x"
-        ))
+              "C-x" "C-x a" "C-x C-a"
+              "C-x 8" "C-x 8 \"  " "C-x 8 '" "C-x 8 ~"
+              "C-u" "C-u C-x"))
 (guide-key-mode 1)
+#+END_SRC
+*** Discover
+On the topic of discovering emacs.. Discover.el is amazing.
+#+BEGIN_SRC emacs-lisp
+(global-discover-mode 1)
 #+END_SRC
 *** Snippets
 Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
@@ -143,8 +154,14 @@ You know, just the stuff I want enabled in any code buffer.
   (smartparens-mode)
   (auto-complete-mode)
   (ggtags-mode)
+  (eldoc-mode)
+  (hs-minor-mode 1)
   (add-hook 'before-save-hook 'whitespace-cleanup)
   (local-set-key "\C-m" 'newline-and-indent))
+#+END_SRC
+*** Log files
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-mode))
 #+END_SRC
 *** ggtags
 This is the ggtags plugin, which uses GNU Global.
@@ -206,6 +223,13 @@ Also, I want to use auto-complete with the ac-html source when in web-mode
                          ac-source-html-tag
                          ac-source-html-attribute)))
 #+END_SRC
+(setq web-mode-markup-indent-offset 4)
+(setq web-mode-css-indent-offset 4)
+(setq web-mode-code-indent-offset 4)
+(setq web-mode-indent-style 4)
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
 *** Javascript
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '(".js$" . js2-mode))
@@ -216,28 +240,52 @@ Also, I want to use auto-complete with the ac-html source when in web-mode
 #+BEGIN_SRC emacs-lisp
 (add-hook 'markdown-mode-hook 'turn-on-orgtbl)
 #+END_SRC
-*** TODO Ruby (explain it all better)
+*** Ruby (explain it all better)
+There's a few extra things I want started when I open a Ruby buffer
 #+BEGIN_SRC emacs-lisp
 (defun stag-ruby-mode-hook ()
   (ruby-refactor-mode-launch)
   (inf-ruby-minor-mode)
+  (modify-syntax-entry ?: ".") ;; Adds ":" to the word definition
   (rbenv-use-corresponding))
-(add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
-(add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
-(add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook)
 (add-hook 'enh-ruby-mode-hook 'stag-code-modes-hook)
-(add-hook 'projectile-mode-hook 'projectile-rails-on)
-(add-to-list 'auto-mode-alist '("Guardfile" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '(".pryrc" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '("Capfile" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '("Gemfile" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '("config.ru" . enh-ruby-mode))
+(add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook)
+#+END_SRC
 
+And I like projectile-rails.
+#+BEGIN_SRC emacs-lisp
+(add-hook 'projectile-mode-hook 'projectile-rails-on)
+#+END_SRC
+
+What counts as a ruby buffer anyway? I like enh-ruby-mode better.
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
+
+(add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("Guardfile" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("\\.rake$" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("\\.pryrc$" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("Rakefile$" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("Capfile$" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("Gemfile$" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("\\.ru$" . enh-ruby-mode))
+#+END_SRC
+
+And I like pry better than irb, so have inf-ruby use pry.
+#+BEGIN_SRC emacs-lisp
 (require 'inf-ruby)
 (add-to-list 'inf-ruby-implementations '("pry" . "pry"))
 (setq inf-ruby-default-implementation "pry")
 (setq inf-ruby-first-prompt-pattern "^\\[[0-9]+\\] pry\\((.*)\\)> *")
 (setq inf-ruby-prompt-pattern "^\\[[0-9]+\\] pry\\((.*)\\)[>*\"'] *")
+#+END_SRC
+
+Emacs has a folding package called "hideshow", "hs" for short.
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'hs-special-modes-alist
+             '(enh-ruby-mode
+               "\\(class\\|def\\|do\\|if\\)" "\\(end\\)" "#"
+               (lambda (arg) (ruby-end-of-block)) nil))
 #+END_SRC
 *** Shells
 #+BEGIN_SRC emacs-lisp
@@ -348,6 +396,13 @@ What? My hands aren't ALWAYS on the keyboard.
 (setq column-number-mode t)
 (setq ring-bell-function 'ignore)
 (setq visible-bell t)
+(setq system-uses-terminfo nil)
+#+END_SRC
+
+This shows the file path in the GUI header
+#+BEGIN_SRC emacs-lisp
+(setq-default frame-title-format '((:eval (if (buffer-file-name)
+                                              (abbreviate-file-name (buffer-file-name)) "%f"))))
 #+END_SRC
 *** Backups
 Centralize emacs backups.
@@ -464,6 +519,7 @@ Because ... I'm used to being in a shell, you know?
 *** Buffer management
 I like unique buffer names. Enter uniquify.
 #+BEGIN_SRC emacs-lisp
+(require 'uniquify)
 (setq
   uniquify-buffer-name-style 'post-forward
   uniquify-separator ":")
@@ -493,6 +549,11 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
 (global-set-key (kbd "C-x 2") 'stag-vsplit-last-buffer)
 (global-set-key (kbd "C-x 3") 'stag-hsplit-last-buffer)
 #+END_SRC
+*** Scrolling
+#+BEGIN_SRC emacs-lisp
+(setq scroll-margin 5
+      scroll-preserve-screen-position 1)
+#+END_SRC
 ** Calendar, dates, times
 #+BEGIN_SRC emacs-lisp
 (setq calendar-week-start-day 1) ;; Monday
@@ -510,6 +571,29 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
 ** File system browsing (dired)
 #+BEGIN_SRC emacs-lisp
 (setq-default dired-listing-switches "-alhv")
+
+;; Auto-refresh silently
+(setq global-auto-revert-non-file-buffers t)
+(setq auto-revert-verbose nil)
+#+END_SRC
+
+It's also nice to have dired with M-< and M-> take you to first and last file
+#+BEGIN_SRC emacs-lisp
+(defun dired-back-to-top ()
+  (interactive)
+  (beginning-of-buffer)
+  (next-line 2))
+
+(define-key dired-mode-map
+  (vector 'remap 'beginning-of-buffer) 'dired-back-to-top)
+
+(defun dired-jump-to-bottom ()
+  (interactive)
+  (end-of-buffer)
+  (next-line -1))
+
+(define-key dired-mode-map
+  (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
 #+END_SRC
 ** Interacting with emacs
 *** Interface
@@ -519,7 +603,8 @@ I use IDO and I like it a lot. flx-ido, especially, is basically heaven.
 (ido-ubiquitous 1)
 (ido-vertical-mode 1)
 (flx-ido-mode 1)
-(setq ido-use-faces nil)
+(setq ido-use-faces t)
+(add-to-list 'ido-ignore-files "\\.DS_Store")
 #+END_SRC
 *** Fuzzy matching
 Enter smex. I like typing "plp" to get to "package-list-packages".
