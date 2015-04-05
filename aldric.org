@@ -287,6 +287,12 @@ Emacs has a folding package called "hideshow", "hs" for short.
                "\\(class\\|def\\|do\\|if\\)" "\\(end\\)" "#"
                (lambda (arg) (ruby-end-of-block)) nil))
 #+END_SRC
+*** Rust
+#+BEGIN_SRC emacs-lisp
+(add-hook 'rust-mode-hook 'stag-code-modes-hook)
+(add-hook 'rust-mode-hook 'flycheck-mode)
+(add-hook 'rust-mode-hook 'flymake-mode)
+#+END_SRC
 *** Shells
 #+BEGIN_SRC emacs-lisp
 (setq explicit-bash-args '("--noediting" "--login" "-i"))
