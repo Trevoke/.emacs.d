@@ -585,6 +585,7 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
 
 It's also nice to have dired with M-< and M-> take you to first and last file
 #+BEGIN_SRC emacs-lisp
+(require 'dired)
 (defun dired-back-to-top ()
   (interactive)
   (beginning-of-buffer)
