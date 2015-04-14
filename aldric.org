@@ -2,6 +2,18 @@
 #+OPTIONS: toc:4 h:4
 
 * Configuration
+** TODO new organization
+I should set up this file in a more goal-oriented manner.
+
+There is the dependency of setting up the package manager (which maybe one day I'll remove entirely, but right now Cask+pallet is too damn nice).
+
+After that, I want something like:
+
+*** Navigating code
+*** Navigating filesystem
+*** Taking notes
+*** Generating content
+*** Uncategorized (which will have things like calendar and such
 ** About (actually put text in here)
 <<babel-init>>
 I came to emacs after vim and Rubymine. I love how it's all buffers.
