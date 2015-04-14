@@ -41,6 +41,12 @@ I use Cask. I enjoy the declarative, Gemfile- or puppet-like approach.
 (pallet-mode t)
 #+END_SRC
 ** Packages
+*** Anzu (about search results)
+#+BEGIN_SRC emacs-lisp
+(global-anzu-mode t)
+(global-set-key (kbd "M-%") 'anzu-query-replace)
+(global-set-key (kbd "C-M-%") 'anzu-query-replace-regexp)
+#+END_SRC
 *** Smart mode line
 #+BEGIN_SRC emacs-lisp
 (setq sml/theme 'dark)
@@ -155,7 +161,7 @@ You know, just the stuff I want enabled in any code buffer.
   (auto-complete-mode)
   (ggtags-mode)
   (eldoc-mode)
-  (hs-minor-mode 1)
+  (hs-minor-mode t)
   (add-hook 'before-save-hook 'whitespace-cleanup)
   (local-set-key "\C-m" 'newline-and-indent))
 #+END_SRC
@@ -317,6 +323,14 @@ auto-upcase SQL keywords as I type, please.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'sql-mode-hook 'sqlup-mode)
 (add-hook 'sql-interactive-mode-hook 'sqlup-mode)
+#+END_SRC
+*** Whitespace
+#+BEGIN_SRC emacs-lisp
+(require 'whitespace)
+(setq whitespace-line-column 80) ;; limit line length
+(setq whitespace-style '(face trailing tabs lines-tail))
+(setq whitespace-global-modes '(not org-mode web-mode "Web"))
+(global-whitespace-mode)
 #+END_SRC
 ** Org-mode
 You could argue that this should be somewhere else, but heck, org-mode is a BIG part of what I do with emacs...
@@ -575,6 +589,10 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
 (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
 #+END_SRC
 ** File system browsing (dired)
+dired-jump is awesome
+#+BEGIN_SRC emacs-lisp
+(require 'dired-x)
+#+END_SRC
 #+BEGIN_SRC emacs-lisp
 (setq-default dired-listing-switches "-alhv")
 
