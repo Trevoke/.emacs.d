@@ -640,8 +640,16 @@ I use IDO and I like it a lot. flx-ido, especially, is basically heaven.
 (ido-ubiquitous 1)
 (ido-vertical-mode 1)
 (flx-ido-mode 1)
-(setq ido-use-faces t)
 (add-to-list 'ido-ignore-files "\\.DS_Store")
+(setq ido-use-faces t
+      ido-enable-prefix nil
+      ido-enable-flex-matching t
+      ido-case-fold t ;; ignore case
+      ido-create-new-buffer 'always ;; easily create files
+      ido-use-filename-at-point nil ;; don't try to be smart
+)
+
+(setq ido-auto-merge-delay-time 7) ;; Default: 0.7
 #+END_SRC
 *** Fuzzy matching
 Enter smex. I like typing "plp" to get to "package-list-packages".
