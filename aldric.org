@@ -270,7 +270,7 @@ There's a few extra things I want started when I open a Ruby buffer
 (add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook)
 #+END_SRC
 
-And I like projectile-rails.
+And I like projectile-rails to handle rails projects.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'projectile-mode-hook 'projectile-rails-on)
 #+END_SRC
@@ -298,13 +298,7 @@ And I like pry better than irb, so have inf-ruby use pry.
 (setq inf-ruby-prompt-pattern "^\\[[0-9]+\\] pry\\((.*)\\)[>*\"'] *")
 #+END_SRC
 
-Emacs has a folding package called "hideshow", "hs" for short.
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'hs-special-modes-alist
-             '(enh-ruby-mode
-               "\\(class\\|def\\|do\\|if\\)" "\\(end\\)" "#"
-               (lambda (arg) (ruby-end-of-block)) nil))
-#+END_SRC
+I use yasnippets, and I've downloaded a collection of snippets from here: https://github.com/bmaland/yasnippet-ruby-mode
 *** Rust
 #+BEGIN_SRC emacs-lisp
 (add-hook 'rust-mode-hook 'stag-code-modes-hook)
