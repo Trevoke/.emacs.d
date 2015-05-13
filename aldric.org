@@ -594,6 +594,36 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
 (add-hook 'diary-display-hook 'diary-fancy-display)
 (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
 #+END_SRC
+*** calfw, the calendar framework
+#+BEGIN_SRC emacs-lisp
+(require 'calfw)
+(require 'calfw-cal)
+(require 'calfw-ical)
+(require 'calfw-org)
+
+(setq cfw:fchar-junction ?╋
+      cfw:fchar-vertical-line ?┃
+      cfw:fchar-horizontal-line ?━
+      cfw:fchar-left-junction ?┣
+      cfw:fchar-right-junction ?┫
+      cfw:fchar-top-junction ?┯
+      cfw:fchar-top-left-corner ?┏
+      cfw:fchar-top-right-corner ?┓)
+#+END_SRC
+
+Here is a sample function where you could, for instance, put your Google Calendar information (mostly so I remember how to create the secret file on a new computer).
+
+#+BEGIN_QUOTE
+(defun stag-calendar ()
+  (interactive)
+  (cfw:open-calendar-buffer
+   :contents-sources
+   (list
+    (cfw:org-create-source "Green")
+    (cfw:cal-create-source "Orange")
+    (cfw:ical-create-source "gcal" "gcal-ics-link" "Blue")
+    )))
+#+END_QUOTE
 ** File system browsing (dired)
 dired-jump is awesome
 #+BEGIN_SRC emacs-lisp
