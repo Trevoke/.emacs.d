@@ -106,6 +106,7 @@ Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes
 Magit for the win.
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "\C-c g") 'magit-status)
+(setq magit-last-seen-setup-instructions "1.4.0") ;; magit auto-reverts unmodified buffers
 #+END_SRC
 *** Default text scale
 This handy little package increases the size of the font in the whole frame.
