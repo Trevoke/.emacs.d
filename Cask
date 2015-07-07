@@ -58,6 +58,7 @@
 (depends-on "grizzl")
 (depends-on "guide-key")
 (depends-on "haml-mode")
+(depends-on "heroku")
 (depends-on "highlight-numbers")
 (depends-on "ido-completing-read+")
 (depends-on "ido-ubiquitous")
