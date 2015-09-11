@@ -163,6 +163,10 @@ Mew's config is in ~/.mew.el so you won't see it here. Nee-ner nee-ner nee-----n
 (setq op/site-main-title "Seven Steps")
 (setq op/site-sub-title "Words... words, they're all we have to go on! - Rosencrantz and Guildenstern are dead")
 #+END_SRC
+*** org-reveal (presentations)
+#+BEGIN_SRC emacs-lisp
+(setq org-reveal-root "file:///users/a206468627/src/vendor/reveal.js")
+#+END_SRC
 ** Programming
 *** First, MY hook
 You know, just the stuff I want enabled in any code buffer.
@@ -254,6 +258,8 @@ Also, I want to use auto-complete with the ac-html source when in web-mode
 (add-to-list 'auto-mode-alist '(".js$" . js2-mode))
 (add-hook 'js2-mode-hook 'stag-code-modes-hook)
 (add-hook 'js2-mode-hook 'ac-js2-mode)
+
+(add-to-list 'auto-mode-alist '(".jsx$" . jsx-mode))
 #+END_SRC
 *** Markdown
 #+BEGIN_SRC emacs-lisp
@@ -321,9 +327,9 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 #+END_SRC
 *** Slime
 #+BEGIN_SRC emacs-lisp
-  (load (expand-file-name "~/quicklisp/slime-helper.el"))
-  ;; Replace "sbcl" with the path to your implementation
-  (setq inferior-lisp-program "clisp")
+  ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
+  ;; ;; Replace "sbcl" with the path to your implementation
+  ;; (setq inferior-lisp-program "clisp")
 #+END_SRC
 *** SQL
 auto-upcase SQL keywords as I type, please.
