@@ -52,6 +52,13 @@ I use Cask. I enjoy the declarative, Gemfile- or puppet-like approach.
 (require 'pallet)
 (pallet-mode t)
 #+END_SRC
+** Writing
+*** Olivetti - writing minor mode
+#+BEGIN_SRC emacs-lisp
+(setq olivetti-body-width 80)
+(add-hook 'org-mode-hook 'turn-on-olivetti-mode)
+(add-hook 'text-mode-hook 'turn-on-olivetti-mode)
+#+END_SRC
 ** Packages
 *** Anzu (about search results)
 #+BEGIN_SRC emacs-lisp
@@ -345,9 +352,15 @@ auto-upcase SQL keywords as I type, please.
 (setq whitespace-global-modes '(not org-mode web-mode "Web"))
 (global-whitespace-mode)
 #+END_SRC
+*
+** Eshell
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'eshell-preoutput-filter-functions
+               #'eshell-did-you-mean-output-filter)
+#+END_SRC
 ** Org-mode
 You could argue that this should be somewhere else, but heck, org-mode is a BIG part of what I do with emacs...
-*** TODO Org-table to Github-flavored markdown table (Add keybinding for custom function)
+**** TODO Org-table to Github-flavored markdown table (Add keybinding for custom function)
 #+BEGIN_SRC emacs-lisp
 ;;; orgtbl-to-gfm conversion function
 ;; Usage Example:
@@ -384,7 +397,7 @@ You could argue that this should be somewhere else, but heck, org-mode is a BIG 
   (previous-line))
 
 #+END_SRC
-*** TODO Other stuff (break it down, explain it more)
+**** TODO Other stuff (break it down, explain it more)
 #+BEGIN_SRC emacs-lisp
 (setq org-src-fontify-natively t)
 (add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
@@ -407,7 +420,7 @@ You could argue that this should be somewhere else, but heck, org-mode is a BIG 
 (setq org-mobile-inbox-for-pull "~/Google Drive/notes/from-mobile.org")
 #+END_SRC
 
-*** Left mouse-click to org-cycle, too
+**** Left mouse-click to org-cycle, too
 What? My hands aren't ALWAYS on the keyboard.
 #+BEGIN_SRC emacs-lisp
 (defun stag-click-to-cycle-org-visibility ()
