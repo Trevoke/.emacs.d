@@ -645,16 +645,25 @@ Here is a sample function where you could, for instance, put your Google Calenda
     )))
 #+END_QUOTE
 ** File system browsing (dired)
-dired-jump is awesome
+dired-jump is awesome (C-x C-j in any buffer)
 #+BEGIN_SRC emacs-lisp
 (require 'dired-x)
 #+END_SRC
+
 #+BEGIN_SRC emacs-lisp
-(setq-default dired-listing-switches "-alhv")
+;; (setq-default dired-listing-switches "-alhv")
+;; Changed my mind. I prefer seeing just the files:
+(add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
 ;; Auto-refresh silently
 (setq global-auto-revert-non-file-buffers t)
 (setq auto-revert-verbose nil)
+#+END_SRC
+
+This will make org-mode behave kinda like a two-pane file manager: with two direds open, you can copy/rename and the default target will be the other pane.
+Using split-window-vertically from the first dired might be required to make this work.
+#+BEGIN_SRC emacs-lisp
+(setq dired-dwim-target t)
 #+END_SRC
 
 It's also nice to have dired with M-< and M-> take you to first and last file
@@ -675,6 +684,15 @@ It's also nice to have dired with M-< and M-> take you to first and last file
 
 (define-key dired-mode-map
   (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
+#+END_SRC
+
+Use the same buffer instead of creating new ones:
+#+BEGIN_SRC emacs-lisp
+(require 'dired )
+
+(define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; was dired-advertised-find-file
+
+(define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file "..")))  ; was dired-up-directory
 #+END_SRC
 ** Interacting with emacs
 *** Interface
