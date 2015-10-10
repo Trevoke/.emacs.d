@@ -54,6 +54,7 @@ I use Cask. I enjoy the declarative, Gemfile- or puppet-like approach.
 #+END_SRC
 ** Writing
 *** Olivetti - writing minor mode
+**** TODO This turns on olivetti for web / html. should not do it.
 #+BEGIN_SRC emacs-lisp
 (setq olivetti-body-width 80)
 (add-hook 'org-mode-hook 'turn-on-olivetti-mode)
@@ -537,6 +538,12 @@ Because ... I'm used to being in a shell, you know?
 
 (global-set-key (kbd "C-o") 'stag-insert-line-below)
 (global-set-key (kbd "C-M-o") 'stag-insert-line-above)
+#+END_SRC
+
+Insert math symbols with shift+space
+#+BEGIN_SRC emacs-lisp
+(add-hook 'text-mode-hook 'xah-math-input-mode)
+(add-hook 'org-mode-hook 'xah-math-input-mode)
 #+END_SRC
 *** UTF-8
 #+BEGIN_SRC emacs-lisp

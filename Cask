@@ -137,5 +137,6 @@
 (depends-on "wgrep-ag")
 (depends-on "with-editor")
 (depends-on "xah-get-thing")
+(depends-on "xah-math-input")
 (depends-on "yaml-mode")
 (depends-on "yasnippet")
