@@ -64,6 +64,7 @@
 (depends-on "helm-projectile")
 (depends-on "heroku")
 (depends-on "highlight-numbers")
+(depends-on "icicles")
 (depends-on "ido-completing-read+")
 (depends-on "ido-ubiquitous")
 (depends-on "ido-vertical-mode")
