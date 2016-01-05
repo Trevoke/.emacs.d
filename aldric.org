@@ -42,7 +42,7 @@ Keeping these separate makes life easier: they get modified when I load a theme 
 In addition, I do keep some somewhat computer-specific stuff in there, like the font, and it's just easier to have this separated there.
 #+BEGIN_SRC emacs-lisp
 (setq custom-file "~/.emacs-custom.el")
-(load custom-file)
+(load custom-file t) ;; t means no error if file does not exist
 #+END_SRC
 ** Package manglement
 I use Cask. I enjoy the declarative, Gemfile- or puppet-like approach.
@@ -61,35 +61,6 @@ I use Cask. I enjoy the declarative, Gemfile- or puppet-like approach.
 (add-hook 'text-mode-hook 'turn-on-olivetti-mode)
 #+END_SRC
 ** Packages
-*** Anzu (about search results)
-#+BEGIN_SRC emacs-lisp
-(global-anzu-mode t)
-(global-set-key (kbd "M-%") 'anzu-query-replace)
-(global-set-key (kbd "C-M-%") 'anzu-query-replace-regexp)
-#+END_SRC
-*** Smart mode line
-#+BEGIN_SRC emacs-lisp
-(setq sml/theme 'dark)
-(sml/setup)
-#+END_SRC
-*** Expand region
-One of the features that makes IDEA's editors awesome is the way you can expand selection. This plugin replicates the feature.
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-c <up>") 'er/expand-region)
-(global-set-key (kbd "C-c <down>") 'er/contract-region)
-#+END_SRC
-*** projectile-mode
-#+BEGIN_SRC emacs-lisp
-(require 'projectile)
-(projectile-global-mode)
-(setq projectile-completion-system 'grizzl)
-#+END_SRC
-*** Wgrep-ag
-Sometimes after you've found a bunch of things, you want to edit.. Kind of a find-and-replace sort of deal, maybe?
-#+BEGIN_SRC emacs-lisp
-(autoload 'wgrep-agp-setup "wgrep-ag")
-(add-hook 'ag-mode-hook 'wgrep-ag-setup)
-#+END_SRC
 *** Guide key
 emacs is awesome. It's also crazy, crazy full-featured. This plugin lets you examine what's behind the door of a key prefix.
 #+BEGIN_SRC emacs-lisp
@@ -104,6 +75,35 @@ emacs is awesome. It's also crazy, crazy full-featured. This plugin lets you exa
 On the topic of discovering emacs.. Discover.el is amazing.
 #+BEGIN_SRC emacs-lisp
 (global-discover-mode 1)
+#+END_SRC
+*** Expand region
+One of the features that makes IDEA's editors awesome is the way you can expand selection. This plugin replicates the feature.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-c <up>") 'er/expand-region)
+(global-set-key (kbd "C-c <down>") 'er/contract-region)
+#+END_SRC
+*** Anzu (about search results)
+#+BEGIN_SRC emacs-lisp
+(global-anzu-mode t)
+(global-set-key (kbd "M-%") 'anzu-query-replace)
+(global-set-key (kbd "C-M-%") 'anzu-query-replace-regexp)
+#+END_SRC
+*** Smart mode line
+#+BEGIN_SRC emacs-lisp
+(setq sml/theme 'dark)
+(sml/setup)
+#+END_SRC
+*** projectile-mode
+#+BEGIN_SRC emacs-lisp
+(require 'projectile)
+(projectile-global-mode)
+(setq projectile-completion-system 'grizzl)
+#+END_SRC
+*** Wgrep-ag
+Sometimes after you've found a bunch of things, you want to edit.. Kind of a find-and-replace sort of deal, maybe?
+#+BEGIN_SRC emacs-lisp
+(autoload 'wgrep-agp-setup "wgrep-ag")
+(add-hook 'ag-mode-hook 'wgrep-ag-setup)
 #+END_SRC
 *** Snippets
 Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
@@ -171,13 +171,17 @@ Mew's config is in ~/.mew.el so you won't see it here. Nee-ner nee-ner nee-----n
 (setq op/personal-github-link "https://github.com/trevoke")
 (setq op/site-domain "http://blog.trevoke.net/")
 (setq op/site-main-title "Seven Steps")
-(setq op/site-sub-title "Words... words, they're all we have to go on! - Rosencrantz and Guildenstern are dead")
+(setq op/site-sub-title "Words... words, they're all we have to go on! — Rosencrantz and Guildenstern are dead")
 #+END_SRC
 *** org-reveal (presentations)
 #+BEGIN_SRC emacs-lisp
 (setq org-reveal-root "file:///users/a206468627/src/vendor/reveal.js")
 #+END_SRC
 ** Programming
+Always spaces. Always.
+#+BEGIN_SRC emacs-lisp
+(setq-default indent-tabs-mode nil)
+#+END_SRC
 *** First, MY hook
 You know, just the stuff I want enabled in any code buffer.
 #+BEGIN_SRC emacs-lisp
@@ -328,6 +332,7 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 
 (require 'em-smart)
 
+;; TODO is this the reason why completion is wonky?
 (require 'bash-completion)
 (bash-completion-setup)
 
@@ -695,14 +700,6 @@ It's also nice to have dired with M-< and M-> take you to first and last file
   (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
 #+END_SRC
 
-Use the same buffer instead of creating new ones:
-#+BEGIN_SRC emacs-lisp
-(require 'dired )
-
-(define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; was dired-advertised-find-file
-
-(define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file "..")))  ; was dired-up-directory
-#+END_SRC
 ** Interacting with emacs
 *** Folding code
 #+BEGIN_SRC emacs-lisp
