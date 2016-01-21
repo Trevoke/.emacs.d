@@ -117,6 +117,7 @@
 (depends-on "rainbow-mode")
 (depends-on "rbenv")
 (depends-on "react-snippets")
+(depends-on "request")
 (depends-on "rich-minority")
 (depends-on "robe")
 (depends-on "rspec-mode")
