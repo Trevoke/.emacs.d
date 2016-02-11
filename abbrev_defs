@@ -1,7 +1,11 @@
 ;;-*-coding: utf-8;-*-
 (define-abbrev-table 'Buffer-menu-mode-abbrev-table '())
 
+(define-abbrev-table 'Custom-mode-abbrev-table '())
+
 (define-abbrev-table 'Info-edit-mode-abbrev-table '())
+
+(define-abbrev-table 'apropos-mode-abbrev-table '())
 
 (define-abbrev-table 'awk-mode-abbrev-table '())
 
@@ -25,6 +29,8 @@
 
 (define-abbrev-table 'completion-list-mode-abbrev-table '())
 
+(define-abbrev-table 'debugger-mode-abbrev-table '())
+
 (define-abbrev-table 'diary-fancy-display-mode-abbrev-table '())
 
 (define-abbrev-table 'diary-mode-abbrev-table '())
@@ -45,11 +51,17 @@
 
 (define-abbrev-table 'epa-key-mode-abbrev-table '())
 
+(define-abbrev-table 'ert-results-mode-abbrev-table '())
+
+(define-abbrev-table 'ert-simple-view-mode-abbrev-table '())
+
 (define-abbrev-table 'eshell-mode-abbrev-table '())
 
 (define-abbrev-table 'flycheck-error-list-mode-abbrev-table '())
 
 (define-abbrev-table 'fundamental-mode-abbrev-table '())
+
+(define-abbrev-table 'gdb-script-mode-abbrev-table '())
 
 (define-abbrev-table 'ggtags-global-mode-abbrev-table '())
 
@@ -57,11 +69,35 @@
 
 (define-abbrev-table 'global-abbrev-table
   '(
+    ("actin" "acting" nil 0)
+    ("aenda" "agenda" nil 0)
+    ("aglie" "agile" nil 0)
     ("agrement" "agreement" nil 1)
+    ("aobut" "about" nil 0)
     ("aplan" "plan" nil 0)
+    ("applicatoin" "application" nil 0)
+    ("communicatoin" "communication" nil 1)
+    ("conversatoin" "conversation" nil 0)
+    ("dev" "developer" nil 8)
+    ("forwar" "forward" nil 0)
+    ("infrsatructure" "infrastructure" nil 0)
+    ("integratoin" "integration" nil 0)
+    ("leran" "learn" nil 0)
     ("maintainbl" "maintainable" nil 1)
+    ("mkae" "make" nil 0)
     ("ompany" "company" nil 0)
+    ("onsite" "site" nil 0)
+    ("ont" "not" nil 0)
+    ("ougrew" "outgrew" nil 0)
     ("qunatitiative" "quantitative" nil 0)
+    ("repsonsibility" "responsibility" nil 0)
+    ("reqs" "requirements" nil 3)
+    ("shold" "should" nil 0)
+    ("somethinglese" "else" nil 0)
+    ("sould" "should" nil 0)
+    ("sr" "senior" nil 0)
+    ("synchronizatoin" "synchronizations" nil 0)
+    ("thathe" "he" nil 0)
     ("thngs" "things" nil 0)
     ("timeling" "timeline" nil 0)
    ))
@@ -71,6 +107,8 @@
 (define-abbrev-table 'google-maps-static-mode-abbrev-table '())
 
 (define-abbrev-table 'grep-mode-abbrev-table '())
+
+(define-abbrev-table 'gud-mode-abbrev-table '())
 
 (define-abbrev-table 'helm-grep-mode-abbrev-table '())
 
@@ -88,11 +126,19 @@
 
 (define-abbrev-table 'image-dired-thumbnail-mode-abbrev-table '())
 
+(define-abbrev-table 'ivy-occur-grep-mode-abbrev-table '())
+
+(define-abbrev-table 'ivy-occur-mode-abbrev-table '())
+
 (define-abbrev-table 'java-mode-abbrev-table '())
 
 (define-abbrev-table 'lisp-mode-abbrev-table '())
 
 (define-abbrev-table 'log-edit-mode-abbrev-table '())
+
+(define-abbrev-table 'log4e-mode-abbrev-table '())
+
+(define-abbrev-table 'lui-mode-abbrev-table '())
 
 (define-abbrev-table 'magit-cherry-mode-abbrev-table '())
 
@@ -148,6 +194,8 @@
 
 (define-abbrev-table 'pike-mode-abbrev-table '())
 
+(define-abbrev-table 'plstore-mode-abbrev-table '())
+
 (define-abbrev-table 'process-menu-mode-abbrev-table '())
 
 (define-abbrev-table 'prog-mode-abbrev-table '())
@@ -168,9 +216,35 @@
 
 (define-abbrev-table 'shell-mode-abbrev-table '())
 
+(define-abbrev-table 'slack-edit-message-mode-abbrev-table '())
+
+(define-abbrev-table 'slack-info-mode-abbrev-table '())
+
+(define-abbrev-table 'slack-mode-abbrev-table '())
+
+(define-abbrev-table 'sldb-mode-abbrev-table '())
+
+(define-abbrev-table 'slime-compiler-notes-mode-abbrev-table '())
+
+(define-abbrev-table 'slime-connection-list-mode-abbrev-table '())
+
+(define-abbrev-table 'slime-fuzzy-completions-mode-abbrev-table '())
+
+(define-abbrev-table 'slime-inspector-mode-abbrev-table '())
+
+(define-abbrev-table 'slime-thread-control-mode-abbrev-table '())
+
+(define-abbrev-table 'slime-trace-dialog--detail-mode-abbrev-table '())
+
+(define-abbrev-table 'slime-trace-dialog-mode-abbrev-table '())
+
+(define-abbrev-table 'slime-xref-mode-abbrev-table '())
+
 (define-abbrev-table 'snippet-mode-abbrev-table '())
 
 (define-abbrev-table 'special-mode-abbrev-table '())
+
+(define-abbrev-table 'speedbar-mode-abbrev-table '())
 
 (define-abbrev-table 'tabulated-list-mode-abbrev-table '())
 
