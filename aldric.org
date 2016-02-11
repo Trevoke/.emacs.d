@@ -601,15 +601,25 @@ Always spaces. Always.
 #+BEGIN_SRC emacs-lisp
 (setq-default indent-tabs-mode nil)
 #+END_SRC
-*** Expand region                                          :external:minor:
-One of the features that makes IDEA's editors awesome is the way you can expand selection. This plugin replicates the feature.
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-c <up>") 'er/expand-region)
-(global-set-key (kbd "C-c <down>") 'er/contract-region)
-#+END_SRC
 *** Basic changes I want made to any code buffer
 #+BEGIN_SRC emacs-lisp
+;; This function comes from http://stackoverflow.com/a/22109370/234025
+(defun stag-enter-key-dwim ()
+  "Inserts an extra newline between matching separators(?) and indents it, if it can, otherwise behaves like normal enter key"
+  (interactive)
+  (let ((break-open-pair (or (and (looking-back "{") (looking-at "}"))
+                             (and (looking-back ">") (looking-at "<"))
+                             (and (looking-back "(") (looking-at ")"))
+                             (and (looking-back "\\[") (looking-at "\\]")))))
+    (newline)
+    (when break-open-pair
+      (save-excursion
+        (newline)
+        (indent-for-tab-command)))
+    (indent-for-tab-command)))
+
 (defun stag-code-modes-hook ()
+  "A couple of changes I like to make to my code buffers"
     (projectile-mode)
     (linum-mode t)
     (smartparens-mode)
@@ -618,9 +628,16 @@ One of the features that makes IDEA's editors awesome is the way you can expand 
     (eldoc-mode)
     ;;  (hs-minor-mode t) ;; folding, built-in to emacs
     (add-hook 'before-save-hook 'whitespace-cleanup)
-    (local-set-key "\C-m" 'newline-and-indent))
+    (local-set-key "\C-m" 'stag-enter-key-dwim))
+    ;;(local-set-key "\C-m" 'newline-and-indent))
 
 (add-hook 'prog-mode-hook 'stag-code-modes-hook)
+#+END_SRC
+*** Expand region                                          :external:minor:
+One of the features that makes IDEA's editors awesome is the way you can expand selection. This plugin replicates the feature.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-c <up>") 'er/expand-region)
+(global-set-key (kbd "C-c <down>") 'er/contract-region)
 #+END_SRC
 *** Log files
 Auto-tail, please.
@@ -686,6 +703,11 @@ And I think all this should be indented with 4 spaces.
 (setq web-mode-css-indent-offset 4)
 (setq web-mode-code-indent-offset 4)
 (setq web-mode-indent-style 4)
+#+END_SRC
+
+And, emmet-mode is pretty sweet.
+#+BEGIN_SRC emacs-lisp
+(add-hook 'html-mode-hook 'emmet-mode)
 #+END_SRC
 *** Javascript
 **** js2-mode                                             :major:external:
