@@ -675,6 +675,18 @@ This is the ggtags plugin, which uses GNU Global.
 (add-to-list 'auto-mode-alist '("\\.css$" . stag-all-css-modes))
 (add-to-list 'auto-mode-alist '("\\.scss$" . stag-all-css-modes))
 #+END_SRC
+*** Golang
+Let's run tests easily, shall we?
+And let's have gofmt chew my code when I save the file.
+Also, let's auto
+#+BEGIN_SRC elisp
+(defun stag-go-mode ()
+  (local-set-key (kbd "C-c r s") 'go-test-current-file) ;; run tests easily
+  (add-hook 'before-save-hook 'gofmt-before-save nil t)) ;; chew my code
+
+(add-hook 'go-mode-hook 'stag-go-mode)
+(add-hook 'go-mode-hook 'auto-complete-for-go)
+#+END_SRC
 *** HTML
 **** Web-mode                                           :external:major:
 Here are all the extensions where I want web-mode enabled
@@ -835,7 +847,7 @@ Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes
 (require 'whitespace)
 (setq whitespace-line-column 80) ;; limit line length
 (setq whitespace-style '(face trailing tabs lines-tail))
-(setq whitespace-global-modes '(not org-mode web-mode "Web"))
+(setq whitespace-global-modes '(not org-mode web-mode "Web" markdown-mode))
 (global-whitespace-mode)
 #+END_SRC
 *** Searching
