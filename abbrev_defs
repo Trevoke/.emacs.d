@@ -21,6 +21,8 @@
 
 (define-abbrev-table 'calc-trail-mode-abbrev-table '())
 
+(define-abbrev-table 'calculator-mode-abbrev-table '())
+
 (define-abbrev-table 'calendar-mode-abbrev-table '())
 
 (define-abbrev-table 'change-log-mode-abbrev-table '())
@@ -44,6 +46,10 @@
 (define-abbrev-table 'emacs-lisp-byte-code-mode-abbrev-table '())
 
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table '())
+
+(define-abbrev-table 'enh-ruby-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'epa-info-mode-abbrev-table '())
 
@@ -78,6 +84,7 @@
     ("applicatoin" "application" nil 0)
     ("communicatoin" "communication" nil 1)
     ("conversatoin" "conversation" nil 0)
+    ("cpaitalization" "capitalization" nil 0)
     ("dev" "developer" nil 8)
     ("forwar" "forward" nil 0)
     ("infrsatructure" "infrastructure" nil 0)
@@ -103,6 +110,10 @@
    ))
 
 (define-abbrev-table 'gnus-group-mode-abbrev-table '())
+
+(define-abbrev-table 'go-mode-abbrev-table '())
+
+(define-abbrev-table 'godoc-mode-abbrev-table '())
 
 (define-abbrev-table 'google-maps-static-mode-abbrev-table '())
 
@@ -174,6 +185,8 @@
 
 (define-abbrev-table 'messages-buffer-mode-abbrev-table '())
 
+(define-abbrev-table 'minitest-compilation-mode-abbrev-table '())
+
 (define-abbrev-table 'objc-mode-abbrev-table '())
 
 (define-abbrev-table 'occur-edit-mode-abbrev-table '())
@@ -207,6 +220,8 @@
 (define-abbrev-table 'projectile-rails-server-mode-abbrev-table '())
 
 (define-abbrev-table 'rake-compilation-mode-abbrev-table '())
+
+(define-abbrev-table 'rspec-compilation-mode-abbrev-table '())
 
 (define-abbrev-table 'ruby-mode-abbrev-table '())
 
