@@ -612,13 +612,11 @@ Makes it easy to type things like {} or [] or () and magically add an extra line
                              (and (looking-back ">") (looking-at "<"))
                              (and (looking-back "(") (looking-at ")"))
                              (and (looking-back "\\[") (looking-at "\\]")))))
-    (newline)
+    (comment-indent-new-line)
     (when break-open-pair
       (save-excursion
-        (newline)
-        (indent-for-tab-command)))
-    (indent-for-tab-command)))
-#+END_SRC
+        (comment-indent-new-line))
+       (indent-for-tab-command))))
 
 Here's where I plug in every modification I want in a code buffer
 #+BEGIN_SRC emacs-lisp
