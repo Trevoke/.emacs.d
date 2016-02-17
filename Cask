@@ -112,6 +112,7 @@
 (depends-on "ox-gfm")
 (depends-on "ox-html5slide")
 (depends-on "ox-impress-js")
+(depends-on "origami")
 (depends-on "ox-ioslide")
 (depends-on "ox-pandoc")
 (depends-on "ox-reveal")

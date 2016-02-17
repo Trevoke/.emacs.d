@@ -458,49 +458,6 @@ On the topic of discovering emacs.. Discover.el is amazing.
 #+BEGIN_SRC emacs-lisp
 (global-discover-mode 1)
 #+END_SRC
-** Writing (specs, docs, blogs...)
-*** Fixing typos
-Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
-
-#+BEGIN_SRC emacs-lisp
-(define-key ctl-x-map "\C-i"
-  #'endless/ispell-word-then-abbrev)
-
-(defun endless/ispell-word-then-abbrev (p)
-  "Call `ispell-word', then create an abbrev for it.
-With prefix P, create local abbrev. Otherwise it will
-be global.
-If there's nothing wrong with the word at point, keep
-looking for a typo until the beginning of buffer. You can
-skip typos you don't want to fix with `SPC', and you can
-abort completely with `C-g'."
-  (interactive "P")
-  (let (bef aft)
-    (save-excursion
-      (while (if (setq bef (thing-at-point 'word))
-                 ;; Word was corrected or used quit.
-                 (if (ispell-word nil 'quiet)
-                     nil ; End the loop.
-                   ;; Also end if we reach `bob'.
-                   (not (bobp)))
-               ;; If there's no word at point, keep looking
-               ;; until `bob'.
-               (not (bobp)))
-        (backward-word))
-      (setq aft (thing-at-point 'word)))
-    (if (and aft bef (not (equal aft bef)))
-        (let ((aft (downcase aft))
-              (bef (downcase bef)))
-          (define-abbrev
-            (if p local-abbrev-table global-abbrev-table)
-            bef aft)
-          (message "\"%s\" now expands to \"%s\" %sally"
-                   bef aft (if p "loc" "glob")))
-      (user-error "No typo at or before point"))))
-
-(setq save-abbrevs 'silently)
-(setq-default abbrev-mode t)
-#+END_SRC
 ** Org-mode
 You could argue that this should be somewhere else, but heck, org-mode is a BIG part of what I do with emacs...
 **** First, Github-Flavored Markdown
@@ -595,13 +552,57 @@ This is currently disabled.
 #+BEGIN_SRC emacs-lisp
 (setq org-reveal-root "file:///users/a206468627/src/vendor/reveal.js")
 #+END_SRC
+** Writing (specs, docs, blogs...)
+*** Fixing typos
+Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
 
+#+BEGIN_SRC emacs-lisp
+(define-key ctl-x-map "\C-i"
+  #'endless/ispell-word-then-abbrev)
+
+(defun endless/ispell-word-then-abbrev (p)
+  "Call `ispell-word', then create an abbrev for it.
+With prefix P, create local abbrev. Otherwise it will
+be global.
+If there's nothing wrong with the word at point, keep
+looking for a typo until the beginning of buffer. You can
+skip typos you don't want to fix with `SPC', and you can
+abort completely with `C-g'."
+  (interactive "P")
+  (let (bef aft)
+    (save-excursion
+      (while (if (setq bef (thing-at-point 'word))
+                 ;; Word was corrected or used quit.
+                 (if (ispell-word nil 'quiet)
+                     nil ; End the loop.
+                   ;; Also end if we reach `bob'.
+                   (not (bobp)))
+               ;; If there's no word at point, keep looking
+               ;; until `bob'.
+               (not (bobp)))
+        (backward-word))
+      (setq aft (thing-at-point 'word)))
+    (if (and aft bef (not (equal aft bef)))
+        (let ((aft (downcase aft))
+              (bef (downcase bef)))
+          (define-abbrev
+            (if p local-abbrev-table global-abbrev-table)
+            bef aft)
+          (message "\"%s\" now expands to \"%s\" %sally"
+                   bef aft (if p "loc" "glob")))
+      (user-error "No typo at or before point"))))
+
+(setq save-abbrevs 'silently)
+(setq-default abbrev-mode t)
+#+END_SRC
 ** Programming
 Always spaces. Always.
 #+BEGIN_SRC emacs-lisp
 (setq-default indent-tabs-mode nil)
 #+END_SRC
 *** Basic changes I want made to any code buffer
+
+Makes it easy to type things like {} or [] or () and magically add an extra line between the two so you can type there
 #+BEGIN_SRC emacs-lisp
 ;; This function comes from http://stackoverflow.com/a/22109370/234025
 (defun stag-enter-key-dwim ()
@@ -617,7 +618,10 @@ Always spaces. Always.
         (newline)
         (indent-for-tab-command)))
     (indent-for-tab-command)))
+#+END_SRC
 
+Here's where I plug in every modification I want in a code buffer
+#+BEGIN_SRC emacs-lisp
 (defun stag-code-modes-hook ()
   "A couple of changes I like to make to my code buffers"
     (projectile-mode)
