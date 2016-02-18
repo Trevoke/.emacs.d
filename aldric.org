@@ -617,6 +617,7 @@ Makes it easy to type things like {} or [] or () and magically add an extra line
       (save-excursion
         (comment-indent-new-line))
        (indent-for-tab-command))))
+#+END_SRC
 
 Here's where I plug in every modification I want in a code buffer
 #+BEGIN_SRC emacs-lisp
