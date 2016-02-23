@@ -47,9 +47,7 @@
 
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table '())
 
-(define-abbrev-table 'enh-ruby-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'enh-ruby-mode-abbrev-table '())
 
 (define-abbrev-table 'epa-info-mode-abbrev-table '())
 
@@ -88,6 +86,7 @@
     ("dev" "developer" nil 8)
     ("forwar" "forward" nil 0)
     ("infrsatructure" "infrastructure" nil 0)
+    ("inhreitance" "inheritance" nil 0)
     ("integratoin" "integration" nil 0)
     ("leran" "learn" nil 0)
     ("maintainbl" "maintainable" nil 1)
@@ -96,6 +95,7 @@
     ("onsite" "site" nil 0)
     ("ont" "not" nil 0)
     ("ougrew" "outgrew" nil 0)
+    ("questoins" "questions" nil 0)
     ("qunatitiative" "quantitative" nil 0)
     ("repsonsibility" "responsibility" nil 0)
     ("reqs" "requirements" nil 3)
