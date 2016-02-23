@@ -118,7 +118,7 @@ Because ... I'm used to being in a shell, you know?
 (global-set-key (kbd "C-w") 'backward-kill-word)
 (global-set-key (kbd "C-x C-k") 'kill-region)
 #+END_SRC
-**** Move down real line by real line
+**** TODO Move down real line by real line (do I kill this?)
 #+BEGIN_SRC emacs-lisp
 (setq line-move-visual nil)
 #+END_SRC
@@ -195,6 +195,10 @@ Also, ibuffer is nicer than plain-old buffer window
 (setq ibuffer-default-sorting-mode 'major-mode)
 #+END_SRC
 *** Window management
+The package switch-window shows you a number for each buffer, making it simple to go to the one you care about.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-x o") 'switch-window)
+#+END_SRC
 Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
 #+BEGIN_SRC emacs-lisp
 (defun stag-vsplit-last-buffer (prefix)
