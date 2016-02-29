@@ -789,10 +789,7 @@ What counts as a ruby buffer anyway? I like enh-ruby-mode better.
 And I like pry better than irb, so have inf-ruby use pry.
 #+BEGIN_SRC emacs-lisp
 (require 'inf-ruby)
-(add-to-list 'inf-ruby-implementations '("pry" . "pry"))
 (setq inf-ruby-default-implementation "pry")
-(setq inf-ruby-first-prompt-pattern "^\\[[0-9]+\\] pry\\((.*)\\)> *")
-(setq inf-ruby-prompt-pattern "^\\[[0-9]+\\] pry\\((.*)\\)[>*\"'] *")
 #+END_SRC
 
 I use yasnippets, and I've downloaded a collection of snippets from here: https://github.com/bmaland/yasnippet-ruby-mode
