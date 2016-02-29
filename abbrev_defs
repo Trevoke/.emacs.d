@@ -7,9 +7,7 @@
 
 (define-abbrev-table 'apropos-mode-abbrev-table '())
 
-(define-abbrev-table 'awk-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'awk-mode-abbrev-table '())
 
 (define-abbrev-table 'bibtex-mode-abbrev-table '())
 
@@ -17,13 +15,9 @@
 
 (define-abbrev-table 'bookmark-edit-annotation-mode-abbrev-table '())
 
-(define-abbrev-table 'c++-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'c++-mode-abbrev-table '())
 
-(define-abbrev-table 'c-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'c-mode-abbrev-table '())
 
 (define-abbrev-table 'calc-trail-mode-abbrev-table '())
 
@@ -45,15 +39,21 @@
 
 (define-abbrev-table 'diff-mode-abbrev-table '())
 
+(define-abbrev-table 'dig-mode-abbrev-table '())
+
 (define-abbrev-table 'edebug-eval-mode-abbrev-table '())
 
 (define-abbrev-table 'edit-abbrevs-mode-abbrev-table '())
+
+(define-abbrev-table 'eieio-custom-mode-abbrev-table '())
 
 (define-abbrev-table 'emacs-lisp-byte-code-mode-abbrev-table '())
 
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table '())
 
-(define-abbrev-table 'enh-ruby-mode-abbrev-table '())
+(define-abbrev-table 'enh-ruby-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'epa-info-mode-abbrev-table '())
 
@@ -88,10 +88,12 @@
     ("applicatoin" "application" nil 0)
     ("autonomoud" "autonomous" nil 0)
     ("comapny" "company" nil 0)
+    ("cometitive" "competitive" nil 0)
     ("communicatoin" "communication" nil 1)
     ("constatn" "constant" nil 0)
     ("conversatoin" "conversation" nil 0)
     ("cpaitalization" "capitalization" nil 0)
+    ("custoemr's" "customer's" nil 0)
     ("dev" "developer" nil 8)
     ("developng" "developing" nil 0)
     ("forwar" "forward" nil 0)
@@ -108,9 +110,10 @@
     ("onsite" "site" nil 0)
     ("ont" "not" nil 0)
     ("ougrew" "outgrew" nil 0)
-    ("questoins" "questions" nil 0)
     ("particpate" "participate" nil 0)
     ("perople" "people" nil 0)
+    ("priorty" "priority" nil 0)
+    ("questoins" "questions" nil 0)
     ("qunatitiative" "quantitative" nil 0)
     ("repsonsibility" "responsibility" nil 0)
     ("reqs" "requirements" nil 3)
@@ -162,9 +165,7 @@
 
 (define-abbrev-table 'ivy-occur-mode-abbrev-table '())
 
-(define-abbrev-table 'java-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'java-mode-abbrev-table '())
 
 (define-abbrev-table 'lisp-mode-abbrev-table '())
 
@@ -210,9 +211,7 @@
 
 (define-abbrev-table 'minitest-compilation-mode-abbrev-table '())
 
-(define-abbrev-table 'objc-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'objc-mode-abbrev-table '())
 
 (define-abbrev-table 'occur-edit-mode-abbrev-table '())
 
@@ -230,9 +229,7 @@
 
 (define-abbrev-table 'paradox-menu-mode-abbrev-table '())
 
-(define-abbrev-table 'pike-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'pike-mode-abbrev-table '())
 
 (define-abbrev-table 'plstore-mode-abbrev-table '())
 
@@ -247,6 +244,8 @@
 (define-abbrev-table 'projectile-rails-server-mode-abbrev-table '())
 
 (define-abbrev-table 'rake-compilation-mode-abbrev-table '())
+
+(define-abbrev-table 'rmail-mime-mode-abbrev-table '())
 
 (define-abbrev-table 'rspec-compilation-mode-abbrev-table '())
 
@@ -281,6 +280,8 @@
 (define-abbrev-table 'slime-trace-dialog-mode-abbrev-table '())
 
 (define-abbrev-table 'slime-xref-mode-abbrev-table '())
+
+(define-abbrev-table 'smime-mode-abbrev-table '())
 
 (define-abbrev-table 'snippet-mode-abbrev-table '())
 
