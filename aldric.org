@@ -749,9 +749,10 @@ And, emmet-mode is pretty sweet.
 (add-hook 'js2-mode-hook 'ac-js2-mode)
 #+END_SRC
 
-So, React is a thing, and so are JSX files...
+So, React is a thing, and so are JSX files and a proliferation of other such things
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '(".jsx$" . js2-jsx-mode))
+(add-to-list 'auto-mode-alist '(".babelrc$" . json-mode))
 #+END_SRC
 
 *** Ruby
@@ -823,8 +824,9 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 #+END_SRC
 **** Eshell
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'eshell-preoutput-filter-functions
-               #'eshell-did-you-mean-output-filter)
+(require 'eshell-did-you-mean)
+(add-to-list 'eshell-preoutput-filter-functions
+             #'eshell-did-you-mean-output-filter)
 #+END_SRC
 *** SQL
 **** sqlup                                                :minor:external:
@@ -852,6 +854,52 @@ Magit is a pretty amazing interface to git.
 Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
 #+BEGIN_SRC emacs-lisp
 (yas-global-mode 1)
+#+END_SRC
+** Email
+#+BEGIN_SRC emacs-lisp
+(setq mail-user-agent 'message-user-agent)
+
+(setq smtpmail-stream-type 'ssl
+      smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 465)
+#+END_SRC
+
+smtpmail-multi
+#+BEGIN_SRC emacs-lisp
+(setq smtpmail-multi-accounts
+      (quote
+       ((stride . ("aldric@stridenyc.com"
+                 "smtp.gmail.com"
+                 587
+                 "aldric@stridenyc.com"
+                 starttls
+                 nil nil nil))
+        (home . ("trevoke@gmail.com"
+                   "smtp.gmail.com"
+                   587
+                   "trevoke@gmail.com"
+                   starttls
+                   nil nil nil)))))
+
+(setq smtpmail-multi-associations
+      (quote
+       (("trevoke@gmail.com" home)
+        ("aldric@stridenyc.com" stride))))
+
+(setq smtpmail-multi-default-account (quote home))
+
+(setq message-send-mail-function 'smtpmail-multi-send-it)
+
+(setq smtpmail-debug-info t)
+(setq smtpmail-debug-verbose t)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(defun stag-email-hook ()
+  (epa-mail-mode)
+  (orgstruct++-mode))
+
+(add-hook 'notmuch-message-mode-hook 'stag-email-hook)
 #+END_SRC
 ** Miscellanous
 *** Whitespace                                             :minor:builtin:
@@ -901,7 +949,7 @@ This handy little package increases the size of the font in the whole frame.
 (require 'auto-complete-config)
 (ac-config-default)
 #+END_SRC emacs-lisp
-*** Mew (email)
+*** TODO Mew (email) (do I stop using mew?)
 Mew's config is in ~/.mew.el so you won't see it here. Nee-ner nee-ner nee-----ner.
 #+BEGIN_SRC emacs-lisp
 (autoload 'mew "mew" nil t)
