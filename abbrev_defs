@@ -9,6 +9,8 @@
 
 (define-abbrev-table 'awk-mode-abbrev-table '())
 
+(define-abbrev-table 'bbdb-mode-abbrev-table '())
+
 (define-abbrev-table 'bibtex-mode-abbrev-table '())
 
 (define-abbrev-table 'bookmark-bmenu-mode-abbrev-table '())
@@ -45,8 +47,6 @@
 
 (define-abbrev-table 'edit-abbrevs-mode-abbrev-table '())
 
-(define-abbrev-table 'eieio-custom-mode-abbrev-table '())
-
 (define-abbrev-table 'emacs-lisp-byte-code-mode-abbrev-table '())
 
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table '())
@@ -67,6 +67,12 @@
 
 (define-abbrev-table 'eshell-mode-abbrev-table '())
 
+(define-abbrev-table 'eww-bookmark-mode-abbrev-table '())
+
+(define-abbrev-table 'eww-history-mode-abbrev-table '())
+
+(define-abbrev-table 'eww-mode-abbrev-table '())
+
 (define-abbrev-table 'flycheck-error-list-mode-abbrev-table '())
 
 (define-abbrev-table 'fundamental-mode-abbrev-table '())
@@ -86,56 +92,62 @@
     ("aobut" "about" nil 0)
     ("aplan" "plan" nil 0)
     ("applicatoin" "application" nil 0)
-    ("autonomoud" "autonomous" nil 0)
-    ("comapny" "company" nil 0)
-    ("cometitive" "competitive" nil 0)
     ("communicatoin" "communication" nil 1)
-    ("constatn" "constant" nil 0)
     ("conversatoin" "conversation" nil 0)
+    ("conversatoins" "conversations" nil 0)
     ("cpaitalization" "capitalization" nil 0)
-    ("custoemr's" "customer's" nil 0)
-    ("dev" "developer" nil 8)
-    ("developng" "developing" nil 0)
+    ("dev" "developer" nil 11)
+    ("everytihng" "everything" nil 0)
     ("forwar" "forward" nil 0)
     ("infrsatructure" "infrastructure" nil 0)
     ("inhreitance" "inheritance" nil 0)
-    ("instil" "instill" nil 0)
     ("integratoin" "integration" nil 0)
-    ("leran" "learn" nil 0)
+    ("intnt" "intent" nil 0)
+    ("introuced" "introduced" nil 0)
+    ("irst" "first" nil 0)
+    ("leran" "learn" nil 1)
     ("maintainbl" "maintainable" nil 1)
-    ("managemetn" "management" nil 0)
     ("mkae" "make" nil 0)
-    ("nevessary" "necessary" nil 0)
+    ("odne" "done" nil 0)
     ("ompany" "company" nil 0)
     ("onsite" "site" nil 0)
     ("ont" "not" nil 0)
     ("ougrew" "outgrew" nil 0)
-    ("particpate" "participate" nil 0)
-    ("perople" "people" nil 0)
-    ("priorty" "priority" nil 0)
     ("questoins" "questions" nil 0)
     ("qunatitiative" "quantitative" nil 0)
     ("repsonsibility" "responsibility" nil 0)
     ("reqs" "requirements" nil 3)
+    ("riht" "right" nil 0)
+    ("settin" "setting" nil 0)
     ("shold" "should" nil 0)
     ("somethinglese" "else" nil 0)
     ("sould" "should" nil 0)
     ("sr" "senior" nil 0)
-    ("strie" "stride" nil 0)
-    ("strier" "strider" nil 0)
+    ("striahgt" "straight" nil 0)
     ("synchronizatoin" "synchronizations" nil 0)
-    ("terams" "teams" nil 0)
     ("thathe" "he" nil 0)
     ("thngs" "things" nil 0)
     ("timeling" "timeline" nil 0)
-    ("understnading" "understanding" nil 0)
-    ("valure" "value" nil 0)
-    ("wthin" "within" nil 0)
+    ("wihle" "while" nil 0)
    ))
+
+(define-abbrev-table 'gnus-article-edit-mode-abbrev-table '())
+
+(define-abbrev-table 'gnus-article-mode-abbrev-table '())
+
+(define-abbrev-table 'gnus-browse-mode-abbrev-table '())
+
+(define-abbrev-table 'gnus-category-mode-abbrev-table '())
 
 (define-abbrev-table 'gnus-group-mode-abbrev-table '())
 
+(define-abbrev-table 'gnus-score-mode-abbrev-table '())
+
+(define-abbrev-table 'gnus-sticky-article-mode-abbrev-table '())
+
 (define-abbrev-table 'go-mode-abbrev-table '())
+
+(define-abbrev-table 'go-test-mode-abbrev-table '())
 
 (define-abbrev-table 'godoc-mode-abbrev-table '())
 
@@ -166,6 +178,12 @@
 (define-abbrev-table 'ivy-occur-mode-abbrev-table '())
 
 (define-abbrev-table 'java-mode-abbrev-table '())
+
+(define-abbrev-table 'js-mode-abbrev-table '())
+
+(define-abbrev-table 'js2-jsx-mode-abbrev-table '())
+
+(define-abbrev-table 'js2-mode-abbrev-table '())
 
 (define-abbrev-table 'lisp-mode-abbrev-table '())
 
@@ -211,6 +229,8 @@
 
 (define-abbrev-table 'minitest-compilation-mode-abbrev-table '())
 
+(define-abbrev-table 'notmuch-message-mode-abbrev-table '())
+
 (define-abbrev-table 'objc-mode-abbrev-table '())
 
 (define-abbrev-table 'occur-edit-mode-abbrev-table '())
@@ -245,8 +265,6 @@
 
 (define-abbrev-table 'rake-compilation-mode-abbrev-table '())
 
-(define-abbrev-table 'rmail-mime-mode-abbrev-table '())
-
 (define-abbrev-table 'rspec-compilation-mode-abbrev-table '())
 
 (define-abbrev-table 'ruby-mode-abbrev-table '())
@@ -255,7 +273,13 @@
 
 (define-abbrev-table 'sgml-mode-abbrev-table '())
 
+(define-abbrev-table 'sh-mode-abbrev-table '())
+
 (define-abbrev-table 'shell-mode-abbrev-table '())
+
+(define-abbrev-table 'skewer-clients-mode-abbrev-table '())
+
+(define-abbrev-table 'skewer-error-mode-abbrev-table '())
 
 (define-abbrev-table 'slack-edit-message-mode-abbrev-table '())
 
@@ -300,8 +324,6 @@
 (define-abbrev-table 'vc-git-log-edit-mode-abbrev-table '())
 
 (define-abbrev-table 'vc-git-log-view-mode-abbrev-table '())
-
-(define-abbrev-table 'vc-svn-log-view-mode-abbrev-table '())
 
 (define-abbrev-table 'web-mode-abbrev-table '())
 
