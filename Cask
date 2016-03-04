@@ -151,6 +151,7 @@
 (depends-on "smart-mode-line")
 (depends-on "smartparens")
 (depends-on "smex")
+(depends-on "smtpmail-multi")
 (depends-on "spinner")
 (depends-on "sqlup-mode")
 (depends-on "swiper")
