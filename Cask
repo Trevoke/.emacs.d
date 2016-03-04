@@ -98,6 +98,7 @@
 (depends-on "mustache")
 (depends-on "niflheim-theme")
 (depends-on "nodejs-repl")
+(depends-on "notmuch")
 (depends-on "olivetti")
 (depends-on "org")
 (depends-on "org-beautify-theme")
