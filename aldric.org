@@ -2,27 +2,49 @@
 #+OPTIONS: toc:4 h:4
 
 * Configuration
-** About
+** TODO About (set global key to open this file)
 <<babel-init>>
-Welcome to my emacs configuration
+Welcome to my emacs configuration.
 ** Personal information
 #+BEGIN_SRC emacs-lisp
 (setq user-full-name "Aldric Giacomoni"
       user-mail-address "trevoke@gmail.com")
 #+END_SRC
+** Package management
+*** The package manager: use-package
+I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
+1. it is integrated within emacs.
+2. it allows me to set up emacs on any OS I desire more easily than other options I've encountered so far
+3. it allows me to easily share / steal configuration snippets
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+(setq package-enable-at-startup nil)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives
+             '("marmalade" . "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives
+             '("melpa-stable" . "https://stable.melpa.org/packages/"))
+
+(package-initialize)
+
+;; Bootstrap `use-package'
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(require 'use-package)
+#+END_SRC
+
+*** Configuring the package manager
+I default to melpa-stable.
+#+BEGIN_SRC emacs-lisp
+(setq use-package-always-pin "melpa-stable")
+(setq use-package-always-ensure t)
+#+END_SRC
 ** Additional paths
-This is mostly necessary for things not handled by Cask (which we'll see later down the line)
 *** Themes
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-#+END_SRC
-*** Package manglement
-I use Cask. I enjoy the declarative, Gemfile- or puppet-like approach.
-#+BEGIN_SRC emacs-lisp
-(require 'cask "~/.cask/cask.el")
-(cask-initialize)
-(require 'pallet)
-(pallet-mode t)
 #+END_SRC
 *** Packages (without package manglement)
 #+BEGIN_SRC emacs-lisp
@@ -64,7 +86,7 @@ This shows the file path in the GUI header
                                               (abbreviate-file-name (buffer-file-name)) "%f"))))
 #+END_SRC
 *** Backups
-Centralize emacs backups.
+Centralize emacs backups. This directory is gitignored.
 #+BEGIN_SRC emacs-lisp
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 #+END_SRC
@@ -97,65 +119,15 @@ I don't really care about any of the extra details - emacs helps me out enough i
   (menu-bar-mode -1)
   (scroll-bar-mode -1))
 #+END_SRC
-
 Although of course if you're on OSX, at least the menu bar can be enabled since the mighty OSX top bar won't ever disappear.
 And I've also added other OSX-specific stuff here... For now.
 #+BEGIN_SRC emacs-lisp
-(when (memq window-system '(mac ns))
-  (exec-path-from-shell-initialize)
-  (setq ns-use-srgb-colorspace t)
-  (menu-bar-mode t))
-#+END_SRC
-*** Interacting with text
-**** Use visual-line-mode
-#+BEGIN_SRC emacs-lisp
-(remove-hook 'text-mode-hook #'turn-on-auto-fill)
-(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
-#+END_SRC
-**** Redefine kill-region and backward-kill-word
-Because ... I'm used to being in a shell, you know?
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-w") 'backward-kill-word)
-(global-set-key (kbd "C-x C-k") 'kill-region)
-#+END_SRC
-**** TODO Move down real line by real line (do I kill this?)
-#+BEGIN_SRC emacs-lisp
-(setq line-move-visual nil)
-#+END_SRC
-**** Sentences end with a single space
-#+BEGIN_SRC emacs-lisp
-(setq sentence-end-double-space nil)
-#+END_SRC
-**** Text size
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-+") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
-#+END_SRC
-**** Inserting new lines before/after current one
-#+BEGIN_SRC emacs-lisp
-(defun stag-insert-line-below ()
-  "Insert and auto-indent line below cursor, like in vim."
-  (interactive)
-  (move-end-of-line 1)
-  (open-line 1)
-  (next-line)
-  (indent-for-tab-command))
-
-(defun stag-insert-line-above ()
-  "Insert and auto-indent line above cursor, like in vim."
-  (interactive)
-  (previous-line)
-  (move-end-of-line 1)
-  (stag-insert-line-below))
-
-(global-set-key (kbd "C-o") 'stag-insert-line-below)
-(global-set-key (kbd "C-M-o") 'stag-insert-line-above)
-#+END_SRC
-
-Insert math symbols with shift+space
-#+BEGIN_SRC emacs-lisp
-(add-hook 'text-mode-hook 'xah-math-input-mode)
-(add-hook 'org-mode-hook 'xah-math-input-mode)
+  (when (memq window-system '(mac ns))
+    (use-package exec-path-from-shell
+      :config
+      (exec-path-from-shell-initialize))
+    (setq ns-use-srgb-colorspace t)
+    (menu-bar-mode t))
 #+END_SRC
 *** UTF-8
 #+BEGIN_SRC emacs-lisp
@@ -197,7 +169,8 @@ Also, ibuffer is nicer than plain-old buffer window
 *** Window management
 The package switch-window shows you a number for each buffer, making it simple to go to the one you care about.
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-x o") 'switch-window)
+(use-package switch-window
+  :bind ("C-x o" . switch-window))
 #+END_SRC
 Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
 #+BEGIN_SRC emacs-lisp
@@ -224,19 +197,16 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
       scroll-preserve-screen-position 1)
 #+END_SRC
 ** Interacting with emacs
-*** Folding code
+*** TODO Folding code (origami-mode please)
+*** Disable C-z to minimize
+Suspend emacs？ I'll use C-x C-z.
 #+BEGIN_SRC emacs-lisp
-(global-unset-key (kbd "C-z")) ;; Suspend emacs？ I'll use C-x C-z.
-(global-set-key (kbd "C-z z") 'vimish-fold)
-(global-set-key (kbd "C-z i") 'vimish-fold-delete)
+(global-unset-key (kbd "C-z"))
 #+END_SRC
 *** Interface
 I use IDO and I like it a lot. flx-ido, especially, is basically heaven.
 #+BEGIN_SRC emacs-lisp
 (ido-mode 1)
-(ido-ubiquitous 1)
-(ido-vertical-mode 1)
-(flx-ido-mode 1)
 (add-to-list 'ido-ignore-files "\\.DS_Store")
 (setq ido-use-faces t
       ido-enable-prefix nil
@@ -245,8 +215,11 @@ I use IDO and I like it a lot. flx-ido, especially, is basically heaven.
       ido-create-new-buffer 'always ;; easily create files
       ido-use-filename-at-point nil ;; don't try to be smart
 )
-
 (setq ido-auto-merge-delay-time 7) ;; Default: 0.7
+
+(use-package ido-ubiquitous :config (ido-ubiquitous 1))
+(use-package ido-vertical-mode :config (ido-vertical-mode 1))
+(use-package flx-ido :config (flx-ido-mode 1))
 #+END_SRC
 
 ;;;; Alright, helm, give me your best shot.
@@ -432,13 +405,16 @@ I use IDO and I like it a lot. flx-ido, especially, is basically heaven.
 *** Fuzzy matching
 Enter smex. I like typing "plp" to get to "package-list-packages".
 #+BEGIN_SRC emacs-lisp
-(smex-initialize)
-(global-set-key (kbd "C-x C-m") 'smex)
-(global-set-key (kbd "C-x m") 'smex-major-mode-commands)
-(setq smex-auto-update t)
+  (use-package smex
+    :config
+    (smex-initialize)
+    (setq smex-auto-update t)
+    :bind (("C-x C-m" . smex)
+           ("C-x m" . smex-major-mode-commands)))
 #+END_SRC
 *** Fonts and stuff
-The world begins with this function I found online somewhere. Before I kept track of things.
+I found this function online somewhere, before I thought tracking code origin for this config file might matter.
+All it does is tell you what face is at point.
 #+BEGIN_SRC emacs-lisp
 (defun stag-what-face (pos)
   (interactive "d")
@@ -446,23 +422,32 @@ The world begins with this function I found online somewhere. Before I kept trac
                   (get-char-property pos 'face))))
     (if face (message "Face: %s" face) (message "No face at %d" pos))))
 #+END_SRC
-** Discovering emacs
+** TODO Discovering emacs (replace this stuff with icicles)
 *** Guide key                                              :minor:external:
 emacs is awesome. It's also crazy, crazy full-featured. This plugin lets you examine what's behind the door of a key prefix.
 #+BEGIN_SRC emacs-lisp
-(setq guide-key/guide-key-sequence
-      '("C-x r" "C-x 4" "C-h" "C-c"
-              "C-x" "C-x a" "C-x C-a"
-              "C-x 8" "C-x 8 \"  " "C-x 8 '" "C-x 8 ~"
-              "C-u" "C-u C-x"))
-(guide-key-mode 1)
+  (use-package guide-key
+    :config
+    (setq guide-key/guide-key-sequence
+          '("C-x r"
+            "C-x 4"
+            "C-h"
+            "C-c"
+            "C-x" "C-x a" "C-x C-a"
+            "C-x 8" "C-x 8 \"  " "C-x 8 '" "C-x 8 ~"
+            "C-u" "C-u C-x"))
+    (guide-key-mode 1))
 #+END_SRC
 *** Discover                                               :external:minor:
 On the topic of discovering emacs.. Discover.el is amazing.
 #+BEGIN_SRC emacs-lisp
-(global-discover-mode 1)
+(use-package discover
+  :config (global-discover-mode 1))
 #+END_SRC
 ** Org-mode
+#+BEGIN_SRC emacs-lisp
+(use-package org)
+#+END_SRC
 I've been having some issues exporting, so I'm actively loading libraries here.
 #+BEGIN_SRC emacs-lisp
 (load-library "org-macro")
@@ -544,76 +529,142 @@ This is currently disabled.
 #+END_SRC
 *** Olivetti                                               :external:minor:
 #+BEGIN_SRC emacs-lisp
+(use-package olivetti
+:config
 (setq olivetti-body-width 80)
-(add-hook 'org-mode-hook 'turn-on-olivetti-mode)
+(add-hook 'org-mode-hook 'turn-on-olivetti-mode))
 #+END_SRC
 *** Markdown                                               :major:external:
 #+BEGIN_SRC emacs-lisp
-(add-hook 'markdown-mode-hook 'turn-on-orgtbl)
+  (use-package markdown-mode
+    :config
+    (add-hook 'markdown-mode-hook 'turn-on-orgtbl))
 #+END_SRC
 *** Blogging
 #+BEGIN_SRC emacs-lisp
-(require 'org-page)
-(setq op/repository-directory "~/src/projects/trevoke.github.io")
-(setq op/personal-github-link "https://github.com/trevoke")
-(setq op/site-domain "http://blog.trevoke.net/")
-(setq op/site-main-title "Seven Steps")
-(setq op/site-sub-title "Words... words, they're all we have to go on! — Rosencrantz and Guildenstern are dead")
+  (use-package org-page
+    :config
+    (setq op/repository-directory "~/src/projects/trevoke.github.io")
+    (setq op/personal-github-link "https://github.com/trevoke")
+    (setq op/site-domain "http://blog.trevoke.net/")
+    (setq op/site-main-title "Seven Steps")
+    (setq op/site-sub-title "Words... words, they're all we have to go on! — Rosencrantz and Guildenstern are dead"))
 #+END_SRC
-*** org-reveal (presentations)
-#+BEGIN_SRC emacs-lisp
-(setq org-reveal-root "file:///users/a206468627/src/vendor/reveal.js")
-#+END_SRC
+*** TODO Presentations (org-reveal? org-ioslide?)
 ** Writing (specs, docs, blogs...)
-*** Fixing typos
+*** Interacting with text
+**** Use visual-line-mode
+#+BEGIN_SRC emacs-lisp
+(remove-hook 'text-mode-hook #'turn-on-auto-fill)
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+#+END_SRC
+**** Redefine kill-region and backward-kill-word
+I used Bash for a long time. This allows me to keep using Ctrl-w to delete a word backward.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-w") 'backward-kill-word)
+(global-set-key (kbd "C-x C-k") 'kill-region)
+#+END_SRC
+**** TODO Move down real line by real line (do I kill this?)
+#+BEGIN_SRC emacs-lisp
+(setq line-move-visual nil)
+#+END_SRC
+**** Sentences end with a single space
+#+BEGIN_SRC emacs-lisp
+(setq sentence-end-double-space nil)
+#+END_SRC
+**** Inserting new lines before/after current one
+#+BEGIN_SRC emacs-lisp
+(defun stag-insert-line-below ()
+  "Insert and auto-indent line below cursor, like in vim."
+  (interactive)
+  (move-end-of-line 1)
+  (open-line 1)
+  (next-line)
+  (indent-for-tab-command))
+
+(defun stag-insert-line-above ()
+  "Insert and auto-indent line above cursor, like in vim."
+  (interactive)
+  (previous-line)
+  (move-end-of-line 1)
+  (stag-insert-line-below))
+
+(global-set-key (kbd "C-o") 'stag-insert-line-below)
+(global-set-key (kbd "C-M-o") 'stag-insert-line-above)
+#+END_SRC
+
+*** Symbols
+#+BEGIN_SRC emacs-lisp
+(use-package xah-math-input
+  :config
+  (add-hook 'text-mode-hook 'xah-math-input-mode)
+  (add-hook 'org-mode-hook 'xah-math-input-mode))
+#+END_SRC
+*** COMMENT Fixing typos
 Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
 
 #+BEGIN_SRC emacs-lisp
-(define-key ctl-x-map "\C-i"
-  #'endless/ispell-word-then-abbrev)
+  (define-key ctl-x-map "\C-i"
+    #'endless/ispell-word-then-abbrev)
 
-(defun endless/ispell-word-then-abbrev (p)
-  "Call `ispell-word', then create an abbrev for it.
-With prefix P, create local abbrev. Otherwise it will
-be global.
-If there's nothing wrong with the word at point, keep
-looking for a typo until the beginning of buffer. You can
-skip typos you don't want to fix with `SPC', and you can
-abort completely with `C-g'."
-  (interactive "P")
-  (let (bef aft)
-    (save-excursion
-      (while (if (setq bef (thing-at-point 'word))
-                 ;; Word was corrected or used quit.
-                 (if (ispell-word nil 'quiet)
-                     nil ; End the loop.
-                   ;; Also end if we reach `bob'.
-                   (not (bobp)))
-               ;; If there's no word at point, keep looking
-               ;; until `bob'.
-               (not (bobp)))
-        (backward-word))
-      (setq aft (thing-at-point 'word)))
-    (if (and aft bef (not (equal aft bef)))
-        (let ((aft (downcase aft))
-              (bef (downcase bef)))
-          (define-abbrev
-            (if p local-abbrev-table global-abbrev-table)
-            bef aft)
-          (message "\"%s\" now expands to \"%s\" %sally"
-                   bef aft (if p "loc" "glob")))
-      (user-error "No typo at or before point"))))
+  (defun endless/ispell-word-then-abbrev (p)
+    "Call `ispell-word', then create an abbrev for it.
+  With prefix P, create local abbrev. Otherwise it will
+  be global.
+  If there's nothing wrong with the word at point, keep
+  looking for a typo until the beginning of buffer. You can
+  skip typos you don't want to fix with `SPC', and you can
+  abort completely with `C-g'."
+    (interactive "P")
+    (let (bef aft)
+      (save-excursion
+        (while (if (setq bef (thing-at-point 'word))
+                   ;; Word was corrected or used quit.
+                   (if (ispell-word nil 'quiet)
+                       nil ; End the loop.
+                     ;; Also end if we reach `bob'.
+                     (not (bobp)))
+                 ;; If there's no word at point, keep looking
+                 ;; until `bob'.
+                 (not (bobp)))
+          (backward-word))
+        (setq aft (thing-at-point 'word)))
+      (if (and aft bef (not (equal aft bef)))
+          (let ((aft (downcase aft))
+                (bef (downcase bef)))
+            (define-abbrev
+              (if p local-abbrev-table global-abbrev-table)
+              bef aft)
+            (message "\"%s\" now expands to \"%s\" %sally"
+                     bef aft (if p "loc" "glob")))
+        (user-error "No typo at or before point"))))
 
-(setq save-abbrevs 'silently)
-(setq-default abbrev-mode t)
+  (setq save-abbrevs 'silently)
+  (setq-default abbrev-mode t)
 #+END_SRC
 ** Programming
+*** Project navigation
+**** projectile                                           :minor:external:
+#+BEGIN_SRC emacs-lisp
+(use-package projectile
+  :config
+  (projectile-global-mode)
+  (setq projectile-completion-system 'grizzl))
+#+END_SRC
+*** Indentation
 Always spaces. Always.
 #+BEGIN_SRC emacs-lisp
 (setq-default indent-tabs-mode nil)
 #+END_SRC
+*** code tagging                                           :external:minor:
+This is the ggtags plugin, which uses GNU Global.
+#+BEGIN_SRC emacs-lisp
+(use-package ggtags
+  :config
+  (setq tags-case-fold-search nil)
+  (global-set-key (kbd "<f7>") 'ggtags-create-tags))
+#+END_SRC
 *** Basic changes I want made to any code buffer
-
 Makes it easy to type things like {} or [] or () and magically add an extra line between the two so you can type there
 #+BEGIN_SRC emacs-lisp
 ;; This function comes from http://stackoverflow.com/a/22109370/234025
@@ -633,15 +684,17 @@ Makes it easy to type things like {} or [] or () and magically add an extra line
 
 Here's where I plug in every modification I want in a code buffer
 #+BEGIN_SRC emacs-lisp
+(use-package smartparens)
+(use-package auto-complete)
+
 (defun stag-code-modes-hook ()
   "A couple of changes I like to make to my code buffers"
-    (projectile-mode)
+;;    (projectile-mode)
     (linum-mode t)
     (smartparens-mode)
     (auto-complete-mode)
     (ggtags-mode)
     (eldoc-mode)
-    ;;  (hs-minor-mode t) ;; folding, built-in to emacs
     (add-hook 'before-save-hook 'whitespace-cleanup)
     (local-set-key "\C-m" 'stag-enter-key-dwim))
     ;;(local-set-key "\C-m" 'newline-and-indent))
@@ -651,169 +704,163 @@ Here's where I plug in every modification I want in a code buffer
 *** Expand region                                          :external:minor:
 One of the features that makes IDEA's editors awesome is the way you can expand selection. This plugin replicates the feature.
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-c <up>") 'er/expand-region)
-(global-set-key (kbd "C-c <down>") 'er/contract-region)
+  (use-package expand-region
+    :config
+    (global-set-key (kbd "C-c <up>") 'er/expand-region)
+    (global-set-key (kbd "C-c <down>") 'er/contract-region))
 #+END_SRC
 *** Log files
 Auto-tail, please.
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-mode))
 #+END_SRC
-*** code tagging                                           :external:minor:
-This is the ggtags plugin, which uses GNU Global.
-#+BEGIN_SRC emacs-lisp
-(setq tags-case-fold-search nil)
-(global-set-key (kbd "<f7>") 'ggtags-create-tags)
-#+END_SRC
-*** C#
+*** TODO C# (add .cs to modelist?)
 #+BEGIN_SRC emacs-lisp
 (defun stag-csharp-mode-hook ()
   (setq c-basic-offset 4))
 
-(add-hook 'csharp-mode-hook 'stag-csharp-mode-hook)
+(use-package csharp-mode
+  :defer t
+  :config
+  (add-hook 'csharp-mode-hook 'stag-csharp-mode-hook))
 #+END_SRC
 *** emacs lisp (gettin' meta in here)
 #+BEGIN_SRC emacs-lisp
-(add-hook 'lisp-mode-hook 'paredit-mode)
-(add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+  (use-package paredit
+    :config
+    (add-hook 'lisp-mode-hook 'paredit-mode)
+    (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
 
-(add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
-(add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
-(add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
+  (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+  (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
+  (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
 #+END_SRC
 *** CSS
 #+BEGIN_SRC emacs-lisp
-(defun stag-all-css-modes ()
-  (css-mode)
-  (rainbow-mode))
+  (use-package rainbow-mode
+    :config
+    (add-hook 'scss-mode-hook 'rainbow-mode)
+    (add-hook 'css-mode-hook 'rainbow-mode))
 
-(add-to-list 'auto-mode-alist '("\\.css$" . stag-all-css-modes))
-(add-to-list 'auto-mode-alist '("\\.scss$" . stag-all-css-modes))
+  (use-package scss-mode :mode "\\.scss$")
+
 #+END_SRC
 *** Golang
 Let's run tests easily, shall we?
 And let's have gofmt chew my code when I save the file.
-Also, let's auto
 #+BEGIN_SRC elisp
-(defun stag-go-mode ()
-  (local-set-key (kbd "C-c r s") 'go-test-current-file) ;; run tests easily
-  (add-hook 'before-save-hook 'gofmt-before-save nil t)) ;; chew my code
-
-(add-hook 'go-mode-hook 'stag-go-mode)
-(add-hook 'go-mode-hook 'auto-complete-for-go)
+  (use-package go-mode
+    :bind (:map go-mode-map
+                ("C c r s" . go-test-current-file))
+    :config
+    (defun stag-go-mode ()
+      (add-hook 'before-save-hook 'gofmt-before-save nil t)) ;; chew my code
+    (add-hook 'go-mode-hook 'stag-go-mode)
+    (use-package go-autocomplete
+      :config (add-hook 'go-mode-hook 'auto-complete-for-go)))
 #+END_SRC
 *** HTML
 **** Web-mode                                           :external:major:
 Here are all the extensions where I want web-mode enabled
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-#+END_SRC
+  (use-package web-mode
+    :mode "\\.mustache$" "\\.html$" "\\.erb$"
+    :config
+    ;; I want to use auto-complete with the ac-html source when in web-mode
+    (use-package ac-html
+      :config
+      (add-to-list 'web-mode-ac-sources-alist
+                   '("html" . (ac-source-html-attribute-value
+                               ac-source-html-tag
+                               ac-source-html-attribute))))
 
-Also, I want to use auto-complete with the ac-html source when in web-mode
-#+BEGIN_SRC emacs-lisp
-(require 'web-mode)
-(add-to-list 'web-mode-ac-sources-alist
-             '("html" . (ac-source-html-attribute-value
-                         ac-source-html-tag
-                         ac-source-html-attribute)))
-#+END_SRC
+    ;; And I think all this should be indented with 4 spaces.
+    (setq web-mode-markup-indent-offset 4)
+    (setq web-mode-css-indent-offset 4)
+    (setq web-mode-code-indent-offset 4)
+    (setq web-mode-indent-style 4)
 
-And I think all this should be indented with 4 spaces.
-#+BEGIN_SRC emacs-lisp
-(setq web-mode-markup-indent-offset 4)
-(setq web-mode-css-indent-offset 4)
-(setq web-mode-code-indent-offset 4)
-(setq web-mode-indent-style 4)
-#+END_SRC
+    ;; And, emmet-mode is pretty sweet.
 
-And, emmet-mode is pretty sweet.
-#+BEGIN_SRC emacs-lisp
-(add-hook 'html-mode-hook 'emmet-mode)
+    (add-hook 'web-mode-hook 'emmet-mode))
+
+  (add-hook 'html-mode-hook 'emmet-mode)
 #+END_SRC
 *** Javascript
 **** js2-mode                                             :major:external:
 #+BEGIN_SRC emacs-lisp
-(setq js2-basic-offset 2)
-(setq js2-bounce-indent-p t)
+  (use-package js2-mode
+    :mode "\\.js$"
+    :config
+    (add-to-list 'auto-mode-alist '(".jsx$" . js2-jsx-mode))
+    (setq js2-basic-offset 2)
+    (setq js2-bounce-indent-p t)
 
-(setq js2-highlight-level 3)
+    (setq js2-highlight-level 3)
 
-(add-to-list 'auto-mode-alist '(".js$" . js2-mode))
-(add-hook 'js2-mode-hook 'stag-code-modes-hook)
-(add-hook 'js2-mode-hook 'ac-js2-mode)
+    (add-hook 'js2-mode-hook 'stag-code-modes-hook)
+    (use-package ac-js2
+      :config
+      (add-hook 'js2-mode-hook 'ac-js2-mode)))
 #+END_SRC
 
-So, React is a thing, and so are JSX files and a proliferation of other such things
+**** json-mode
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '(".jsx$" . js2-jsx-mode))
-(add-to-list 'auto-mode-alist '(".babelrc$" . json-mode))
+(use-package json-mode :mode "\\.babelrc$")
 #+END_SRC
-
 *** Ruby
+**** Enh-ruby-mode
 There's a few extra things I want started when I open a Ruby buffer
 #+BEGIN_SRC emacs-lisp
-(defun stag-ruby-mode-hook ()
-  (ruby-refactor-mode-launch)
-  (inf-ruby-minor-mode)
-  (modify-syntax-entry ?: ".") ;; Adds ":" to the word definition
-  (rbenv-use-corresponding))
+  (defun stag-ruby-mode-hook ()
+    (ruby-refactor-mode-launch)
+    (inf-ruby-minor-mode)
+    (modify-syntax-entry ?: ".") ;; Adds ":" to the word definition
+    (rbenv-use-corresponding))
 
-(add-hook 'enh-ruby-mode-hook 'stag-code-modes-hook)
-(add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook)
+  (use-package enh-ruby-mode
+    :interpreter "ruby"
+    :mode "\\.rb$" "Guardfile" "\\.rake$" "\\.pryrc$" "Rakefile" "Capfile" "Gemfile" "\\.ru$"
+    :config
+    (add-hook 'enh-ruby-mode-hook 'stag-code-modes-hook)
+    (add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook))
 #+END_SRC
 
 And I like projectile-rails to handle rails projects.
-#+BEGIN_SRC emacs-lisp
-(add-hook 'projectile-mode-hook 'projectile-rails-on)
-#+END_SRC
-
-What counts as a ruby buffer anyway? I like enh-ruby-mode better.
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
-
-(add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '("Guardfile" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '("\\.rake$" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '("\\.pryrc$" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '("Rakefile$" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '("Capfile$" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '("Gemfile$" . enh-ruby-mode))
-(add-to-list 'auto-mode-alist '("\\.ru$" . enh-ruby-mode))
-#+END_SRC
 
 And I like pry better than irb, so have inf-ruby use pry.
 #+BEGIN_SRC emacs-lisp
-(require 'inf-ruby)
-(setq inf-ruby-default-implementation "pry")
+  (use-package inf-ruby
+    :config
+    (setq inf-ruby-default-implementation "pry")
+    :bind (:map inf-ruby-mode-map
+                ("TAB" . auto-complete)))
 #+END_SRC
 
 I use yasnippets, and I've downloaded a collection of snippets from here: https://github.com/bmaland/yasnippet-ruby-mode
+***** TODO Projectile-Rails
+#+BEGIN_SRC emacs-lisp
+;; (add-hook 'projectile-mode-hook 'projectile-rails-on)
+#+END_SRC
 *** Rust
 #+BEGIN_SRC emacs-lisp
-(add-hook 'rust-mode-hook 'stag-code-modes-hook)
-(add-hook 'rust-mode-hook 'flycheck-mode)
-(add-hook 'rust-mode-hook 'flymake-mode)
+(use-package rust-mode
+  :config
+  (add-hook 'rust-mode-hook 'stag-code-modes-hook)
+  (add-hook 'rust-mode-hook 'flycheck-mode)
+  (add-hook 'rust-mode-hook 'flymake-mode))
 #+END_SRC
 *** Shells
 **** Bash
 #+BEGIN_SRC emacs-lisp
-(setq explicit-bash-args '("--noediting" "--login" "-i"))
+  (setq explicit-bash-args '("--noediting" "--login" "-i"))
+  (require 'em-smart)
 
-(require 'em-smart)
+  (use-package bash-completion :config (bash-completion-setup))
 
-;; TODO is this the reason why completion is wonky?
-(require 'bash-completion)
-(bash-completion-setup)
-
-(defadvice ansi-term (after advise-ansi-term-coding-system)
-    (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
-(ad-activate 'ansi-term)
+  ;; (defadvice ansi-term (after advise-ansi-term-coding-system)
+  ;;     (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
+  ;; (ad-activate 'ansi-term)
 #+END_SRC
 
 **** Slime
@@ -824,38 +871,60 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 #+END_SRC
 **** Eshell
 #+BEGIN_SRC emacs-lisp
-(require 'eshell-did-you-mean)
-(add-to-list 'eshell-preoutput-filter-functions
-             #'eshell-did-you-mean-output-filter)
+(use-package eshell-did-you-mean
+  :config
+  (add-to-list 'eshell-preoutput-filter-functions
+               #'eshell-did-you-mean-output-filter))
 #+END_SRC
 *** SQL
 **** sqlup                                                :minor:external:
 auto-upcase SQL keywords as I type, please.
 #+BEGIN_SRC emacs-lisp
-(add-hook 'sql-mode-hook 'sqlup-mode)
-(add-hook 'sql-interactive-mode-hook 'sqlup-mode)
-#+END_SRC
-
-*** Project navigation
-**** projectile                                           :minor:external:
-#+BEGIN_SRC emacs-lisp
-(require 'projectile)
-(projectile-global-mode)
-(setq projectile-completion-system 'grizzl)
+(use-package sqlup-mode
+  :config
+  (add-hook 'sql-mode-hook 'sqlup-mode)
+  (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 #+END_SRC
 *** Git
 **** Magit                                                :external:minor:
 Magit is a pretty amazing interface to git.
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "\C-c g") 'magit-status)
-(setq magit-last-seen-setup-instructions "1.4.0") ;; magit auto-reverts unmodified buffers
+(use-package magit
+  :bind ("C-c g" . magit-status)
+  :config (setq magit-last-seen-setup-instructions "1.4.0"))
 #+END_SRC
 *** Snippets
 Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
 #+BEGIN_SRC emacs-lisp
-(yas-global-mode 1)
+(use-package yasnippet :config (yas-global-mode 1))
 #+END_SRC
 ** Email
+*** TODO Mew (email) (do I stop using mew?)
+Mew's config is in ~/.mew.el so you won't see it here. Nee-ner nee-ner nee-----ner.
+#+BEGIN_SRC emacs-lisp
+  (use-package mew
+    :config
+    (autoload 'mew "mew" nil t)
+    (autoload 'mew-send "mew" nil t)
+
+    ;; Optional setup (Read Mail menu):
+    (setq read-mail-command 'mew)
+
+    ;; Optional setup (e.g. C-xm for sending a message):
+    (autoload 'mew-user-agent-compose "mew" nil t)
+    (if (boundp 'mail-user-agent)
+        (setq mail-user-agent 'mew-user-agent))
+    (if (fboundp 'define-mail-user-agent)
+        (define-mail-user-agent
+          'mew-user-agent
+          'mew-user-agent-compose
+          'mew-draft-send-message
+          'mew-draft-kill
+          'mew-send-hook))
+
+    (setq mew-use-master-passwd t))
+#+END_SRC
+*** Sending email
 #+BEGIN_SRC emacs-lisp
 (setq mail-user-agent 'message-user-agent)
 
@@ -866,34 +935,36 @@ Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes
 
 smtpmail-multi
 #+BEGIN_SRC emacs-lisp
-(setq smtpmail-multi-accounts
-      (quote
-       ((stride . ("aldric@stridenyc.com"
-                 "smtp.gmail.com"
-                 587
-                 "aldric@stridenyc.com"
-                 starttls
-                 nil nil nil))
-        (home . ("trevoke@gmail.com"
-                   "smtp.gmail.com"
-                   587
-                   "trevoke@gmail.com"
-                   starttls
-                   nil nil nil)))))
+  (use-package smtpmail-multi
+    :config
+    (setq smtpmail-multi-accounts
+          (quote
+           ((stride . ("aldric@stridenyc.com"
+                       "smtp.gmail.com"
+                       587
+                       "aldric@stridenyc.com"
+                       starttls
+                       nil nil nil))
+            (home . ("trevoke@gmail.com"
+                     "smtp.gmail.com"
+                     587
+                     "trevoke@gmail.com"
+                     starttls
+                     nil nil nil)))))
 
-(setq smtpmail-multi-associations
-      (quote
-       (("trevoke@gmail.com" home)
-        ("aldric@stridenyc.com" stride))))
+    (setq smtpmail-multi-associations
+          (quote
+           (("trevoke@gmail.com" home)
+            ("aldric@stridenyc.com" stride))))
 
-(setq smtpmail-multi-default-account (quote home))
+    (setq smtpmail-multi-default-account (quote home))
 
-(setq message-send-mail-function 'smtpmail-multi-send-it)
+    (setq message-send-mail-function 'smtpmail-multi-send-it)
 
-(setq smtpmail-debug-info t)
-(setq smtpmail-debug-verbose t)
+    (setq smtpmail-debug-info t)
+    (setq smtpmail-debug-verbose t))
 #+END_SRC
-
+*** Sending/Reading/Encrypting email
 #+BEGIN_SRC emacs-lisp
 (defun stag-email-hook ()
   (epa-mail-mode)
@@ -913,64 +984,47 @@ smtpmail-multi
 *** Searching
 **** Anzu (about search results)                          :external:minor:
 #+BEGIN_SRC emacs-lisp
-(global-anzu-mode t)
-(global-set-key (kbd "M-%") 'anzu-query-replace)
-(global-set-key (kbd "C-M-%") 'anzu-query-replace-regexp)
+  (use-package anzu
+    :config
+    (global-anzu-mode t)
+    :bind (("M-%" . anzu-query-replace)
+           ("C-M-%" . anzu-query-replace-regexp)))
 #+END_SRC
 **** Wgrep-ag
 Sometimes after you've found a bunch of things, you want to edit.. Kind of a find-and-replace sort of deal, maybe?
 #+BEGIN_SRC emacs-lisp
-(autoload 'wgrep-agp-setup "wgrep-ag")
-(add-hook 'ag-mode-hook 'wgrep-ag-setup)
+  (use-package wgrep-ag
+    :ensure wgrep
+    :config
+    (autoload 'wgrep-ag-setup "wgrep-ag")
+    (add-hook 'ag-mode-hook 'wgrep-ag-setup))
 #+END_SRC
 *** Interface customization
 **** Smart mode line
 #+BEGIN_SRC emacs-lisp
-(setq sml/theme 'dark)
-(sml/setup)
+  (use-package smart-mode-line
+    :config
+    (setq sml/theme 'dark)
+    (sml/setup))
 #+END_SRC
 **** Default text scale
 This handy little package increases the size of the font in the whole frame.
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-x C-=") 'default-text-scale-increase)
-(global-set-key (kbd "C-x C--") 'default-text-scale-decrease)
+(use-package default-text-scale
+  :bind (("C-x C-=" . default-text-scale-increase)
+         ("C-x C--" . default-text-scale-decrease)))
 #+END_SRC
-*** Auto completion
+*** TODO Auto completion (there's a helm thing in here)
 #+BEGIN_SRC emacs-lisp
-(eval-after-load 'auto-complete
-  '(add-to-list 'ac-modes 'inf-ruby-mode))
-(add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable)
+  (use-package auto-complete
+    :config
+    (add-to-list 'ac-modes 'inf-ruby-mode)
+    (add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable)
 
-(eval-after-load 'inf-ruby
-  '(define-key inf-ruby-mode-map (kbd "TAB") 'auto-complete))
+    ;; (define-key ac-complete-mode-map (kbd "C-:") 'ac-complete-with-helm)
 
-(define-key ac-complete-mode-map (kbd "C-:") 'ac-complete-with-helm)
-
-(require 'auto-complete-config)
-(ac-config-default)
-#+END_SRC emacs-lisp
-*** TODO Mew (email) (do I stop using mew?)
-Mew's config is in ~/.mew.el so you won't see it here. Nee-ner nee-ner nee-----ner.
-#+BEGIN_SRC emacs-lisp
-(autoload 'mew "mew" nil t)
-(autoload 'mew-send "mew" nil t)
-
-;; Optional setup (Read Mail menu):
-(setq read-mail-command 'mew)
-
-;; Optional setup (e.g. C-xm for sending a message):
-(autoload 'mew-user-agent-compose "mew" nil t)
-(if (boundp 'mail-user-agent)
-    (setq mail-user-agent 'mew-user-agent))
-(if (fboundp 'define-mail-user-agent)
-    (define-mail-user-agent
-      'mew-user-agent
-      'mew-user-agent-compose
-      'mew-draft-send-message
-      'mew-draft-kill
-      'mew-send-hook))
-
-(setq mew-use-master-passwd t)
+    (require 'auto-complete-config)
+    (ac-config-default))
 #+END_SRC
 *** Calendar, dates, times
 #+BEGIN_SRC emacs-lisp
@@ -988,22 +1042,23 @@ Mew's config is in ~/.mew.el so you won't see it here. Nee-ner nee-ner nee-----n
 #+END_SRC
 **** calfw, the calendar framework
 #+BEGIN_SRC emacs-lisp
-(require 'calfw)
-(require 'calfw-cal)
-(require 'calfw-ical)
-(require 'calfw-org)
+  (use-package calfw
+    :config
+    (require 'calfw-cal)
+    (require 'calfw-ical)
+    (require 'calfw-org)
 
-(setq cfw:fchar-junction ?╋
-      cfw:fchar-vertical-line ?┃
-      cfw:fchar-horizontal-line ?━
-      cfw:fchar-left-junction ?┣
-      cfw:fchar-right-junction ?┫
-      cfw:fchar-top-junction ?┯
-      cfw:fchar-top-left-corner ?┏
-      cfw:fchar-top-right-corner ?┓)
+    (setq cfw:fchar-junction ?╋
+          cfw:fchar-vertical-line ?┃
+          cfw:fchar-horizontal-line ?━
+          cfw:fchar-left-junction ?┣
+          cfw:fchar-right-junction ?┫
+          cfw:fchar-top-junction ?┯
+          cfw:fchar-top-left-corner ?┏
+          cfw:fchar-top-right-corner ?┓))
 #+END_SRC
-
-Here is a sample function where you could, for instance, put your Google Calendar information (mostly so I remember how to create the secret file on a new computer).
+***** TODO calfw-gcal
+Here is a sample function where you could put your Google Calendar information (mostly so I remember how to create the secret file on a new computer).
 
 #+BEGIN_QUOTE
 (defun stag-calendar ()
@@ -1023,7 +1078,6 @@ dired-jump is awesome (C-x C-j in any buffer)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-;; (setq-default dired-listing-switches "-alhv")
 ;; Changed my mind. I prefer seeing just the files:
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
@@ -1058,9 +1112,3 @@ It's also nice to have dired with M-< and M-> take you to first and last file
   (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
 #+END_SRC
 
-** Playing
-*** Playing MUDs
-#+BEGIN_SRC emacs-lisp
-(autoload 'mu-open "mu" "Play on MUSHes and MUDs" t)
-(add-hook 'mu-connection-mode-hook 'ansi-color-for-comint-mode-on)
-#+END_SRC
