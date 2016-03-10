@@ -5,6 +5,11 @@
 ** TODO About (set global key to open this file)
 <<babel-init>>
 Welcome to my emacs configuration.
+I tinker with this file a lot, so I need a quick way to get to it. This is probably one of the worst possible ways to do it.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-c C-<SPC>")
+                (lambda () (interactive) (find-file "~/.emacs.d/aldric.org")))
+#+END_SRC
 ** Personal information
 #+BEGIN_SRC emacs-lisp
 (setq user-full-name "Aldric Giacomoni"
@@ -41,10 +46,16 @@ I default to melpa-stable.
 (setq use-package-always-pin "melpa-stable")
 (setq use-package-always-ensure t)
 #+END_SRC
+
+*** A new package browser
+#+BEGIN_SRC emacs-lisp
+(use-package paradox)
+#+END_SRC
 ** Additional paths
 *** Themes
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+(load-theme 'mejelly t)
 #+END_SRC
 *** Packages (without package manglement)
 #+BEGIN_SRC emacs-lisp
@@ -203,205 +214,6 @@ Suspend emacs？ I'll use C-x C-z.
 #+BEGIN_SRC emacs-lisp
 (global-unset-key (kbd "C-z"))
 #+END_SRC
-*** Interface
-I use IDO and I like it a lot. flx-ido, especially, is basically heaven.
-#+BEGIN_SRC emacs-lisp
-(ido-mode 1)
-(add-to-list 'ido-ignore-files "\\.DS_Store")
-(setq ido-use-faces t
-      ido-enable-prefix nil
-      ido-enable-flex-matching t
-      ido-case-fold t ;; ignore case
-      ido-create-new-buffer 'always ;; easily create files
-      ido-use-filename-at-point nil ;; don't try to be smart
-)
-(setq ido-auto-merge-delay-time 7) ;; Default: 0.7
-
-(use-package ido-ubiquitous :config (ido-ubiquitous 1))
-(use-package ido-vertical-mode :config (ido-vertical-mode 1))
-(use-package flx-ido :config (flx-ido-mode 1))
-#+END_SRC
-
-;;;; Alright, helm, give me your best shot.
-;;;; #+BEGIN_SRC emacs-lisp
-;;;; (require 'helm)
-;;;; #+END_SRC
-;;;; **** Appearance
-;;;; Only pop up at the bottom.
-;;;;
-;;;; #+BEGIN_SRC emacs-lisp
-;;;; (setq helm-split-window-in-side-p t)
-;;;;
-;;;; (add-to-list 'display-buffer-alist
-;;;;              '("\\`\\*helm.*\\*\\'"
-;;;;                (display-buffer-in-side-window)
-;;;;                (inhibit-same-window . t)
-;;;;                (window-height . 0.4)))
-;;;;
-;;;; (setq helm-swoop-split-with-multiple-windows nil
-;;;;         helm-swoop-split-direction 'split-window-vertically
-;;;;         helm-swoop-split-window-function 'helm-default-display-buffer)
-;;;;
-;;;; #+END_SRC
-;;;;
-;;;; Input in header line and hide the mode-lines above.
-;;;;
-;;;; #+BEGIN_SRC emacs-lisp
-;;;; (setq helm-echo-input-in-header-line t)
-;;;;
-;;;; (defvar bottom-buffers nil
-;;;;   "List of bottom buffers before helm session.
-;;;;     Its element is a pair of `buffer-name' and `mode-line-format'.")
-;;;;
-;;;; (defun bottom-buffers-init ()
-;;;;   (setq-local mode-line-format (default-value 'mode-line-format))
-;;;;   (setq bottom-buffers
-;;;;         (cl-loop for w in (window-list)
-;;;;                  when (window-at-side-p w 'bottom)
-;;;;                  collect (with-current-buffer (window-buffer w)
-;;;;                            (cons (buffer-name) mode-line-format)))))
-;;;;
-;;;;
-;;;; (defun bottom-buffers-hide-mode-line ()
-;;;;   (setq-default cursor-in-non-selected-windows nil)
-;;;;   (mapc (lambda (elt)
-;;;;           (with-current-buffer (car elt)
-;;;;             (setq-local mode-line-format nil)))
-;;;;         bottom-buffers))
-;;;;
-;;;;
-;;;; (defun bottom-buffers-show-mode-line ()
-;;;;   (setq-default cursor-in-non-selected-windows t)
-;;;;   (when bottom-buffers
-;;;;     (mapc (lambda (elt)
-;;;;             (with-current-buffer (car elt)
-;;;;               (setq-local mode-line-format (cdr elt))))
-;;;;           bottom-buffers)
-;;;;     (setq bottom-buffers nil)))
-;;;;
-;;;; (defun helm-keyboard-quit-advice (orig-func &rest args)
-;;;;   (bottom-buffers-show-mode-line)
-;;;;   (apply orig-func args))
-;;;;
-;;;;
-;;;; (add-hook 'helm-before-initialize-hook #'bottom-buffers-init)
-;;;; (add-hook 'helm-after-initialize-hook #'bottom-buffers-hide-mode-line)
-;;;; (add-hook 'helm-exit-minibuffer-hook #'bottom-buffers-show-mode-line)
-;;;; (add-hook 'helm-cleanup-hook #'bottom-buffers-show-mode-line)
-;;;; (advice-add 'helm-keyboard-quit :around #'helm-keyboard-quit-advice)
-;;;; #+END_SRC
-;;;; **** File Navigation
-;;;;
-;;;; Backspace goes to the upper folder if you are not inside a filename,
-;;;; and Return will select a file or navigate into the directory if
-;;;; it is one.
-;;;;
-;;;; #+BEGIN_SRC emacs-lisp
-;;;; (require 'helm)
-;;;; (helm-mode 1)
-;;;; (defun dwim-helm-find-files-up-one-level-maybe ()
-;;;;   (interactive)
-;;;;   (if (looking-back "/" 1)
-;;;;       (call-interactively 'helm-find-files-up-one-level)
-;;;;     (delete-backward-char 1)))
-;;;;
-;;;; (define-key helm-read-file-map (kbd "<backsqpace>") 'dwim-helm-find-files-up-one-level-maybe)
-;;;; (define-key helm-read-file-map (kbd "DEL") 'dwim-helm-find-files-up-one-level-maybe)
-;;;; (define-key helm-find-files-map (kbd "<backspace>") 'dwim-helm-find-files-up-one-level-maybe)
-;;;; (define-key helm-find-files-map (kbd "DEL") 'dwim-helm-find-files-up-one-level-maybe)
-;;;;
-;;;; (defun dwim-helm-find-files-navigate-forward (orig-fun &rest args)
-;;;;   "Adjust how helm-execute-persistent actions behaves, depending on context"
-;;;;   (if (file-directory-p (helm-get-selection))
-;;;;       (apply orig-fun args)
-;;;;     (helm-maybe-exit-minibuffer)))
-;;;;
-;;;;
-;;;; (define-key helm-map (kbd "<return>") 'helm-maybe-exit-minibuffer)
-;;;; (define-key helm-map (kbd "RET") 'helm-maybe-exit-minibuffer)
-;;;; (define-key helm-find-files-map (kbd "<return>") 'helm-execute-persistent-action)
-;;;; (define-key helm-read-file-map (kbd "<return>") 'helm-execute-persistent-action)
-;;;; (define-key helm-find-files-map (kbd "RET") 'helm-execute-persistent-action)
-;;;; (define-key helm-read-file-map (kbd "RET") 'helm-execute-persistent-action)
-;;;;
-;;;; (advice-add 'helm-execute-persistent-action :around #'dwim-helm-find-files-navigate-forward)
-;;;; #+END_SRC
-;;;;
-;;;; **** FLX
-;;;; #+BEGIN_SRC emacs-lisp
-;;;; (with-eval-after-load 'helm
-;;;;   (require 'flx)
-;;;;   (defvar helm-flx-cache (flx-make-string-cache #'flx-get-heatmap-file))
-;;;;   (defadvice helm-score-candidate-for-pattern
-;;;;       (around flx-score (candidate pattern) activate preactivate compile)
-;;;;     (setq ad-return-value
-;;;;           (or
-;;;;            (car (flx-score
-;;;;                  (substring-no-properties candidate)
-;;;;                  (substring-no-properties pattern)
-;;;;                  helm-flx-cache))
-;;;;            0)))
-;;;;
-;;;;   (defadvice helm-fuzzy-default-highlight-match
-;;;;       (around flx-highlight (candidate) activate preactivate compile)
-;;;;     "The default function to highlight matches in fuzzy matching.
-;;;; It is meant to use with `filter-one-by-one' slot."
-;;;;     (setq ad-return-value
-;;;;           (let* ((pair (and (consp candidate) candidate))
-;;;;                  (display (if pair (car pair) candidate))
-;;;;                  (real (cdr pair)))
-;;;;             (with-temp-buffer
-;;;;               (insert display)
-;;;;               (goto-char (point-min))
-;;;;               (if (string-match-p " " helm-pattern)
-;;;;                   (cl-loop with pattern = (split-string helm-pattern)
-;;;;                            for p in pattern
-;;;;                            do (when (search-forward (substring-no-properties p) nil t)
-;;;;                                 (add-text-properties
-;;;;                                  (match-beginning 0) (match-end 0) '(face helm-match))))
-;;;;                 (cl-loop with pattern = (cdr (flx-score
-;;;;                                               (substring-no-properties display)
-;;;;                                               helm-pattern helm-flx-cache))
-;;;;                          for index in pattern
-;;;;                          do (add-text-properties
-;;;;                              (1+ index) (+ 2 index) '(face helm-match))))
-;;;;               (setq display (buffer-string)))
-;;;;             (if real (cons display real) display))))
-;;;;
-;;;;   (setq
-;;;;    helm-buffers-fuzzy-matching t
-;;;;    helm-imenu-fuzzy-match t
-;;;;    helm-recentf-fuzzy-match t
-;;;;    helm-locate-fuzzy-match nil
-;;;;    helm-M-x-fuzzy-match t
-;;;;    helm-semantic-fuzzy-match t))
-;;;; #+END_SRC
-;;;; **** Helm-AG-r
-;;;; #+BEGIN_SRC
-;;;; (setq helm-ag-r-option-list
-;;;;       '("-S -U --hidden"
-;;;;         "-S -U -l"))
-;;;; #+END_SRC
-;;;; **** TODO helm-gtags (connect to stag-code-modes-hook?)
-;;;; #+BEGIN_SRC emacs-lisp
-;;;;     ;; Enable helm-gtags-mode
-;;;;     (add-hook 'c-mode-hook 'helm-gtags-mode)
-;;;;     (add-hook 'c++-mode-hook 'helm-gtags-mode)
-;;;;     (add-hook 'asm-mode-hook 'helm-gtags-mode)
-;;;;     (add-hook 'enh-ruby-mode-hook 'helm-gtags-mode)
-;;;;
-;;;;     ;; Set key bindings
-;;;;     (eval-after-load "helm-gtags"
-;;;;       '(progn
-;;;;          (define-key helm-gtags-mode-map (kbd "M-t") 'helm-gtags-find-tag)
-;;;;          (define-key helm-gtags-mode-map (kbd "M-r") 'helm-gtags-find-rtag)
-;;;;          (define-key helm-gtags-mode-map (kbd "M-s") 'helm-gtags-find-symbol)
-;;;;          (define-key helm-gtags-mode-map (kbd "M-g M-p") 'helm-gtags-parse-file)
-;;;;          (define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
-;;;;          (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
-;;;;          (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)))
-;;;;
-;;;; #+END_SRC
 *** Fuzzy matching
 Enter smex. I like typing "plp" to get to "package-list-packages".
 #+BEGIN_SRC emacs-lisp
@@ -441,12 +253,74 @@ emacs is awesome. It's also crazy, crazy full-featured. This plugin lets you exa
 *** Discover                                               :external:minor:
 On the topic of discovering emacs.. Discover.el is amazing.
 #+BEGIN_SRC emacs-lisp
-(use-package discover
-  :config (global-discover-mode 1))
+(use-package discover :config (global-discover-mode 1))
+#+END_SRC
+** Extending emacs with engines
+*** Interface: =ido=
+I use IDO and I like it a lot. flx-ido, especially, is basically heaven.
+#+BEGIN_SRC emacs-lisp
+(ido-mode 1)
+(ido-everywhere 1)
+(add-to-list 'ido-ignore-files "\\.DS_Store")
+(setq ido-use-faces t
+      ido-enable-prefix nil
+      ido-enable-flex-matching t
+      ido-case-fold t ;; ignore case
+      ido-create-new-buffer 'always ;; easily create files
+      ido-use-filename-at-point nil ;; don't try to be smart
+)
+(setq ido-auto-merge-delay-time 7) ;; Default: 0.7
+
+(use-package ido-ubiquitous
+             :config
+             (ido-ubiquitous-mode)
+             (setq org-completion-use-ido t)
+             (setq magit-completing-read-function 'magit-ido-completing-read))
+(use-package ido-vertical-mode :config (ido-vertical-mode 1))
+(use-package flx-ido :config (flx-ido-mode 1))
+#+END_SRC
+
+*** Completion
+#+BEGIN_SRC emacs-lisp
+  (use-package auto-complete
+    :config
+    (require 'auto-complete-config)
+    (ac-config-default))
+#+END_SRC
+*** Project navigation
+Projectile is pretty sweet.
+#+BEGIN_SRC emacs-lisp
+(use-package projectile
+  :init
+  (use-package grizzl)
+  :config
+  (projectile-global-mode)
+  (setq projectile-completion-system 'grizzl))
+#+END_SRC
+*** Searching
+**** Anzu (about search results)                          :external:minor:
+#+BEGIN_SRC emacs-lisp
+  (use-package anzu
+    :config (global-anzu-mode t)
+    :bind (("M-%" . anzu-query-replace)
+           ("C-M-%" . anzu-query-replace-regexp)))
+#+END_SRC
+**** Silver searcher + Wgrep-ag
+Sometimes after you've found a bunch of things, you want to edit.. Kind of a find-and-replace sort of deal, maybe?
+#+BEGIN_SRC emacs-lisp
+(use-package ag
+  :config
+  (use-package wgrep-ag
+    :ensure wgrep
+    :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
+    :config (autoload 'wgrep-ag-setup "wgrep-ag")))
 #+END_SRC
 ** Org-mode
 #+BEGIN_SRC emacs-lisp
-(use-package org)
+  (use-package org
+    :config
+    (use-package org-bullets
+      :init (add-hook 'org-mode-hook 'org-bullets-mode)))
 #+END_SRC
 I've been having some issues exporting, so I'm actively loading libraries here.
 #+BEGIN_SRC emacs-lisp
@@ -530,14 +404,15 @@ This is currently disabled.
 *** Olivetti                                               :external:minor:
 #+BEGIN_SRC emacs-lisp
 (use-package olivetti
-:config
-(setq olivetti-body-width 80)
-(add-hook 'org-mode-hook 'turn-on-olivetti-mode))
+  :init
+  (add-hook 'org-mode-hook 'turn-on-olivetti-mode)
+  :config
+  (setq olivetti-body-width 80))
 #+END_SRC
 *** Markdown                                               :major:external:
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
-    :config
+    :init
     (add-hook 'markdown-mode-hook 'turn-on-orgtbl))
 #+END_SRC
 *** Blogging
@@ -553,6 +428,10 @@ This is currently disabled.
 *** TODO Presentations (org-reveal? org-ioslide?)
 ** Writing (specs, docs, blogs...)
 *** Interacting with text
+**** More fine-grained word-by-word navigation
+#+BEGIN_SRC emacs-lisp
+(use-package syntax-subword :config (syntax-subword-mode))
+#+END_SRC
 **** Use visual-line-mode
 #+BEGIN_SRC emacs-lisp
 (remove-hook 'text-mode-hook #'turn-on-auto-fill)
@@ -596,7 +475,7 @@ I used Bash for a long time. This allows me to keep using Ctrl-w to delete a wor
 *** Symbols
 #+BEGIN_SRC emacs-lisp
 (use-package xah-math-input
-  :config
+  :init
   (add-hook 'text-mode-hook 'xah-math-input-mode)
   (add-hook 'org-mode-hook 'xah-math-input-mode))
 #+END_SRC
@@ -643,14 +522,6 @@ Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct
   (setq-default abbrev-mode t)
 #+END_SRC
 ** Programming
-*** Project navigation
-**** projectile                                           :minor:external:
-#+BEGIN_SRC emacs-lisp
-(use-package projectile
-  :config
-  (projectile-global-mode)
-  (setq projectile-completion-system 'grizzl))
-#+END_SRC
 *** Indentation
 Always spaces. Always.
 #+BEGIN_SRC emacs-lisp
@@ -662,7 +533,7 @@ This is the ggtags plugin, which uses GNU Global.
 (use-package ggtags
   :config
   (setq tags-case-fold-search nil)
-  (global-set-key (kbd "<f7>") 'ggtags-create-tags))
+  :bind ("<f7>" . ggtags-create-tags))
 #+END_SRC
 *** Basic changes I want made to any code buffer
 Makes it easy to type things like {} or [] or () and magically add an extra line between the two so you can type there
@@ -705,29 +576,28 @@ Here's where I plug in every modification I want in a code buffer
 One of the features that makes IDEA's editors awesome is the way you can expand selection. This plugin replicates the feature.
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
-    :config
-    (global-set-key (kbd "C-c <up>") 'er/expand-region)
-    (global-set-key (kbd "C-c <down>") 'er/contract-region))
+    :bind (("C-c <up>" . er/expand-region)
+           ("C-c <down>" . er/contract-region)))
 #+END_SRC
 *** Log files
 Auto-tail, please.
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-mode))
 #+END_SRC
-*** TODO C# (add .cs to modelist?)
+*** C#
 #+BEGIN_SRC emacs-lisp
 (defun stag-csharp-mode-hook ()
   (setq c-basic-offset 4))
 
 (use-package csharp-mode
   :defer t
-  :config
+  :init
   (add-hook 'csharp-mode-hook 'stag-csharp-mode-hook))
 #+END_SRC
-*** emacs lisp (gettin' meta in here)
+*** emacs lisp
 #+BEGIN_SRC emacs-lisp
   (use-package paredit
-    :config
+    :init
     (add-hook 'lisp-mode-hook 'paredit-mode)
     (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
 
@@ -735,14 +605,24 @@ Auto-tail, please.
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
 #+END_SRC
+*** Elixir
+#+BEGIN_SRC emacs-lisp
+  (use-package alchemist
+    :config
+    (use-package elixir-yasnippets)
+    (use-package flymake-elixir
+      :init (add-hook 'elixir-mode-hook 'flymake-mode)))
+#+END_SRC
 *** CSS
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode
-    :config
+    :init
     (add-hook 'scss-mode-hook 'rainbow-mode)
     (add-hook 'css-mode-hook 'rainbow-mode))
 
-  (use-package scss-mode :mode "\\.scss$")
+  (use-package scss-mode
+    :mode "\\.scss$"
+    :init (add-hook 'scss-mode-hook 'flymake-mode))
 
 #+END_SRC
 *** Golang
@@ -752,12 +632,13 @@ And let's have gofmt chew my code when I save the file.
   (use-package go-mode
     :bind (:map go-mode-map
                 ("C c r s" . go-test-current-file))
-    :config
+    :init
     (defun stag-go-mode ()
       (add-hook 'before-save-hook 'gofmt-before-save nil t)) ;; chew my code
     (add-hook 'go-mode-hook 'stag-go-mode)
+    :config
     (use-package go-autocomplete
-      :config (add-hook 'go-mode-hook 'auto-complete-for-go)))
+      :init (add-hook 'go-mode-hook 'auto-complete-for-go)))
 #+END_SRC
 *** HTML
 **** Web-mode                                           :external:major:
@@ -778,35 +659,37 @@ Here are all the extensions where I want web-mode enabled
     (setq web-mode-markup-indent-offset 4)
     (setq web-mode-css-indent-offset 4)
     (setq web-mode-code-indent-offset 4)
-    (setq web-mode-indent-style 4)
+    (setq web-mode-indent-style 4))
 
-    ;; And, emmet-mode is pretty sweet.
-
+  (use-package emmet-mode
+    :init
+    (add-hook 'html-mode-hook 'emmet-mode)
     (add-hook 'web-mode-hook 'emmet-mode))
 
-  (add-hook 'html-mode-hook 'emmet-mode)
 #+END_SRC
 *** Javascript
 **** js2-mode                                             :major:external:
 #+BEGIN_SRC emacs-lisp
   (use-package js2-mode
     :mode "\\.js$"
+    :mode ("\\.jsx$" . js2-jsx-mode)
+    :init (add-hook 'js2-mode-hook 'stag-code-modes-hook)
     :config
-    (add-to-list 'auto-mode-alist '(".jsx$" . js2-jsx-mode))
     (setq js2-basic-offset 2)
-    (setq js2-bounce-indent-p t)
-
+    (setq js2-bounce-indent-p f) ;; if I want to toggle indentation
     (setq js2-highlight-level 3)
-
-    (add-hook 'js2-mode-hook 'stag-code-modes-hook)
     (use-package ac-js2
-      :config
-      (add-hook 'js2-mode-hook 'ac-js2-mode)))
+      :init (add-hook 'js2-mode-hook 'ac-js2-mode)))
 #+END_SRC
-
+**** TODO inferior mode (Pick one? Keep both?)
+#+BEGIN_SRC emacs-lisp
+  (use-package js-comint)
+  (use-package nodejs-repl)
+#+END_SRC
 **** json-mode
 #+BEGIN_SRC emacs-lisp
 (use-package json-mode :mode "\\.babelrc$")
+(use-package json-reformat)
 #+END_SRC
 *** Ruby
 **** Enh-ruby-mode
@@ -821,36 +704,50 @@ There's a few extra things I want started when I open a Ruby buffer
   (use-package enh-ruby-mode
     :interpreter "ruby"
     :mode "\\.rb$" "Guardfile" "\\.rake$" "\\.pryrc$" "Rakefile" "Capfile" "Gemfile" "\\.ru$"
-    :config
+    :init
     (add-hook 'enh-ruby-mode-hook 'stag-code-modes-hook)
     (add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook))
 #+END_SRC
-
+**** Project navigation
 And I like projectile-rails to handle rails projects.
-
+#+BEGIN_SRC emacs-lisp
+(use-package projectile-rails
+  :init
+   (add-hook 'projectile-mode-hook 'projectile-rails-on))
+#+END_SRC
+**** Inferior Ruby
 And I like pry better than irb, so have inf-ruby use pry.
 #+BEGIN_SRC emacs-lisp
   (use-package inf-ruby
     :config
     (setq inf-ruby-default-implementation "pry")
-    :bind (:map inf-ruby-mode-map
-                ("TAB" . auto-complete)))
+    (use-package ac-inf-ruby
+      :init (add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable)
+      :config
+      (add-to-list 'ac-modes 'inf-ruby-mode)
+      :bind (:map inf-ruby-mode-map
+                  ("TAB" . auto-complete))))
 #+END_SRC
-
+**** Snippets
 I use yasnippets, and I've downloaded a collection of snippets from here: https://github.com/bmaland/yasnippet-ruby-mode
-***** TODO Projectile-Rails
-#+BEGIN_SRC emacs-lisp
-;; (add-hook 'projectile-mode-hook 'projectile-rails-on)
-#+END_SRC
 *** Rust
 #+BEGIN_SRC emacs-lisp
-(use-package rust-mode
-  :config
-  (add-hook 'rust-mode-hook 'stag-code-modes-hook)
-  (add-hook 'rust-mode-hook 'flycheck-mode)
-  (add-hook 'rust-mode-hook 'flymake-mode))
+  (use-package rust-mode
+    :init
+    (add-hook 'rust-mode-hook 'stag-code-modes-hook)
+    (add-hook 'rust-mode-hook 'flycheck-mode)
+    (add-hook 'rust-mode-hook 'flymake-mode)
+    :config
+    (use-package flycheck-rust)
+    (use-package flymake-rust)
+    (use-package cargo))
 #+END_SRC
 *** Shells
+**** Generic shell things
+#+BEGIN_SRC emacs-lisp
+(use-package shell-command
+  :init (add-hook 'shell-mode-hook 'shell-command-completion-mode))
+#+END_SRC
 **** Bash
 #+BEGIN_SRC emacs-lisp
   (setq explicit-bash-args '("--noediting" "--login" "-i"))
@@ -865,9 +762,12 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 
 **** Slime
 #+BEGIN_SRC emacs-lisp
+(use-package slime
+  :config
   ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
   ;; ;; Replace "sbcl" with the path to your implementation
   ;; (setq inferior-lisp-program "clisp")
+  )
 #+END_SRC
 **** Eshell
 #+BEGIN_SRC emacs-lisp
@@ -881,7 +781,7 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 auto-upcase SQL keywords as I type, please.
 #+BEGIN_SRC emacs-lisp
 (use-package sqlup-mode
-  :config
+  :init
   (add-hook 'sql-mode-hook 'sqlup-mode)
   (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 #+END_SRC
@@ -973,6 +873,13 @@ smtpmail-multi
 (add-hook 'notmuch-message-mode-hook 'stag-email-hook)
 #+END_SRC
 ** Miscellanous
+*** Color themes
+#+BEGIN_SRC emacs-lisp
+(use-package material-theme)
+(use-package moe-theme)
+(use-package railscasts-theme)
+#+END_SRC
+
 *** Whitespace                                             :minor:builtin:
 #+BEGIN_SRC emacs-lisp
 (require 'whitespace)
@@ -980,24 +887,6 @@ smtpmail-multi
 (setq whitespace-style '(face trailing tabs lines-tail))
 (setq whitespace-global-modes '(not org-mode web-mode "Web" markdown-mode))
 (global-whitespace-mode)
-#+END_SRC
-*** Searching
-**** Anzu (about search results)                          :external:minor:
-#+BEGIN_SRC emacs-lisp
-  (use-package anzu
-    :config
-    (global-anzu-mode t)
-    :bind (("M-%" . anzu-query-replace)
-           ("C-M-%" . anzu-query-replace-regexp)))
-#+END_SRC
-**** Wgrep-ag
-Sometimes after you've found a bunch of things, you want to edit.. Kind of a find-and-replace sort of deal, maybe?
-#+BEGIN_SRC emacs-lisp
-  (use-package wgrep-ag
-    :ensure wgrep
-    :config
-    (autoload 'wgrep-ag-setup "wgrep-ag")
-    (add-hook 'ag-mode-hook 'wgrep-ag-setup))
 #+END_SRC
 *** Interface customization
 **** Smart mode line
@@ -1013,18 +902,6 @@ This handy little package increases the size of the font in the whole frame.
 (use-package default-text-scale
   :bind (("C-x C-=" . default-text-scale-increase)
          ("C-x C--" . default-text-scale-decrease)))
-#+END_SRC
-*** TODO Auto completion (there's a helm thing in here)
-#+BEGIN_SRC emacs-lisp
-  (use-package auto-complete
-    :config
-    (add-to-list 'ac-modes 'inf-ruby-mode)
-    (add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable)
-
-    ;; (define-key ac-complete-mode-map (kbd "C-:") 'ac-complete-with-helm)
-
-    (require 'auto-complete-config)
-    (ac-config-default))
 #+END_SRC
 *** Calendar, dates, times
 #+BEGIN_SRC emacs-lisp
@@ -1111,4 +988,3 @@ It's also nice to have dired with M-< and M-> take you to first and last file
 (define-key dired-mode-map
   (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
 #+END_SRC
-
