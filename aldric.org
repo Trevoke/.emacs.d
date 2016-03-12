@@ -10,6 +10,8 @@ I tinker with this file a lot, so I need a quick way to get to it. This is proba
 (global-set-key (kbd "C-c C-<SPC>")
                 (lambda () (interactive) (find-file "~/.emacs.d/aldric.org")))
 #+END_SRC
+*** TODO Minor modes?
+I could create here some empty minor modes based on how I think about a buffer, hook those to whatever major modes I care about, and then just hook to the minor mode everywhere else in my configuration
 ** Personal information
 #+BEGIN_SRC emacs-lisp
 (setq user-full-name "Aldric Giacomoni"
@@ -68,7 +70,7 @@ I default to melpa-stable.
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/packages")
 #+END_SRC
-*** TODO Secrets (configure paradox)
+*** Secrets
 API keys, passwords, etc are kept in here. This file is .gitignored.
 #+BEGIN_SRC emacs-lisp
 (load "~/.emacs.d/emacs.secrets" t)
@@ -215,7 +217,10 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
       scroll-preserve-screen-position 1)
 #+END_SRC
 ** Interacting with emacs
-*** TODO Folding code (origami-mode please)
+*** Folding code
+#+BEGIN_SRC emacs-lisp
+(use-package origami :config (global-origami-mode))
+#+END_SRC
 *** Disable C-z to minimize
 Suspend emacs？ I'll use C-x C-z.
 #+BEGIN_SRC emacs-lisp
@@ -321,252 +326,6 @@ I forget the basic keybindings all the time: After a search using =ag=, use C-c 
   (use-package wgrep-ag
     :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
     :config (autoload 'wgrep-ag-setup "wgrep-ag")))
-#+END_SRC
-** Org-mode
-#+BEGIN_SRC emacs-lisp
-  (use-package org
-    :pin melpa
-    :config
-    (use-package org-bullets
-      :init (add-hook 'org-mode-hook 'org-bullets-mode)))
-#+END_SRC
-I've been having some issues exporting, so I'm actively loading libraries here.
-#+BEGIN_SRC emacs-lisp
-(load-library "org-macro")
-(load-library "ob-exp")
-(load-library "org")
-(load-library "org-compat")
-(load-library "ox")
-#+END_SRC
-Org-mode is nowadays a BIG part of what I do with emacs...
-**** First, Github-Flavored Markdown
-It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table. use C-c C-c to generate / update GFM table.
-#+BEGIN_SRC emacs-lisp
-;;; orgtbl-to-gfm conversion function
-;; Usage Example:
-;;
-;; <!-- BEGIN RECEIVE ORGTBL ${1:YOUR_TABLE_NAME} -->
-;; <!-- END RECEIVE ORGTBL $1 -->
-;;
-;; <!--
-;; #+ORGTBL: SEND $1 orgtbl-to-gfm
-;; | $0 |
-;; -->
-
-(defun orgtbl-to-gfm (table params)
-  "Convert the Orgtbl mode TABLE to GitHub Flavored Markdown."
-  (let* ((alignment (mapconcat (lambda (x) (if x "|--:" "|---"))
-                               org-table-last-alignment ""))
-         (params2
-          (list
-           :splice t
-           :hline (concat alignment "|")
-           :lstart "| " :lend " |" :sep " | ")))
-           (orgtbl-to-generic table (org-combine-plists params2 params))))
-
-(defun stag-insert-org-to-gfm-table (table-name)
-  (interactive "*sEnter table name: ")
-  (insert "<!---
-#+ORGTBL: SEND " table-name " orgtbl-to-gfm
-
--->
-<!--- BEGIN RECEIVE ORGTBL " table-name " -->
-<!--- END RECEIVE ORGTBL " table-name " -->")
-  (previous-line)
-  (previous-line)
-  (previous-line))
-
-  (global-set-key (kbd "C-c t") 'stag-insert-org-to-gfm-table)
-#+END_SRC
-**** Generic org-mode configuration
-#+BEGIN_SRC emacs-lisp
-(setq org-src-fontify-natively t)
-(add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
-
-(setq org-directory "~/Google Drive/notes")
-(setq org-default-notes-file (concat org-directory "/notes.org.txt"))
-(define-key global-map "\C-cc" 'org-capture)
-
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cb" 'org-iswitchb)
-
-(setq org-startup-indented t)
-(setq org-log-done 'time)
-
-(setq org-todo-keywords '( "TODO(t)" "WAIT(w)" "|" "DONE" "CANCELED(c)"))
-(setq org-tag-alist '(("@home" . ?h) ("@work" . ?w) ("family") ("weiqi") ("ruby") ("lisp") ("emacs")))
-
-(setq org-mobile-directory "~/Dropbox/orgnotes")
-(setq org-mobile-inbox-for-pull "~/Google Drive/notes/from-mobile.org")
-#+END_SRC
-
-**** Left mouse-click to org-cycle
-What? My hands aren't ALWAYS on the keyboard.
-This is currently disabled.
-#+BEGIN_SRC emacs-lisp
-;; (defun stag-click-to-cycle-org-visibility ()
-;;   (local-set-key [mouse-1] 'org-cycle))
-;; (add-hook 'org-mode-hook 'stag-click-to-cycle-org-visibility)
-#+END_SRC
-*** Olivetti                                               :external:minor:
-#+BEGIN_SRC emacs-lisp
-(use-package olivetti
-  :init
-  (add-hook 'org-mode-hook 'turn-on-olivetti-mode)
-  :config
-  (setq olivetti-body-width 80))
-#+END_SRC
-*** Markdown                                               :major:external:
-#+BEGIN_SRC emacs-lisp
-  (use-package markdown-mode
-    :init
-    (add-hook 'markdown-mode-hook 'turn-on-orgtbl))
-#+END_SRC
-*** Blogging
-#+BEGIN_SRC emacs-lisp
-  (use-package org-page
-    :config
-    (setq op/repository-directory "~/src/projects/trevoke.github.io")
-    (setq op/personal-github-link "https://github.com/trevoke")
-    (setq op/site-domain "http://blog.trevoke.net/")
-    (setq op/site-main-title "Seven Steps")
-    (setq op/site-sub-title "Words... words, they're all we have to go on! — Rosencrantz and Guildenstern are dead"))
-#+END_SRC
-*** TODO Presentations (org-reveal? org-ioslide?)
-** Writing (specs, docs, blogs...)
-*** Interacting with text
-**** More fine-grained word-by-word navigation
-#+BEGIN_SRC emacs-lisp
-(use-package syntax-subword :config (syntax-subword-mode))
-#+END_SRC
-**** Use visual-line-mode
-#+BEGIN_SRC emacs-lisp
-(remove-hook 'text-mode-hook #'turn-on-auto-fill)
-(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
-#+END_SRC
-**** Redefine kill-region and backward-kill-word
-I used Bash for a long time. This allows me to keep using Ctrl-w to delete a word backward.
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-w") 'backward-kill-word)
-(global-set-key (kbd "C-x C-k") 'kill-region)
-#+END_SRC
-**** TODO Move down real line by real line (do I kill this?)
-#+BEGIN_SRC emacs-lisp
-(setq line-move-visual nil)
-#+END_SRC
-**** Sentences end with a single space
-#+BEGIN_SRC emacs-lisp
-(setq sentence-end-double-space nil)
-#+END_SRC
-**** Inserting new lines before/after current one
-#+BEGIN_SRC emacs-lisp
-(defun stag-insert-line-below ()
-  "Insert and auto-indent line below cursor, like in vim."
-  (interactive)
-  (move-end-of-line 1)
-  (open-line 1)
-  (next-line)
-  (indent-for-tab-command))
-
-(defun stag-insert-line-above ()
-  "Insert and auto-indent line above cursor, like in vim."
-  (interactive)
-  (previous-line)
-  (move-end-of-line 1)
-  (stag-insert-line-below))
-
-(global-set-key (kbd "C-o") 'stag-insert-line-below)
-(global-set-key (kbd "C-M-o") 'stag-insert-line-above)
-#+END_SRC
-
-*** Symbols
-#+BEGIN_SRC emacs-lisp
-(use-package xah-math-input
-  :init
-  (add-hook 'text-mode-hook 'xah-math-input-mode)
-  (add-hook 'org-mode-hook 'xah-math-input-mode))
-#+END_SRC
-*** COMMENT Fixing typos
-Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
-
-#+BEGIN_SRC emacs-lisp
-  (define-key ctl-x-map "\C-i"
-    #'endless/ispell-word-then-abbrev)
-
-  (defun endless/ispell-word-then-abbrev (p)
-    "Call `ispell-word', then create an abbrev for it.
-  With prefix P, create local abbrev. Otherwise it will
-  be global.
-  If there's nothing wrong with the word at point, keep
-  looking for a typo until the beginning of buffer. You can
-  skip typos you don't want to fix with `SPC', and you can
-  abort completely with `C-g'."
-    (interactive "P")
-    (let (bef aft)
-      (save-excursion
-        (while (if (setq bef (thing-at-point 'word))
-                   ;; Word was corrected or used quit.
-                   (if (ispell-word nil 'quiet)
-                       nil ; End the loop.
-                     ;; Also end if we reach `bob'.
-                     (not (bobp)))
-                 ;; If there's no word at point, keep looking
-                 ;; until `bob'.
-                 (not (bobp)))
-          (backward-word))
-        (setq aft (thing-at-point 'word)))
-      (if (and aft bef (not (equal aft bef)))
-          (let ((aft (downcase aft))
-                (bef (downcase bef)))
-            (define-abbrev
-              (if p local-abbrev-table global-abbrev-table)
-              bef aft)
-            (message "\"%s\" now expands to \"%s\" %sally"
-                     bef aft (if p "loc" "glob")))
-        (user-error "No typo at or before point"))))
-
-  (setq save-abbrevs 'silently)
-  (setq-default abbrev-mode t)
-#+END_SRC
-** Version control
-*** Git
-**** Editing various git files
-#+BEGIN_SRC emacs-lisp
-(use-package gitconfig-mode)
-#+END_SRC
-**** Walking through a file's history
-#+BEGIN_SRC emacs-lisp
-(use-package git-timemachine)
-#+END_SRC
-**** Magit                                                :external:minor:
-Magit is a pretty amazing interface to git.
-#+BEGIN_SRC emacs-lisp
-(use-package magit
-  :bind ("C-c g" . magit-status)
-  :config (setq magit-last-seen-setup-instructions "1.4.0"))
-#+END_SRC
-***** Magit + gitflow
-With this configuration, using C-f in a status buffer will trigger the gitflow selectors.
-#+BEGIN_SRC emacs-lisp
-(use-package magit-gitflow
-  :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
-#+END_SRC
-***** Github pull requests
-This will let us handle pull requests through Github.
-| key | behavior                                        |
-|-----+-------------------------------------------------|
-| # g | refresh list of PRs                             |
-| # f | fetch commits for PR                            |
-| # b | create topic branch for PR                      |
-| # m | merge PR on top of currently checked out branch |
-| # c | create new pull request                         |
-| # o | open PR in browser                              |
-| j q | jump to PR section in magit-status              |
-|-----+-------------------------------------------------|
-#+BEGIN_SRC emacs-lisp
-(use-package magit-gh-pulls
-  :config (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls))
 #+END_SRC
 ** Programming
 *** Indentation
@@ -746,6 +505,10 @@ Here are all the extensions where I want web-mode enabled
 (use-package json-mode :mode "\\.babelrc$")
 (use-package json-reformat)
 #+END_SRC
+**** snippets
+#+BEGIN_SRC emacs-lisp
+(use-package react-snippets)
+#+END_SRC
 *** Ruby
 **** Enh-ruby-mode
 There's a few extra things I want started when I open a Ruby buffer
@@ -852,6 +615,273 @@ auto-upcase SQL keywords as I type, please.
   (add-hook 'sql-mode-hook 'sqlup-mode)
   (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 #+END_SRC
+*** Exercism
+#+BEGIN_SRC emacs-lisp
+(use-package exercism)
+#+END_SRC
+** Org-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :pin melpa
+    :config
+    (use-package org-bullets
+      :init (add-hook 'org-mode-hook 'org-bullets-mode)))
+#+END_SRC
+I've been having some issues exporting, so I'm actively loading libraries here.
+#+BEGIN_SRC emacs-lisp
+(load-library "org-macro")
+(load-library "ob-exp")
+(load-library "org")
+(load-library "org-compat")
+(load-library "ox")
+
+(use-package ox-pandoc)
+#+END_SRC
+Org-mode is nowadays a BIG part of what I do with emacs...
+**** Generic org-mode configuration
+#+BEGIN_SRC emacs-lisp
+(setq org-src-fontify-natively t)
+(add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
+
+(setq org-directory "~/Google Drive/notes")
+(setq org-default-notes-file (concat org-directory "/notes.org.txt"))
+(define-key global-map "\C-cc" 'org-capture)
+
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cb" 'org-iswitchb)
+
+(setq org-startup-indented t)
+(setq org-log-done 'time)
+
+(setq org-todo-keywords '( "TODO(t)" "WAIT(w)" "|" "DONE" "CANCELED(c)"))
+(setq org-tag-alist '(("@home" . ?h) ("@work" . ?w) ("family") ("weiqi") ("ruby") ("lisp") ("emacs")))
+
+(setq org-mobile-directory "~/Dropbox/orgnotes")
+(setq org-mobile-inbox-for-pull "~/Google Drive/notes/from-mobile.org")
+#+END_SRC
+
+**** Left mouse-click to org-cycle
+What? My hands aren't ALWAYS on the keyboard.
+This is currently disabled.
+#+BEGIN_SRC emacs-lisp
+;; (defun stag-click-to-cycle-org-visibility ()
+;;   (local-set-key [mouse-1] 'org-cycle))
+;; (add-hook 'org-mode-hook 'stag-click-to-cycle-org-visibility)
+#+END_SRC
+*** Olivetti                                               :external:minor:
+#+BEGIN_SRC emacs-lisp
+(use-package olivetti
+  :init
+  (add-hook 'org-mode-hook 'turn-on-olivetti-mode)
+  :config
+  (setq olivetti-body-width 80))
+#+END_SRC
+*** Markdown                                               :major:external:
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :init
+    (add-hook 'markdown-mode-hook 'turn-on-orgtbl))
+#+END_SRC
+**** TODO Github-Flavored Markdown (requires backend config?)
+#+BEGIN_SRC emacs-lisp
+(require 'ox-md)
+#+END_SRC
+**** TODO My orgtbl-to-gfm conversion (obsoleted by above?)
+It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table. use C-c C-c to generate / update GFM table.
+#+BEGIN_SRC emacs-lisp
+;;; orgtbl-to-gfm conversion function
+;; Usage Example:
+;;
+;; <!-- BEGIN RECEIVE ORGTBL ${1:YOUR_TABLE_NAME} -->
+;; <!-- END RECEIVE ORGTBL $1 -->
+;;
+;; <!--
+;; #+ORGTBL: SEND $1 orgtbl-to-gfm
+;; | $0 |
+;; -->
+
+(defun orgtbl-to-gfm (table params)
+  "Convert the Orgtbl mode TABLE to GitHub Flavored Markdown."
+  (let* ((alignment (mapconcat (lambda (x) (if x "|--:" "|---"))
+                               org-table-last-alignment ""))
+         (params2
+          (list
+           :splice t
+           :hline (concat alignment "|")
+           :lstart "| " :lend " |" :sep " | ")))
+           (orgtbl-to-generic table (org-combine-plists params2 params))))
+
+(defun stag-insert-org-to-gfm-table (table-name)
+  (interactive "*sEnter table name: ")
+  (insert "<!---
+#+ORGTBL: SEND " table-name " orgtbl-to-gfm
+
+-->
+<!--- BEGIN RECEIVE ORGTBL " table-name " -->
+<!--- END RECEIVE ORGTBL " table-name " -->")
+  (previous-line)
+  (previous-line)
+  (previous-line))
+
+  (global-set-key (kbd "C-c t") 'stag-insert-org-to-gfm-table)
+#+END_SRC
+
+*** Blogging
+#+BEGIN_SRC emacs-lisp
+  (use-package org-page
+    :config
+    (setq op/repository-directory "~/src/projects/trevoke.github.io")
+    (setq op/personal-github-link "https://github.com/trevoke")
+    (setq op/site-domain "http://blog.trevoke.net/")
+    (setq op/site-main-title "Seven Steps")
+    (setq op/site-sub-title "Words... words, they're all we have to go on! — Rosencrantz and Guildenstern are dead"))
+#+END_SRC
+** Writing (specs, docs, blogs...)
+*** Interacting with text
+**** More fine-grained word-by-word navigation
+#+BEGIN_SRC emacs-lisp
+(use-package syntax-subword :config (syntax-subword-mode))
+#+END_SRC
+**** Use visual-line-mode
+#+BEGIN_SRC emacs-lisp
+(remove-hook 'text-mode-hook #'turn-on-auto-fill)
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+#+END_SRC
+**** Redefine kill-region and backward-kill-word
+I used Bash for a long time. This allows me to keep using Ctrl-w to delete a word backward.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-w") 'backward-kill-word)
+(global-set-key (kbd "C-x C-k") 'kill-region)
+#+END_SRC
+**** TODO Move down real line by real line (do I kill this?)
+#+BEGIN_SRC emacs-lisp
+(setq line-move-visual nil)
+#+END_SRC
+**** Sentences end with a single space
+#+BEGIN_SRC emacs-lisp
+(setq sentence-end-double-space nil)
+#+END_SRC
+**** Inserting new lines before/after current one
+#+BEGIN_SRC emacs-lisp
+(defun stag-insert-line-below ()
+  "Insert and auto-indent line below cursor, like in vim."
+  (interactive)
+  (move-end-of-line 1)
+  (open-line 1)
+  (next-line)
+  (indent-for-tab-command))
+
+(defun stag-insert-line-above ()
+  "Insert and auto-indent line above cursor, like in vim."
+  (interactive)
+  (previous-line)
+  (move-end-of-line 1)
+  (stag-insert-line-below))
+
+(global-set-key (kbd "C-o") 'stag-insert-line-below)
+(global-set-key (kbd "C-M-o") 'stag-insert-line-above)
+#+END_SRC
+
+*** Symbols
+#+BEGIN_SRC emacs-lisp
+(use-package xah-math-input
+  :init
+  (add-hook 'text-mode-hook 'xah-math-input-mode)
+  (add-hook 'org-mode-hook 'xah-math-input-mode))
+#+END_SRC
+*** COMMENT Fixing typos
+Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
+
+#+BEGIN_SRC emacs-lisp
+  (define-key ctl-x-map "\C-i"
+    #'endless/ispell-word-then-abbrev)
+
+  (defun endless/ispell-word-then-abbrev (p)
+    "Call `ispell-word', then create an abbrev for it.
+  With prefix P, create local abbrev. Otherwise it will
+  be global.
+  If there's nothing wrong with the word at point, keep
+  looking for a typo until the beginning of buffer. You can
+  skip typos you don't want to fix with `SPC', and you can
+  abort completely with `C-g'."
+    (interactive "P")
+    (let (bef aft)
+      (save-excursion
+        (while (if (setq bef (thing-at-point 'word))
+                   ;; Word was corrected or used quit.
+                   (if (ispell-word nil 'quiet)
+                       nil ; End the loop.
+                     ;; Also end if we reach `bob'.
+                     (not (bobp)))
+                 ;; If there's no word at point, keep looking
+                 ;; until `bob'.
+                 (not (bobp)))
+          (backward-word))
+        (setq aft (thing-at-point 'word)))
+      (if (and aft bef (not (equal aft bef)))
+          (let ((aft (downcase aft))
+                (bef (downcase bef)))
+            (define-abbrev
+              (if p local-abbrev-table global-abbrev-table)
+              bef aft)
+            (message "\"%s\" now expands to \"%s\" %sally"
+                     bef aft (if p "loc" "glob")))
+        (user-error "No typo at or before point"))))
+
+  (setq save-abbrevs 'silently)
+  (setq-default abbrev-mode t)
+#+END_SRC
+** Presentations
+*** Screencasts
+Camcorder is a tool to record screencasts, in GIF or other formats
+#+BEGIN_SRC emacs-lisp
+(use-package camcorder)
+#+END_SRC
+*** Slides
+#+BEGIN_SRC emacs-lisp
+(use-package org-ioslide)
+(use-package org-reveal :config (use-package htmlize))
+#+END_SRC
+** Version control
+*** Git
+**** Editing various git files
+#+BEGIN_SRC emacs-lisp
+(use-package gitconfig-mode)
+#+END_SRC
+**** Walking through a file's history
+#+BEGIN_SRC emacs-lisp
+(use-package git-timemachine)
+#+END_SRC
+**** Magit                                                :external:minor:
+Magit is a pretty amazing interface to git.
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :bind ("C-c g" . magit-status)
+  :config (setq magit-last-seen-setup-instructions "1.4.0"))
+#+END_SRC
+***** Magit + gitflow
+With this configuration, using C-f in a status buffer will trigger the gitflow selectors.
+#+BEGIN_SRC emacs-lisp
+(use-package magit-gitflow
+  :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
+#+END_SRC
+***** Github pull requests
+This will let us handle pull requests through Github.
+| key | behavior                                        |
+|-----+-------------------------------------------------|
+| # g | refresh list of PRs                             |
+| # f | fetch commits for PR                            |
+| # b | create topic branch for PR                      |
+| # m | merge PR on top of currently checked out branch |
+| # c | create new pull request                         |
+| # o | open PR in browser                              |
+| j q | jump to PR section in magit-status              |
+|-----+-------------------------------------------------|
+#+BEGIN_SRC emacs-lisp
+(use-package magit-gh-pulls
+  :config (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls))
+#+END_SRC
 ** Email
 *** TODO Add BBDB
 *** TODO Mew (email) (do I stop using mew?)
@@ -921,11 +951,18 @@ smtpmail-multi
 #+END_SRC
 *** Sending/Reading/Encrypting email
 #+BEGIN_SRC emacs-lisp
-(defun stag-email-hook ()
-  (epa-mail-mode)
-  (orgstruct++-mode))
+(use-package notmuch
+  :config
+  (defun stag-email-hook ()
+    (epa-mail-mode)
+    (orgstruct++-mode))
 
-(add-hook 'notmuch-message-mode-hook 'stag-email-hook)
+  (add-hook 'notmuch-message-mode-hook 'stag-email-hook))
+#+END_SRC
+** Communication
+#+BEGIN_SRC emacs-lisp
+(use-package circe)
+(use-package slack)
 #+END_SRC
 ** Miscellanous
 *** Color themes
@@ -940,7 +977,7 @@ smtpmail-multi
 (require 'whitespace)
 (setq whitespace-line-column 80) ;; limit line length
 (setq whitespace-style '(face trailing tabs lines-tail))
-(setq whitespace-global-modes '(not org-mode web-mode "Web" markdown-mode))
+(setq whitespace-global-modes '(not org-mode web-mode "Web" markdown-mode text-mode fundamental-mode))
 (global-whitespace-mode)
 #+END_SRC
 *** Interface customization
@@ -993,6 +1030,7 @@ This handy little package increases the size of the font in the whole frame.
 Here is a sample function where you could put your Google Calendar information (mostly so I remember how to create the secret file on a new computer).
 
 #+BEGIN_QUOTE
+(use-package calfw-gcal)
 (defun stag-calendar ()
   (interactive)
   (cfw:open-calendar-buffer
