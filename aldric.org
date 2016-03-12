@@ -241,26 +241,12 @@ All it does is tell you what face is at point.
                   (get-char-property pos 'face))))
     (if face (message "Face: %s" face) (message "No face at %d" pos))))
 #+END_SRC
-** TODO Discovering emacs (replace this stuff with icicles)
-*** Guide key                                              :minor:external:
-emacs is awesome. It's also crazy, crazy full-featured. This plugin lets you examine what's behind the door of a key prefix.
+** Discovering emacs
+*** Icicles
+With icicles, S-TAB will let you know what key bindings are available at any given moment. Pretty awesome. And that's just scratching the surface of what icicle does...
 #+BEGIN_SRC emacs-lisp
-  (use-package guide-key
-    :config
-    (setq guide-key/guide-key-sequence
-          '("C-x r"
-            "C-x 4"
-            "C-h"
-            "C-c"
-            "C-x" "C-x a" "C-x C-a"
-            "C-x 8" "C-x 8 \"  " "C-x 8 '" "C-x 8 ~"
-            "C-u" "C-u C-x"))
-    (guide-key-mode 1))
-#+END_SRC
-*** Discover                                               :external:minor:
-On the topic of discovering emacs.. Discover.el is amazing.
-#+BEGIN_SRC emacs-lisp
-(use-package discover :config (global-discover-mode 1))
+(use-package icicles
+  :config (icy-mode 1))
 #+END_SRC
 ** Extending emacs with engines
 *** Interface: =ido=
