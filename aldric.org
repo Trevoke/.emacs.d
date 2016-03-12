@@ -2,7 +2,7 @@
 #+OPTIONS: toc:4 h:4
 
 * Configuration
-** TODO About (set global key to open this file)
+** About
 <<babel-init>>
 Welcome to my emacs configuration.
 I tinker with this file a lot, so I need a quick way to get to it. This is probably one of the worst possible ways to do it.
@@ -38,6 +38,13 @@ I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
   (package-refresh-contents)
   (package-install 'use-package))
 (require 'use-package)
+
+;; This lets use-package install packages that come built-in with emacs, like org-mode
+;; (defun package-from-archive (f &rest args)
+;;   (and (apply f args)
+;;        (assq (car args) package-alist)))
+
+;; (advice-add 'package-installed-p :around 'package-from-archive)
 #+END_SRC
 
 *** Configuring the package manager
@@ -281,11 +288,24 @@ I use IDO and I like it a lot. flx-ido, especially, is basically heaven.
 #+END_SRC
 
 *** Completion
+**** Auto-complete
 #+BEGIN_SRC emacs-lisp
   (use-package auto-complete
     :config
     (require 'auto-complete-config)
-    (ac-config-default))
+    (ac-config-default)
+    (use-package ac-dabbrev
+      :config
+      (add-to-list 'ac-sources 'ac-source-dabbrev)
+      (defun ac-dabbrev-expand ()
+        (interactive)
+        (auto-complete '(ac-source-dabbrev)))
+      (global-set-key (kbd "M-/") 'ac-dabbrev-expand)))
+#+END_SRC
+**** Snippets
+Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
+#+BEGIN_SRC emacs-lisp
+(use-package yasnippet :config (yas-global-mode 1))
 #+END_SRC
 *** Project navigation
 Projectile is pretty sweet.
@@ -318,6 +338,7 @@ Sometimes after you've found a bunch of things, you want to edit.. Kind of a fin
 ** Org-mode
 #+BEGIN_SRC emacs-lisp
   (use-package org
+    :pin melpa
     :config
     (use-package org-bullets
       :init (add-hook 'org-mode-hook 'org-bullets-mode)))
@@ -521,6 +542,45 @@ Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct
   (setq save-abbrevs 'silently)
   (setq-default abbrev-mode t)
 #+END_SRC
+** Version control
+*** Git
+**** Editing various git files
+#+BEGIN_SRC emacs-lisp
+(use-package gitconfig-mode)
+#+END_SRC
+**** Walking through a file's history
+#+BEGIN_SRC emacs-lisp
+(use-package git-timemachine)
+#+END_SRC
+**** Magit                                                :external:minor:
+Magit is a pretty amazing interface to git.
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :bind ("C-c g" . magit-status)
+  :config (setq magit-last-seen-setup-instructions "1.4.0"))
+#+END_SRC
+***** Magit + gitflow
+With this configuration, using C-f in a status buffer will trigger the gitflow selectors.
+#+BEGIN_SRC emacs-lisp
+(use-package magit-gitflow
+  :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
+#+END_SRC
+***** Github pull requests
+This will let us handle pull requests through Github.
+| key | behavior                                        |
+|-----+-------------------------------------------------|
+| # g | refresh list of PRs                             |
+| # f | fetch commits for PR                            |
+| # b | create topic branch for PR                      |
+| # m | merge PR on top of currently checked out branch |
+| # c | create new pull request                         |
+| # o | open PR in browser                              |
+| j q | jump to PR section in magit-status              |
+|-----+-------------------------------------------------|
+#+BEGIN_SRC emacs-lisp
+(use-package magit-gh-pulls
+  :config (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls))
+#+END_SRC
 ** Programming
 *** Indentation
 Always spaces. Always.
@@ -626,6 +686,7 @@ Auto-tail, please.
 
 #+END_SRC
 *** Golang
+**** Golang mode
 Let's run tests easily, shall we?
 And let's have gofmt chew my code when I save the file.
 #+BEGIN_SRC elisp
@@ -640,6 +701,13 @@ And let's have gofmt chew my code when I save the file.
     (use-package go-autocomplete
       :init (add-hook 'go-mode-hook 'auto-complete-for-go)))
 #+END_SRC
+**** TODO Packages to be added
+- (use-package go-eldoc)
+- (use-package go-playground)
+- (use-package go-projectile)
+- (use-package gore-mode)
+- (use-package gorepl-mode)
+- (use-package gotest)
 *** HTML
 **** Web-mode                                           :external:major:
 Here are all the extensions where I want web-mode enabled
@@ -676,7 +744,7 @@ Here are all the extensions where I want web-mode enabled
     :init (add-hook 'js2-mode-hook 'stag-code-modes-hook)
     :config
     (setq js2-basic-offset 2)
-    (setq js2-bounce-indent-p f) ;; if I want to toggle indentation
+    (setq js2-bounce-indent-p nil) ;; if I want to toggle indentation
     (setq js2-highlight-level 3)
     (use-package ac-js2
       :init (add-hook 'js2-mode-hook 'ac-js2-mode)))
@@ -730,6 +798,18 @@ And I like pry better than irb, so have inf-ruby use pry.
 #+END_SRC
 **** Snippets
 I use yasnippets, and I've downloaded a collection of snippets from here: https://github.com/bmaland/yasnippet-ruby-mode
+**** TODO packages to be added
+- (use-package bundler)
+- (use-package goto-gem)
+- (use-package haml-mode)
+- (use-package slim-mode)
+- (use-package minitest)
+- (use-package rbenv)
+- (use-package robe)
+- (use-package rspec-mode)
+- (use-package ruby-hash-syntax)
+- (use-package ruby-refactor)
+- (use-package yaml-mode)
 *** Rust
 #+BEGIN_SRC emacs-lisp
   (use-package rust-mode
@@ -785,20 +865,8 @@ auto-upcase SQL keywords as I type, please.
   (add-hook 'sql-mode-hook 'sqlup-mode)
   (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 #+END_SRC
-*** Git
-**** Magit                                                :external:minor:
-Magit is a pretty amazing interface to git.
-#+BEGIN_SRC emacs-lisp
-(use-package magit
-  :bind ("C-c g" . magit-status)
-  :config (setq magit-last-seen-setup-instructions "1.4.0"))
-#+END_SRC
-*** Snippets
-Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
-#+BEGIN_SRC emacs-lisp
-(use-package yasnippet :config (yas-global-mode 1))
-#+END_SRC
 ** Email
+*** TODO Add BBDB
 *** TODO Mew (email) (do I stop using mew?)
 Mew's config is in ~/.mew.el so you won't see it here. Nee-ner nee-ner nee-----ner.
 #+BEGIN_SRC emacs-lisp

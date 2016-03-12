@@ -96,7 +96,6 @@
     ("conversatoin" "conversation" nil 0)
     ("conversatoins" "conversations" nil 0)
     ("cpaitalization" "capitalization" nil 0)
-    ("dev" "developer" nil 11)
     ("everytihng" "everything" nil 0)
     ("forwar" "forward" nil 0)
     ("infrsatructure" "infrastructure" nil 0)
