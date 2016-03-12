@@ -313,11 +313,12 @@ Projectile is pretty sweet.
 #+END_SRC
 **** Silver searcher + Wgrep-ag
 Sometimes after you've found a bunch of things, you want to edit.. Kind of a find-and-replace sort of deal, maybe?
+
+I forget the basic keybindings all the time: After a search using =ag=, use C-c C-p to start editing the results buffer, and use C-c C-c to save the changes and C-c C-k to cancel.
 #+BEGIN_SRC emacs-lisp
 (use-package ag
   :config
   (use-package wgrep-ag
-    :ensure wgrep
     :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
     :config (autoload 'wgrep-ag-setup "wgrep-ag")))
 #+END_SRC
