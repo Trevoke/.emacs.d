@@ -1058,22 +1058,28 @@ Using split-window-vertically from the first dired might be required to make thi
 (setq dired-dwim-target t)
 #+END_SRC
 
+OSX.. Windows.. *sigh*.
+#+BEGIN_SRC emacs-lisp
+(setq ls-lisp-use-insert-directory-program nil)
+(require 'ls-lisp)
+#+END_SRC
+
 It's also nice to have dired with M-< and M-> take you to first and last file
 #+BEGIN_SRC emacs-lisp
-(require 'dired)
-(defun dired-back-to-top ()
-  (interactive)
-  (beginning-of-buffer)
-  (next-line 2))
+  (require 'dired)
+  (defun dired-back-to-top ()
+    (interactive)
+    (beginning-of-buffer)
+    (next-line 2))
 
-(define-key dired-mode-map
-  (vector 'remap 'beginning-of-buffer) 'dired-back-to-top)
+  (define-key dired-mode-map
+    (vector 'remap 'beginning-of-buffer) 'dired-back-to-top)
 
-(defun dired-jump-to-bottom ()
-  (interactive)
-  (end-of-buffer)
-  (next-line -1))
+  (defun dired-jump-to-bottom ()
+    (interactive)
+    (end-of-buffer)
+    (next-line -1))
 
-(define-key dired-mode-map
-  (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
+  (define-key dired-mode-map
+    (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
 #+END_SRC
