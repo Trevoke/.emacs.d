@@ -615,10 +615,6 @@ auto-upcase SQL keywords as I type, please.
   (add-hook 'sql-mode-hook 'sqlup-mode)
   (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 #+END_SRC
-*** Exercism
-#+BEGIN_SRC emacs-lisp
-(use-package exercism)
-#+END_SRC
 ** Org-mode
 #+BEGIN_SRC emacs-lisp
   (use-package org
@@ -840,8 +836,8 @@ Camcorder is a tool to record screencasts, in GIF or other formats
 #+END_SRC
 *** Slides
 #+BEGIN_SRC emacs-lisp
-(use-package org-ioslide)
-(use-package org-reveal :config (use-package htmlize))
+(use-package ox-ioslide)
+(use-package ox-reveal :config (use-package htmlize))
 #+END_SRC
 ** Version control
 *** Git
