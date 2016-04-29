@@ -1,4 +1,4 @@
-#+TITLE Trevoke's emacs config
+#+TITLE: Trevoke's emacs config
 #+OPTIONS: toc:4 h:4
 
 * Configuration
@@ -18,7 +18,7 @@ I could create here some empty minor modes based on how I think about a buffer, 
       user-mail-address "trevoke@gmail.com")
 #+END_SRC
 ** Package management
-*** The package manager: use-package
+*** The package manager: =use-package=
 I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
 1. it is integrated within emacs.
 2. it allows me to set up emacs on any OS I desire more easily than other options I've encountered so far
@@ -102,8 +102,9 @@ In addition, I do keep some somewhat computer-specific stuff in there, like the 
 
 This shows the file path in the GUI header
 #+BEGIN_SRC emacs-lisp
-(setq-default frame-title-format '((:eval (if (buffer-file-name)
-                                              (abbreviate-file-name (buffer-file-name)) "%f"))))
+  (setq-default frame-title-format
+                '((:eval (if (buffer-file-name)
+                             (abbreviate-file-name (buffer-file-name)) "%f"))))
 #+END_SRC
 *** Backups
 Centralize emacs backups. This directory is gitignored.
