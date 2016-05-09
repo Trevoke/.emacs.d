@@ -54,6 +54,7 @@ I default to melpa-stable.
 #+BEGIN_SRC emacs-lisp
 (setq use-package-always-pin "melpa-stable")
 (setq use-package-always-ensure t)
+;; (setq use-package-always-defer t)
 #+END_SRC
 
 *** A new package browser
@@ -64,7 +65,7 @@ I default to melpa-stable.
 *** Themes
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-(load-theme 'mejelly t)
+;; (load-theme 'mejelly t)
 #+END_SRC
 *** Packages (without package manglement)
 #+BEGIN_SRC emacs-lisp
@@ -230,12 +231,12 @@ Suspend emacs？ I'll use C-x C-z.
 *** Fuzzy matching
 Enter smex. I like typing "plp" to get to "package-list-packages".
 #+BEGIN_SRC emacs-lisp
-  (use-package smex
-    :config
-    (smex-initialize)
-    (setq smex-auto-update t)
-    :bind (("C-x C-m" . smex)
-           ("C-x m" . smex-major-mode-commands)))
+  ;; (use-package smex
+  ;;   :config
+  ;;   (smex-initialize)
+  ;;   (setq smex-auto-update t)
+  ;;   :bind (("C-x C-m" . smex)
+  ;;          ("C-x m" . smex-major-mode-commands)))
 #+END_SRC
 *** Fonts and stuff
 I found this function online somewhere, before I thought tracking code origin for this config file might matter.
@@ -251,34 +252,21 @@ All it does is tell you what face is at point.
 *** Icicles
 With icicles, S-TAB will let you know what key bindings are available at any given moment. Pretty awesome. And that's just scratching the surface of what icicle does...
 #+BEGIN_SRC emacs-lisp
+(ido-mode nil)
 (use-package icicles
-  :config (icy-mode 1))
+  :init
+  (setq icicle-expand-input-to-common-match 0)
+  (setq icicle-show-Completions-initially-flag t)
+  (setq icicle-max-candidates 20)
+  (setq icicle-top-level-when-sole-completion-flag t)
+  (setq icicle-buffers-ido-like-flag t)
+  (setq icicle-files-ido-like-flag t)
+  :config
+  (icy-mode 1)
+  (icicle-ido-like-mode)
+  :bind (("C-x C-m" . icicle-execute-extended-command)))
 #+END_SRC
 ** Extending emacs with engines
-*** Interface: =ido=
-I use IDO and I like it a lot. flx-ido, especially, is basically heaven.
-#+BEGIN_SRC emacs-lisp
-(ido-mode 1)
-(ido-everywhere 1)
-(add-to-list 'ido-ignore-files "\\.DS_Store")
-(setq ido-use-faces t
-      ido-enable-prefix nil
-      ido-enable-flex-matching t
-      ido-case-fold t ;; ignore case
-      ido-create-new-buffer 'always ;; easily create files
-      ido-use-filename-at-point nil ;; don't try to be smart
-)
-(setq ido-auto-merge-delay-time 7) ;; Default: 0.7
-
-(use-package ido-ubiquitous
-             :config
-             (ido-ubiquitous-mode)
-             (setq org-completion-use-ido t)
-             (setq magit-completing-read-function 'magit-ido-completing-read))
-(use-package ido-vertical-mode :config (ido-vertical-mode 1))
-(use-package flx-ido :config (flx-ido-mode 1))
-#+END_SRC
-
 *** Completion
 **** Auto-complete
 #+BEGIN_SRC emacs-lisp
@@ -418,7 +406,8 @@ Auto-tail, please.
     :config
     (use-package elixir-yasnippets)
     (use-package flymake-elixir
-      :init (add-hook 'elixir-mode-hook 'flymake-mode)))
+      :init (use-package flymake-easy)
+            (add-hook 'elixir-mode-hook 'flymake-mode)))
 #+END_SRC
 *** CSS
 #+BEGIN_SRC emacs-lisp
@@ -460,7 +449,7 @@ And let's have gofmt chew my code when I save the file.
 Here are all the extensions where I want web-mode enabled
 #+BEGIN_SRC emacs-lisp
   (use-package web-mode
-    :mode "\\.mustache$" "\\.html$" "\\.erb$"
+    :mode "\\.mustache$" "\\.html$" "\\.erb$" "\\.jsx$"
     :config
     ;; I want to use auto-complete with the ac-html source when in web-mode
     (use-package ac-html
@@ -469,12 +458,26 @@ Here are all the extensions where I want web-mode enabled
                    '("html" . (ac-source-html-attribute-value
                                ac-source-html-tag
                                ac-source-html-attribute))))
+    (flycheck-define-checker jsxhint-checker
+      "A JSX syntax and style checker based on JSXHint."
+
+      :command ("jsxhint" source)
+      :error-patterns
+      ((error line-start (1+ nonl) ": line " line ", col " column ", " (message) line-end))
+      :modes (web-mode))
+
+    (add-hook 'web-mode-hook
+              (lambda ()
+                (when (equal web-mode-content-type "jsx")
+                  ;; enable flycheck
+                  (flycheck-select-checker 'jsxhint-checker)
+                  (flycheck-mode))))
 
     ;; And I think all this should be indented with 4 spaces.
-    (setq web-mode-markup-indent-offset 4)
-    (setq web-mode-css-indent-offset 4)
-    (setq web-mode-code-indent-offset 4)
-    (setq web-mode-indent-style 4))
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-css-indent-offset 2)
+    (setq web-mode-code-indent-offset 2)
+    (setq web-mode-indent-style 2))
 
   (use-package emmet-mode
     :init
@@ -487,14 +490,28 @@ Here are all the extensions where I want web-mode enabled
 #+BEGIN_SRC emacs-lisp
   (use-package js2-mode
     :mode "\\.js$"
-    :mode ("\\.jsx$" . js2-jsx-mode)
-    :init (add-hook 'js2-mode-hook 'stag-code-modes-hook)
+    :init
+    (add-hook 'js2-mode-hook 'stag-code-modes-hook)
     :config
     (setq js2-basic-offset 2)
     (setq js2-bounce-indent-p nil) ;; if I want to toggle indentation
     (setq js2-highlight-level 3)
     (use-package ac-js2
       :init (add-hook 'js2-mode-hook 'ac-js2-mode)))
+#+END_SRC
+**** tern-mode
+#+BEGIN_SRC emacs-lisp
+(use-package tern
+  :init (add-hook 'js2-mode-hook 'tern-mode)
+  :config
+  (use-package tern-auto-complete
+    :config
+    (require 'tern-auto-complete)
+    (tern-ac-setup)))
+
+(defun delete-tern-process ()
+  (interactive)
+  (delete-process "Tern"))
 #+END_SRC
 **** TODO inferior mode (Pick one? Keep both?)
 #+BEGIN_SRC emacs-lisp
@@ -527,7 +544,16 @@ There's a few extra things I want started when I open a Ruby buffer
     (add-hook 'enh-ruby-mode-hook 'stag-code-modes-hook)
     (add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook))
 #+END_SRC
-**** Project navigation
+**** Project management
+***** rbenv
+#+BEGIN_SRC emacs-lisp
+(use-package rbenv)
+#+END_SRC
+***** Bundler
+#+BEGIN_SRC emacs-lisp
+(use-package bundler)
+#+END_SRC
+***** Project navigation
 And I like projectile-rails to handle rails projects.
 #+BEGIN_SRC emacs-lisp
 (use-package projectile-rails
@@ -549,6 +575,11 @@ And I like pry better than irb, so have inf-ruby use pry.
 #+END_SRC
 **** Snippets
 I use yasnippets, and I've downloaded a collection of snippets from here: https://github.com/bmaland/yasnippet-ruby-mode
+**** Testing
+***** rspec
+#+BEGIN_SRC emacs-lisp
+(use-package rspec-mode)
+#+END_SRC
 **** TODO packages to be added
 - (use-package bundler)
 - (use-package goto-gem)
@@ -557,7 +588,6 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 - (use-package minitest)
 - (use-package rbenv)
 - (use-package robe)
-- (use-package rspec-mode)
 - (use-package ruby-hash-syntax)
 - (use-package ruby-refactor)
 - (use-package yaml-mode)
@@ -733,6 +763,16 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
     (setq op/site-domain "http://blog.trevoke.net/")
     (setq op/site-main-title "Seven Steps")
     (setq op/site-sub-title "Words... words, they're all we have to go on! — Rosencrantz and Guildenstern are dead"))
+
+  (use-package blog-admin
+    :init
+    (setq blog-admin-backend-path "~/src/projects/trevoke.github.io")
+    (setq blog-admin-backend-type 'org-page)
+    (setq blog-admin-backend-new-post-in-drafts t)
+    (setq blog-admin-backend-new-post-with-same-name-dir t)
+    (setq blog-admin-backend-org-page-drafts "_drafts")) ;; directory to save draft
+;;    (add-hook 'blog-admin-backend-after-new-post-hook 'find-file))
+
 #+END_SRC
 ** Writing (specs, docs, blogs...)
 *** Interacting with text
@@ -964,9 +1004,9 @@ smtpmail-multi
 ** Miscellanous
 *** Color themes
 #+BEGIN_SRC emacs-lisp
-(use-package material-theme)
-(use-package moe-theme)
-(use-package railscasts-theme)
+(use-package material-theme :defer t)
+(use-package moe-theme :defer t)
+(use-package railscasts-theme :defer t)
 #+END_SRC
 
 *** Whitespace                                             :minor:builtin:
@@ -1046,11 +1086,11 @@ dired-jump is awesome (C-x C-j in any buffer)
 
 #+BEGIN_SRC emacs-lisp
 ;; Changed my mind. I prefer seeing just the files:
-(add-hook 'dired-mode-hook 'dired-hide-details-mode)
+ (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
 ;; Auto-refresh silently
-(setq global-auto-revert-non-file-buffers t)
-(setq auto-revert-verbose nil)
+ (setq global-auto-revert-non-file-buffers t)
+ (setq auto-revert-verbose nil)
 #+END_SRC
 
 This will make org-mode behave kinda like a two-pane file manager: with two direds open, you can copy/rename and the default target will be the other pane.
@@ -1067,20 +1107,20 @@ OSX.. Windows.. *sigh*.
 
 It's also nice to have dired with M-< and M-> take you to first and last file
 #+BEGIN_SRC emacs-lisp
-  (require 'dired)
-  (defun dired-back-to-top ()
-    (interactive)
-    (beginning-of-buffer)
-    (next-line 2))
+(require 'dired)
+(defun dired-back-to-top ()
+  (interactive)
+  (beginning-of-buffer)
+  (next-line 2))
 
-  (define-key dired-mode-map
-    (vector 'remap 'beginning-of-buffer) 'dired-back-to-top)
+(define-key dired-mode-map
+  (vector 'remap 'beginning-of-buffer) 'dired-back-to-top)
 
-  (defun dired-jump-to-bottom ()
-    (interactive)
-    (end-of-buffer)
-    (next-line -1))
+(defun dired-jump-to-bottom ()
+  (interactive)
+  (end-of-buffer)
+  (next-line -1))
 
-  (define-key dired-mode-map
-    (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
+(define-key dired-mode-map
+  (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
 #+END_SRC
