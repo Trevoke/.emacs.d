@@ -121,7 +121,6 @@
     ("shold" "should" nil 0)
     ("somethinglese" "else" nil 0)
     ("sould" "should" nil 0)
-    ("sr" "senior" nil 0)
     ("striahgt" "straight" nil 0)
     ("synchronizatoin" "synchronizations" nil 0)
     ("thathe" "he" nil 0)
