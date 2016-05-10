@@ -297,6 +297,12 @@ Projectile is pretty sweet.
   (projectile-global-mode)
   (setq projectile-completion-system 'grizzl))
 #+END_SRC
+
+But sometimes you need a directory tree.
+#+BEGIN_SRC emacs-lisp
+(use-package sr-speedbar
+  :bind (("C-c \\" . sr-speedbar-toggle)))
+#+END_SRC
 *** Searching
 **** Anzu (about search results)                          :external:minor:
 #+BEGIN_SRC emacs-lisp
