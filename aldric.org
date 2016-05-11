@@ -42,11 +42,11 @@ I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
 (require 'use-package)
 
 ;; This lets use-package install packages that come built-in with emacs, like org-mode
-;; (defun package-from-archive (f &rest args)
-;;   (and (apply f args)
-;;        (assq (car args) package-alist)))
+ (defun package-from-archive (f &rest args)
+   (and (apply f args)
+        (assq (car args) package-alist)))
 
-;; (advice-add 'package-installed-p :around 'package-from-archive)
+ (advice-add 'package-installed-p :around 'package-from-archive)
 #+END_SRC
 
 *** Configuring the package manager
@@ -417,6 +417,8 @@ Auto-tail, please.
 #+END_SRC
 *** CSS
 #+BEGIN_SRC emacs-lisp
+  (setq css-indent-offset 2)
+
   (use-package rainbow-mode
     :init
     (add-hook 'scss-mode-hook 'rainbow-mode)
@@ -464,10 +466,10 @@ Here are all the extensions where I want web-mode enabled
                    '("html" . (ac-source-html-attribute-value
                                ac-source-html-tag
                                ac-source-html-attribute))))
-    (flycheck-define-checker jsxhint-checker
+    (flycheck-define-checker eslint-checker
       "A JSX syntax and style checker based on JSXHint."
 
-      :command ("jsxhint" source)
+      :command ("eslint" source)
       :error-patterns
       ((error line-start (1+ nonl) ": line " line ", col " column ", " (message) line-end))
       :modes (web-mode))
@@ -476,14 +478,22 @@ Here are all the extensions where I want web-mode enabled
               (lambda ()
                 (when (equal web-mode-content-type "jsx")
                   ;; enable flycheck
-                  (flycheck-select-checker 'jsxhint-checker)
+                  (flycheck-select-checker 'eslint-checker)
                   (flycheck-mode))))
 
     ;; And I think all this should be indented with 4 spaces.
     (setq web-mode-markup-indent-offset 2)
     (setq web-mode-css-indent-offset 2)
     (setq web-mode-code-indent-offset 2)
-    (setq web-mode-indent-style 2))
+    (setq web-mode-indent-style 2)
+
+    ;; for better jsx syntax-highlighting in web-mode
+    ;; - courtesy of Patrick @halbtuerke
+    (defadvice web-mode-highlight-part (around tweak-jsx activate)
+      (if (equal web-mode-content-type "jsx")
+        (let ((web-mode-enable-part-face nil))
+          ad-do-it)
+        ad-do-it)))
 
   (use-package emmet-mode
     :init
@@ -762,22 +772,22 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
 
 *** Blogging
 #+BEGIN_SRC emacs-lisp
-  (use-package org-page
-    :config
-    (setq op/repository-directory "~/src/projects/trevoke.github.io")
-    (setq op/personal-github-link "https://github.com/trevoke")
-    (setq op/site-domain "http://blog.trevoke.net/")
-    (setq op/site-main-title "Seven Steps")
-    (setq op/site-sub-title "Words... words, they're all we have to go on! — Rosencrantz and Guildenstern are dead"))
+        (use-package org-page
+          :config
+          (setq op/repository-directory "~/src/projects/trevoke.github.io")
+          (setq op/personal-github-link "https://github.com/trevoke")
+          (setq op/site-domain "http://blog.trevoke.net/")
+          (setq op/site-main-title "Seven Steps")
+          (setq op/site-sub-title "Words... words, they're all we have to go on! — Rosencrantz and Guildenstern are dead"))
 
-  (use-package blog-admin
-    :init
-    (setq blog-admin-backend-path "~/src/projects/trevoke.github.io")
-    (setq blog-admin-backend-type 'org-page)
-    (setq blog-admin-backend-new-post-in-drafts t)
-    (setq blog-admin-backend-new-post-with-same-name-dir t)
-    (setq blog-admin-backend-org-page-drafts "_drafts")) ;; directory to save draft
-;;    (add-hook 'blog-admin-backend-after-new-post-hook 'find-file))
+        ;; (use-package blog-admin
+        ;;   :init
+        ;;   (setq blog-admin-backend-path "~/src/projects/trevoke.github.io")
+        ;;   (setq blog-admin-backend-type 'org-page)
+        ;;   (setq blog-admin-backend-new-post-in-drafts t)
+        ;;   (setq blog-admin-backend-new-post-with-same-name-dir t)
+        ;;   (setq blog-admin-backend-org-page-drafts "_drafts")) ;; directory to save draft
+  ;;        (add-hook 'blog-admin-backend-after-new-post-hook 'find-file))
 
 #+END_SRC
 ** Writing (specs, docs, blogs...)
