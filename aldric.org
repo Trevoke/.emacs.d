@@ -42,11 +42,11 @@ I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
 (require 'use-package)
 
 ;; This lets use-package install packages that come built-in with emacs, like org-mode
- (defun package-from-archive (f &rest args)
-   (and (apply f args)
-        (assq (car args) package-alist)))
+;; (defun package-from-archive (f &rest args)
+;;   (and (apply f args)
+;;        (assq (car args) package-alist)))
 
- (advice-add 'package-installed-p :around 'package-from-archive)
+;; (advice-add 'package-installed-p :around 'package-from-archive)
 #+END_SRC
 
 *** Configuring the package manager
@@ -457,7 +457,7 @@ And let's have gofmt chew my code when I save the file.
 Here are all the extensions where I want web-mode enabled
 #+BEGIN_SRC emacs-lisp
   (use-package web-mode
-    :mode "\\.mustache$" "\\.html$" "\\.erb$" "\\.jsx$"
+    :mode "\\.mustache$" "\\.html$" "\\.erb$" "\\.jsx$" "\\.eex$"
     :config
     ;; I want to use auto-complete with the ac-html source when in web-mode
     (use-package ac-html
