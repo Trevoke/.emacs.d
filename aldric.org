@@ -189,10 +189,15 @@ Also, ibuffer is nicer than plain-old buffer window
 (setq ibuffer-default-sorting-mode 'major-mode)
 #+END_SRC
 *** Window management
-The package switch-window shows you a number for each buffer, making it simple to go to the one you care about.
+Two built-in minor modes allow me to recover a lost window config (winner-mode) and move across windows with Shift-<Arrow>, which is quite convenient.
 #+BEGIN_SRC emacs-lisp
-(use-package switch-window
-  :bind ("C-x o" . switch-window))
+  (winner-mode)
+  (windmove-default-keybindings)
+  (add-hook 'org-shiftup-final-hook 'windmove-up)
+  (add-hook 'org-shiftleft-final-hook 'windmove-left)
+  (add-hook 'org-shiftdown-final-hook 'windmove-down)
+  (add-hook 'org-shiftright-final-hook 'windmove-right)
+
 #+END_SRC
 Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
 #+BEGIN_SRC emacs-lisp
@@ -369,7 +374,6 @@ Here's where I plug in every modification I want in a code buffer
     (eldoc-mode)
     (add-hook 'before-save-hook 'whitespace-cleanup)
     (local-set-key "\C-m" 'stag-enter-key-dwim))
-    ;;(local-set-key "\C-m" 'newline-and-indent))
 
 (add-hook 'prog-mode-hook 'stag-code-modes-hook)
 #+END_SRC
