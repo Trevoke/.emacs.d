@@ -236,12 +236,12 @@ Suspend emacs？ I'll use C-x C-z.
 *** Fuzzy matching
 Enter smex. I like typing "plp" to get to "package-list-packages".
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package smex
-  ;;   :config
-  ;;   (smex-initialize)
-  ;;   (setq smex-auto-update t)
-  ;;   :bind (("C-x C-m" . smex)
-  ;;          ("C-x m" . smex-major-mode-commands)))
+  (use-package smex
+    :config
+    (smex-initialize)
+    (setq smex-auto-update t)
+    :bind (("C-x C-m" . smex)
+           ("C-x m" . smex-major-mode-commands)))
 #+END_SRC
 *** Fonts and stuff
 I found this function online somewhere, before I thought tracking code origin for this config file might matter.
@@ -254,22 +254,28 @@ All it does is tell you what face is at point.
     (if face (message "Face: %s" face) (message "No face at %d" pos))))
 #+END_SRC
 ** Discovering emacs
-*** Icicles
-With icicles, S-TAB will let you know what key bindings are available at any given moment. Pretty awesome. And that's just scratching the surface of what icicle does...
+*** ido-mode
+Someday I'll try helm again, but for now ido is my deity.
 #+BEGIN_SRC emacs-lisp
-(ido-mode nil)
-(use-package icicles
-  :init
-  (setq icicle-expand-input-to-common-match 0)
-  (setq icicle-show-Completions-initially-flag t)
-  (setq icicle-max-candidates 20)
-  (setq icicle-top-level-when-sole-completion-flag t)
-  (setq icicle-buffers-ido-like-flag t)
-  (setq icicle-files-ido-like-flag t)
-  :config
-  (icy-mode 1)
-  (icicle-ido-like-mode)
-  :bind (("C-x C-m" . icicle-execute-extended-command)))
+(ido-mode 1)
+(ido-everywhere 1)
+(add-to-list 'ido-ignore-files "\\.DS_Store")
+(setq ido-use-faces t
+      ido-enable-prefix nil
+      ido-enable-flex-matching t
+      ido-case-fold t ;; ignore case
+      ido-create-new-buffer 'always ;; easily create files
+      ido-use-filename-at-point nil ;; don't try to be smart
+)
+(setq ido-auto-merge-delay-time 7) ;; Default: 0.7
+
+(use-package ido-ubiquitous
+             :config
+             (ido-ubiquitous-mode)
+             (setq org-completion-use-ido t)
+             (setq magit-completing-read-function 'magit-ido-completing-read))
+(use-package ido-vertical-mode :config (ido-vertical-mode 1))
+(use-package flx-ido :config (flx-ido-mode 1))
 #+END_SRC
 ** Extending emacs with engines
 *** Completion
