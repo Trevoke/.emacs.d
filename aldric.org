@@ -553,6 +553,16 @@ Here are all the extensions where I want web-mode enabled
 #+BEGIN_SRC emacs-lisp
 (use-package react-snippets)
 #+END_SRC
+*** Python
+#+BEGIN_SRC emacs-lisp
+ (use-package elpy
+   :config
+   (add-hook 'python-mode-hook 'elpy-enable))
+(use-package auto-virtualenv
+  :config
+  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
+  (add-hook 'projectile-after-switch-project-hook  'auto-virtualenv-set-virtualenv))
+#+END_SRC
 *** Ruby
 **** Enh-ruby-mode
 There's a few extra things I want started when I open a Ruby buffer
