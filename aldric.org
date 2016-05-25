@@ -467,7 +467,7 @@ And let's have gofmt chew my code when I save the file.
 Here are all the extensions where I want web-mode enabled
 #+BEGIN_SRC emacs-lisp
   (use-package web-mode
-    :mode "\\.mustache$" "\\.html$" "\\.erb$" "\\.jsx$" "\\.eex$"
+    :mode "\\.mustache$" "\\.html$" "\\.erb$" "\\.jsx$" "\\.eex$" "\\.php$"
     :config
     ;; I want to use auto-complete with the ac-html source when in web-mode
     (use-package ac-html
@@ -491,7 +491,7 @@ Here are all the extensions where I want web-mode enabled
                   (flycheck-select-checker 'eslint-checker)
                   (flycheck-mode))))
 
-    ;; And I think all this should be indented with 4 spaces.
+    ;; And I think all this should be indented with 2 spaces.
     (setq web-mode-markup-indent-offset 2)
     (setq web-mode-css-indent-offset 2)
     (setq web-mode-code-indent-offset 2)
