@@ -913,8 +913,11 @@ Camcorder is a tool to record screencasts, in GIF or other formats
 #+END_SRC
 *** Slides
 #+BEGIN_SRC emacs-lisp
-(use-package ox-ioslide)
-(use-package ox-reveal :config (use-package htmlize))
+  (use-package ox-ioslide)
+  (use-package ox-reveal
+    :config
+    (use-package htmlize)
+    (setq org-reveal-root "file:///Users/aldric/src/vendor/reveal.js-3.3.0"))
 #+END_SRC
 ** Version control
 *** Git
