@@ -416,6 +416,10 @@ Auto-tail, please.
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
 #+END_SRC
+*** Elm
+#+BEGIN_SRC emacs-lisp
+(use-package elm-mode)
+#+END_SRC
 *** Elixir
 #+BEGIN_SRC emacs-lisp
   (use-package alchemist
