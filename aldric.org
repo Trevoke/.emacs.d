@@ -12,6 +12,7 @@ I tinker with this file a lot, so I need a quick way to get to it. This is proba
 #+END_SRC
 *** TODO Minor modes?
 I could create here some empty minor modes based on how I think about a buffer, hook those to whatever major modes I care about, and then just hook to the minor mode everywhere else in my configuration
+*** TODO Switch to company mode
 ** Personal information
 #+BEGIN_SRC emacs-lisp
 (setq user-full-name "Aldric Giacomoni"
