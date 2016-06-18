@@ -396,6 +396,10 @@ Auto-tail, please.
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-mode))
 #+END_SRC
+*** Cucumber
+#+BEGIN_SRC emacs-lisp
+(use-package feature-mode)
+#+END_SRC
 *** C#
 #+BEGIN_SRC emacs-lisp
 (defun stag-csharp-mode-hook ()
