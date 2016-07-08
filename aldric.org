@@ -189,10 +189,25 @@ Also, ibuffer is nicer than plain-old buffer window
 (global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
 (setq ibuffer-default-sorting-mode 'major-mode)
 #+END_SRC
-*** Window management
-Two built-in minor modes allow me to recover a lost window config (winner-mode) and move across windows with Shift-<Arrow>, which is quite convenient.
+*** Scrolling
 #+BEGIN_SRC emacs-lisp
-  (winner-mode)
+(setq scroll-margin 5
+      scroll-preserve-screen-position 1)
+#+END_SRC
+** Window management
+*** Window layout manager (eyebrowse)
+Prefix key is =C-c C-w=
+#+BEGIN_SRC emacs-lisp
+(use-package eyebrowse
+  :config (eyebrowse-mode))
+#+END_SRC
+*** Winner-mode (undo/redo window changes)
+Remember: =C-c <left>= and =C-c <right>=
+#+BEGIN_SRC emacs-lisp
+(winner-mode)
+#+END_SRC
+*** Windmove (move across windows with shift+arrow)
+#+BEGIN_SRC emacs-lisp
   (windmove-default-keybindings)
   (add-hook 'org-shiftup-final-hook 'windmove-up)
   (add-hook 'org-shiftleft-final-hook 'windmove-left)
@@ -200,6 +215,7 @@ Two built-in minor modes allow me to recover a lost window config (winner-mode) 
   (add-hook 'org-shiftright-final-hook 'windmove-right)
 
 #+END_SRC
+*** Move to new window when splitting
 Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
 #+BEGIN_SRC emacs-lisp
 (defun stag-vsplit-last-buffer (prefix)
@@ -218,11 +234,6 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
 
 (global-set-key (kbd "C-x 2") 'stag-vsplit-last-buffer)
 (global-set-key (kbd "C-x 3") 'stag-hsplit-last-buffer)
-#+END_SRC
-*** Scrolling
-#+BEGIN_SRC emacs-lisp
-(setq scroll-margin 5
-      scroll-preserve-screen-position 1)
 #+END_SRC
 ** Interacting with emacs
 *** Folding code
@@ -297,7 +308,7 @@ Someday I'll try helm again, but for now ido is my deity.
 **** Snippets
 Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
 #+BEGIN_SRC emacs-lisp
-(use-package yasnippet :config (yas-global-mode 1))
+(use-package yasnippet)
 #+END_SRC
 *** Project navigation
 Projectile is pretty sweet.
@@ -377,6 +388,7 @@ Here's where I plug in every modification I want in a code buffer
     (linum-mode t)
     (smartparens-mode)
     (auto-complete-mode)
+    (yas-mode)
     (ggtags-mode)
     (eldoc-mode)
     (add-hook 'before-save-hook 'whitespace-cleanup)
@@ -1171,4 +1183,8 @@ It's also nice to have dired with M-< and M-> take you to first and last file
 
 (define-key dired-mode-map
   (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
+#+END_SRC
+*** Editing Tintin++ config files
+#+BEGIN_SRC emacs-lisp
+(use-package tintin-mode)
 #+END_SRC
