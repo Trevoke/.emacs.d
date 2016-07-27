@@ -54,7 +54,6 @@ I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
 I default to melpa-stable.
 #+BEGIN_SRC emacs-lisp
 (setq use-package-always-pin "melpa-stable")
-(setq use-package-always-ensure t)
 ;; (setq use-package-always-defer t)
 #+END_SRC
 
@@ -388,8 +387,8 @@ Here's where I plug in every modification I want in a code buffer
     (linum-mode t)
     (smartparens-mode)
     (auto-complete-mode)
-    (yas-mode)
-    (ggtags-mode)
+    (yas-minor-mode)
+;;    (ggtags-mode)
     (eldoc-mode)
     (add-hook 'before-save-hook 'whitespace-cleanup)
     (local-set-key "\C-m" 'stag-enter-key-dwim))
@@ -659,6 +658,16 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
     (use-package flycheck-rust)
     (use-package flymake-rust)
     (use-package cargo))
+#+END_SRC
+*** Scala
+**** Ensime is our key to IDE-like features
+#+BEGIN_SRC emacs-lisp
+(use-package scala-mode)
+(use-package sbt-mode)
+(use-package ensime
+  :config
+  (add-hook 'scala-mode-hook 'ensime-scala-mode-hook))
+
 #+END_SRC
 *** Shells
 **** Generic shell things

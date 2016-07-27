@@ -18,6 +18,7 @@
       (mejelly-light-yellow-0 "#7f5406")
       (mejelly-light-yellow-1 "#808080")
       (mejelly-light-yellow-2 "#d8ad4c")
+      (mejelly-light-yellow-3 "#f7e7b0")
 
       (mejelly-light-blue-0 "#3a5ca6")
       (mejelly-light-blue-1 "#074e8d")
@@ -178,10 +179,11 @@
                                                         :background ,mejelly-light-bg))))
 
    `(mode-line                               ((,class ( :foreground ,mejelly-light-fg
-                                                        :background nil))))
+                                                        :background ,mejelly-light-yellow-3))))
    `(mode-line-inactive                      ((,class ( :foreground ,mejelly-light-grey-3
                                                         :background nil))))
 
+   `(org-hide                                ((,class ( :foreground ,mejelly-light-bg))))
    `(org-checkbox                            ((,class ( :foreground ,mejelly-light-green-0))))
    `(org-date                                ((,class ( :foreground ,mejelly-light-purple-0))))
    `(org-done                                ((,class ( :foreground ,mejelly-light-green-0))))
