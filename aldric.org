@@ -5,11 +5,8 @@
 ** About
 <<babel-init>>
 Welcome to my emacs configuration.
-I tinker with this file a lot, so I need a quick way to get to it. This is probably one of the worst possible ways to do it.
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-c C-<SPC>")
-                (lambda () (interactive) (find-file "~/.emacs.d/aldric.org")))
-#+END_SRC
+I tinker with this file a lot, so I need a quick way to get to it.
+I set a bookmark with =C-x r m= and I can get back here with =C-x r b=
 *** TODO Minor modes?
 I could create here some empty minor modes based on how I think about a buffer, hook those to whatever major modes I care about, and then just hook to the minor mode everywhere else in my configuration
 *** TODO Switch to company mode
