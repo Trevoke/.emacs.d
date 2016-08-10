@@ -15,49 +15,6 @@ I could create here some empty minor modes based on how I think about a buffer, 
 (setq user-full-name "Aldric Giacomoni"
       user-mail-address "trevoke@gmail.com")
 #+END_SRC
-** Package management
-*** The package manager: =use-package=
-I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
-1. it is integrated within emacs.
-2. it allows me to set up emacs on any OS I desire more easily than other options I've encountered so far
-3. it allows me to easily share / steal configuration snippets
-#+BEGIN_SRC emacs-lisp
-(require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/"))
-(add-to-list 'package-archives
-             '("melpa-stable" . "https://stable.melpa.org/packages/"))
-
-(package-initialize)
-
-;; Bootstrap `use-package'
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-(require 'use-package)
-
-;; This lets use-package install packages that come built-in with emacs, like org-mode
-;; (defun package-from-archive (f &rest args)
-;;   (and (apply f args)
-;;        (assq (car args) package-alist)))
-
-;; (advice-add 'package-installed-p :around 'package-from-archive)
-#+END_SRC
-
-*** Configuring the package manager
-I default to melpa-stable.
-#+BEGIN_SRC emacs-lisp
-(setq use-package-always-pin "melpa-stable")
-;; (setq use-package-always-defer t)
-#+END_SRC
-
-*** A new package browser
-#+BEGIN_SRC emacs-lisp
-(use-package paradox)
-#+END_SRC
 ** Additional paths
 *** Themes
 #+BEGIN_SRC emacs-lisp
@@ -79,6 +36,47 @@ In addition, I do keep some somewhat computer-specific stuff in there, like the 
 #+BEGIN_SRC emacs-lisp
 (setq custom-file "~/.emacs-custom.el")
 (load custom-file t) ;; t means no error if file does not exist
+#+END_SRC
+** Package management
+*** The package manager: =use-package=
+I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
+1. it is integrated within emacs.
+2. it allows me to set up emacs on any OS I desire more easily than other options I've encountered so far
+3. it allows me to easily share / steal configuration snippets
+#+BEGIN_SRC emacs-lisp
+  (require 'package)
+  (setq package-enable-at-startup nil)
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                           ("marmalade" . "http://marmalade-repo.org/packages/")
+                           ("melpa-stable" . "https://stable.melpa.org/packages/")
+                           ("gnu" . "https://elpa.gnu.org/packages/")))
+  (package-initialize)
+
+  ;; Bootstrap `use-package'
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+  (require 'use-package)
+
+  ;; ;; This lets use-package install packages that come built-in with emacs, like org-mode
+  ;; (defun package-from-archive (f &rest args)
+  ;;   (and (apply f args)
+  ;;        (assq (car args) package-alist)))
+
+  ;; (advice-add 'package-installed-p :around 'package-from-archive)
+#+END_SRC
+
+*** Configuring the package manager
+I default to melpa-stable.
+#+BEGIN_SRC emacs-lisp
+(setq use-package-always-pin "melpa-stable")
+(setq use-package-always-ensure t)
+;; (setq use-package-always-defer t)
+#+END_SRC
+
+*** A new package browser
+#+BEGIN_SRC emacs-lisp
+(use-package paradox)
 #+END_SRC
 ** General emacs config (no external packages)
 *** Yes/No => y/n
@@ -234,7 +232,9 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
 ** Interacting with emacs
 *** Folding code
 #+BEGIN_SRC emacs-lisp
-(use-package origami :config (global-origami-mode))
+  (use-package origami
+    :pin "melpa"
+    :config (global-origami-mode))
 #+END_SRC
 *** Disable C-z to minimize
 Suspend emacs？ I'll use C-x C-z.
@@ -294,6 +294,7 @@ Someday I'll try helm again, but for now ido is my deity.
     (require 'auto-complete-config)
     (ac-config-default)
     (use-package ac-dabbrev
+      :pin "melpa"
       :config
       (add-to-list 'ac-sources 'ac-source-dabbrev)
       (defun ac-dabbrev-expand ()
@@ -317,11 +318,6 @@ Projectile is pretty sweet.
   (setq projectile-completion-system 'grizzl))
 #+END_SRC
 
-But sometimes you need a directory tree.
-#+BEGIN_SRC emacs-lisp
-(use-package sr-speedbar
-  :bind (("C-c \\" . sr-speedbar-toggle)))
-#+END_SRC
 *** Searching
 **** Anzu (about search results)                          :external:minor:
 #+BEGIN_SRC emacs-lisp
@@ -439,6 +435,7 @@ Auto-tail, please.
     :config
     (use-package elixir-yasnippets)
     (use-package flymake-elixir
+      :pin "melpa"
       :init (use-package flymake-easy)
             (add-hook 'elixir-mode-hook 'flymake-mode)))
 #+END_SRC
@@ -447,6 +444,7 @@ Auto-tail, please.
   (setq css-indent-offset 2)
 
   (use-package rainbow-mode
+    :pin "gnu"
     :init
     (add-hook 'scss-mode-hook 'rainbow-mode)
     (add-hook 'css-mode-hook 'rainbow-mode))
@@ -540,6 +538,7 @@ Here are all the extensions where I want web-mode enabled
     (setq js2-bounce-indent-p nil) ;; if I want to toggle indentation
     (setq js2-highlight-level 3)
     (use-package ac-js2
+      :pin "melpa"
       :init (add-hook 'js2-mode-hook 'ac-js2-mode)))
 #+END_SRC
 **** tern-mode
@@ -568,7 +567,8 @@ Here are all the extensions where I want web-mode enabled
 #+END_SRC
 **** snippets
 #+BEGIN_SRC emacs-lisp
-(use-package react-snippets)
+  (use-package react-snippets
+    :pin "melpa")
 #+END_SRC
 *** Python
 #+BEGIN_SRC emacs-lisp
@@ -576,6 +576,7 @@ Here are all the extensions where I want web-mode enabled
    :config
    (add-hook 'python-mode-hook 'elpy-enable))
 (use-package auto-virtualenv
+  :pin "melpa"
   :config
   (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
   (add-hook 'projectile-after-switch-project-hook  'auto-virtualenv-set-virtualenv))
@@ -591,6 +592,7 @@ There's a few extra things I want started when I open a Ruby buffer
     (rbenv-use-corresponding))
 
   (use-package enh-ruby-mode
+    :pin "melpa"
     :interpreter "ruby"
     :mode "\\.rb$" "Guardfile" "\\.rake$" "\\.pryrc$" "Rakefile" "Capfile" "Gemfile" "\\.ru$"
     :init
@@ -647,13 +649,14 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 *** Rust
 #+BEGIN_SRC emacs-lisp
   (use-package rust-mode
+    :pin "melpa"
     :init
     (add-hook 'rust-mode-hook 'stag-code-modes-hook)
     (add-hook 'rust-mode-hook 'flycheck-mode)
     (add-hook 'rust-mode-hook 'flymake-mode)
     :config
-    (use-package flycheck-rust)
-    (use-package flymake-rust)
+    (use-package flycheck-rust :pin "melpa")
+    (use-package flymake-rust :pin "melpa")
     (use-package cargo))
 #+END_SRC
 *** Scala
@@ -669,8 +672,9 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 *** Shells
 **** Generic shell things
 #+BEGIN_SRC emacs-lisp
-(use-package shell-command
-  :init (add-hook 'shell-mode-hook 'shell-command-completion-mode))
+  (use-package shell-command
+    :pin "melpa"
+    :init (add-hook 'shell-mode-hook 'shell-command-completion-mode))
 #+END_SRC
 **** Bash
 #+BEGIN_SRC emacs-lisp
@@ -696,9 +700,9 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 **** Eshell
 #+BEGIN_SRC emacs-lisp
 (use-package eshell-did-you-mean
+  :pin "melpa"
   :config
-  (add-to-list 'eshell-preoutput-filter-functions
-               #'eshell-did-you-mean-output-filter))
+  (eshell-did-you-mean-setup))
 #+END_SRC
 *** SQL
 **** sqlup                                                :minor:external:
@@ -712,7 +716,7 @@ auto-upcase SQL keywords as I type, please.
 ** Org-mode
 #+BEGIN_SRC emacs-lisp
   (use-package org
-    :pin melpa
+    :pin "gnu"
     :config
     (use-package org-bullets
       :init (add-hook 'org-mode-hook 'org-bullets-mode)))
@@ -886,6 +890,7 @@ I used Bash for a long time. This allows me to keep using Ctrl-w to delete a wor
 *** Symbols
 #+BEGIN_SRC emacs-lisp
 (use-package xah-math-input
+  :pin "melpa"
   :init
   (add-hook 'text-mode-hook 'xah-math-input-mode)
   (add-hook 'org-mode-hook 'xah-math-input-mode))
@@ -942,6 +947,7 @@ Camcorder is a tool to record screencasts, in GIF or other formats
 #+BEGIN_SRC emacs-lisp
   (use-package ox-ioslide)
   (use-package ox-reveal
+    :pin "melpa"
     :config
     (use-package htmlize)
     (setq org-reveal-root "file:///Users/aldric/src/vendor/reveal.js-3.3.0"))
@@ -982,8 +988,8 @@ This will let us handle pull requests through Github.
 | j q | jump to PR section in magit-status              |
 |-----+-------------------------------------------------|
 #+BEGIN_SRC emacs-lisp
-(use-package magit-gh-pulls
-  :config (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls))
+;; (use-package magit-gh-pulls
+;;  :config (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls))
 #+END_SRC
 ** Email
 *** TODO Add BBDB
@@ -1024,6 +1030,7 @@ Mew's config is in ~/.mew.el so you won't see it here. Nee-ner nee-ner nee-----n
 smtpmail-multi
 #+BEGIN_SRC emacs-lisp
   (use-package smtpmail-multi
+    :pin "melpa"
     :config
     (setq smtpmail-multi-accounts
           (quote
@@ -1065,14 +1072,13 @@ smtpmail-multi
 ** Communication
 #+BEGIN_SRC emacs-lisp
 (use-package circe)
-(use-package slack)
+(use-package slack :pin "melpa")
 #+END_SRC
 ** Miscellanous
 *** Color themes
 #+BEGIN_SRC emacs-lisp
-(use-package material-theme :defer t)
-(use-package moe-theme :defer t)
-(use-package railscasts-theme :defer t)
+;; (use-package material-theme :pin "melpa")
+(use-package moe-theme :pin "melpa")
 #+END_SRC
 
 *** Whitespace                                             :minor:builtin:
@@ -1192,5 +1198,5 @@ It's also nice to have dired with M-< and M-> take you to first and last file
 #+END_SRC
 *** Editing Tintin++ config files
 #+BEGIN_SRC emacs-lisp
-(use-package tintin-mode)
+;; (use-package tintin-mode)
 #+END_SRC
