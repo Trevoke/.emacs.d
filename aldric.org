@@ -700,7 +700,6 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 **** Eshell
 #+BEGIN_SRC emacs-lisp
 (use-package eshell-did-you-mean
-  :pin "melpa"
   :config
   (eshell-did-you-mean-setup))
 #+END_SRC
