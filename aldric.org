@@ -287,20 +287,9 @@ Someday I'll try helm again, but for now ido is my deity.
 #+END_SRC
 ** Extending emacs with engines
 *** Completion
-**** Auto-complete
+**** company-mode
 #+BEGIN_SRC emacs-lisp
-  (use-package auto-complete
-    :config
-    (require 'auto-complete-config)
-    (ac-config-default)
-    (use-package ac-dabbrev
-      :pin "melpa"
-      :config
-      (add-to-list 'ac-sources 'ac-source-dabbrev)
-      (defun ac-dabbrev-expand ()
-        (interactive)
-        (auto-complete '(ac-source-dabbrev)))
-      (global-set-key (kbd "M-/") 'ac-dabbrev-expand)))
+(use-package company)
 #+END_SRC
 **** Snippets
 Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
@@ -372,14 +361,12 @@ Makes it easy to type things like {} or [] or () and magically add an extra line
 Here's where I plug in every modification I want in a code buffer
 #+BEGIN_SRC emacs-lisp
 (use-package smartparens)
-(use-package auto-complete)
 
 (defun stag-code-modes-hook ()
   "A couple of changes I like to make to my code buffers"
 ;;    (projectile-mode)
     (linum-mode t)
     (smartparens-mode)
-    (auto-complete-mode)
     (yas-minor-mode)
 ;;    (ggtags-mode)
     (eldoc-mode)
@@ -467,8 +454,8 @@ And let's have gofmt chew my code when I save the file.
       (add-hook 'before-save-hook 'gofmt-before-save nil t)) ;; chew my code
     (add-hook 'go-mode-hook 'stag-go-mode)
     :config
-    (use-package go-autocomplete
-      :init (add-hook 'go-mode-hook 'auto-complete-for-go)))
+    (use-package company-go
+      :config (set (make-local-variable 'company-backends) '(company-go))))
 #+END_SRC
 **** TODO Packages to be added
 - (use-package go-eldoc)
@@ -484,13 +471,12 @@ Here are all the extensions where I want web-mode enabled
   (use-package web-mode
     :mode "\\.mustache$" "\\.html$" "\\.erb$" "\\.jsx$" "\\.eex$" "\\.php$"
     :config
-    ;; I want to use auto-complete with the ac-html source when in web-mode
-    (use-package ac-html
+    (use-package company-web
       :config
-      (add-to-list 'web-mode-ac-sources-alist
-                   '("html" . (ac-source-html-attribute-value
-                               ac-source-html-tag
-                               ac-source-html-attribute))))
+      (add-to-list 'company-backends 'company-web-html)
+      (add-to-list 'company-backends 'company-web-jade)
+      (add-to-list 'company-backends 'company-web-slim))
+
     (flycheck-define-checker eslint-checker
       "A JSX syntax and style checker based on JSXHint."
 
@@ -536,20 +522,17 @@ Here are all the extensions where I want web-mode enabled
     :config
     (setq js2-basic-offset 2)
     (setq js2-bounce-indent-p nil) ;; if I want to toggle indentation
-    (setq js2-highlight-level 3)
-    (use-package ac-js2
-      :pin "melpa"
-      :init (add-hook 'js2-mode-hook 'ac-js2-mode)))
+    (setq js2-highlight-level 3))
 #+END_SRC
 **** tern-mode
 #+BEGIN_SRC emacs-lisp
 (use-package tern
   :init (add-hook 'js2-mode-hook 'tern-mode)
   :config
-  (use-package tern-auto-complete
-    :config
-    (require 'tern-auto-complete)
-    (tern-ac-setup)))
+  (use-package company-tern
+  :config
+  (add-to-list 'company-backends 'company-tern)
+  (setq company-tern-meta-as-single-line t)))
 
 (defun delete-tern-process ()
   (interactive)
@@ -621,12 +604,10 @@ And I like pry better than irb, so have inf-ruby use pry.
   (use-package inf-ruby
     :config
     (setq inf-ruby-default-implementation "pry")
-    (use-package ac-inf-ruby
-      :init (add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable)
+    (use-package company-inf-ruby
+      :pin "melpa"
       :config
-      (add-to-list 'ac-modes 'inf-ruby-mode)
-      :bind (:map inf-ruby-mode-map
-                  ("TAB" . auto-complete))))
+      (add-to-list 'company-backends 'company-inf-ruby)))
 #+END_SRC
 **** Snippets
 I use yasnippets, and I've downloaded a collection of snippets from here: https://github.com/bmaland/yasnippet-ruby-mode
