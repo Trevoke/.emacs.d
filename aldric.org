@@ -9,7 +9,6 @@ I tinker with this file a lot, so I need a quick way to get to it.
 I set a bookmark with =C-x r m= and I can get back here with =C-x r b=
 *** TODO Minor modes?
 I could create here some empty minor modes based on how I think about a buffer, hook those to whatever major modes I care about, and then just hook to the minor mode everywhere else in my configuration
-*** TODO Switch to company mode
 ** Personal information
 #+BEGIN_SRC emacs-lisp
 (setq user-full-name "Aldric Giacomoni"
@@ -100,7 +99,8 @@ This shows the file path in the GUI header
 #+BEGIN_SRC emacs-lisp
   (setq-default frame-title-format
                 '((:eval (if (buffer-file-name)
-                             (abbreviate-file-name (buffer-file-name)) "%f"))))
+                             (abbreviate-file-name (buffer-file-name))
+                           "%f"))))
 #+END_SRC
 *** Backups
 Centralize emacs backups. This directory is gitignored.
@@ -115,7 +115,7 @@ And I'm not super-worried about old backups and other such things, so I'll just 
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
 #+END_SRC
 *** History
-Stolen from http://www.wisdomandwonder.com/wordpress/wp-content/uploads/2014/03/C3F.html#sec-10-3-2
+Stolen from https://www.wisdomandwonder.com/wp-content/uploads/2014/03/C3F.html
 #+BEGIN_SRC emacs-lisp
 (setq savehist-file "~/.emacs.d/savehist")
 (savehist-mode 1)
