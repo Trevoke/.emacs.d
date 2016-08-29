@@ -193,6 +193,7 @@ Also, ibuffer is nicer than plain-old buffer window
 Prefix key is =C-c C-w=
 #+BEGIN_SRC emacs-lisp
 (use-package eyebrowse
+  :init (setq eyebrowse-new-workspace t)
   :config (eyebrowse-mode))
 #+END_SRC
 *** Winner-mode (undo/redo window changes)
