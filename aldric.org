@@ -263,29 +263,16 @@ All it does is tell you what face is at point.
     (if face (message "Face: %s" face) (message "No face at %d" pos))))
 #+END_SRC
 ** Discovering emacs
-*** ido-mode
-Someday I'll try helm again, but for now ido is my deity.
+*** ivy
+Apparently ivy is like ido but cooler, sooooooo
 #+BEGIN_SRC emacs-lisp
-(ido-mode 1)
-(ido-everywhere 1)
-(add-to-list 'ido-ignore-files "\\.DS_Store")
-(setq ido-use-faces t
-      ido-enable-prefix nil
-      ido-enable-flex-matching t
-      ido-case-fold t ;; ignore case
-      ido-create-new-buffer 'always ;; easily create files
-      ido-use-filename-at-point nil ;; don't try to be smart
-)
-(setq ido-auto-merge-delay-time 7) ;; Default: 0.7
-
-(use-package ido-ubiquitous
-             :config
-             (ido-ubiquitous-mode)
-             (setq org-completion-use-ido t)
-             (setq magit-completing-read-function 'magit-ido-completing-read))
-(use-package ido-vertical-mode :config (ido-vertical-mode 1))
-(use-package flx-ido :config (flx-ido-mode 1))
+(use-package ivy
+  :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (use-package flx))
 #+END_SRC
+
 ** Extending emacs with engines
 *** Completion
 **** company-mode
@@ -302,10 +289,10 @@ Projectile is pretty sweet.
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
   :init
-  (use-package grizzl)
+  (use-package ivy)
   :config
   (projectile-global-mode)
-  (setq projectile-completion-system 'grizzl))
+  (setq projectile-completion-system 'ivy))
 #+END_SRC
 
 *** Searching
@@ -326,6 +313,45 @@ I forget the basic keybindings all the time: After a search using =ag=, use C-c 
   (use-package wgrep-ag
     :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
     :config (autoload 'wgrep-ag-setup "wgrep-ag")))
+#+END_SRC
+** Version control
+*** Git
+**** Editing various git files
+#+BEGIN_SRC emacs-lisp
+(use-package gitconfig-mode)
+#+END_SRC
+**** Walking through a file's history
+#+BEGIN_SRC emacs-lisp
+(use-package git-timemachine)
+#+END_SRC
+**** Magit                                                :external:minor:
+Magit is a pretty amazing interface to git.
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :bind ("C-c g" . magit-status)
+  :config (setq magit-last-seen-setup-instructions "1.4.0"))
+#+END_SRC
+***** Magit + gitflow
+With this configuration, using C-f in a status buffer will trigger the gitflow selectors.
+#+BEGIN_SRC emacs-lisp
+(use-package magit-gitflow
+  :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
+#+END_SRC
+***** Github pull requests
+This will let us handle pull requests through Github.
+| key | behavior                                        |
+|-----+-------------------------------------------------|
+| # g | refresh list of PRs                             |
+| # f | fetch commits for PR                            |
+| # b | create topic branch for PR                      |
+| # m | merge PR on top of currently checked out branch |
+| # c | create new pull request                         |
+| # o | open PR in browser                              |
+| j q | jump to PR section in magit-status              |
+|-----+-------------------------------------------------|
+#+BEGIN_SRC emacs-lisp
+;; (use-package magit-gh-pulls
+;;  :config (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls))
 #+END_SRC
 ** Programming
 *** Indentation
@@ -933,45 +959,6 @@ Camcorder is a tool to record screencasts, in GIF or other formats
     (use-package htmlize)
     (setq org-reveal-root "file:///Users/aldric/src/vendor/reveal.js-3.3.0"))
 #+END_SRC
-** Version control
-*** Git
-**** Editing various git files
-#+BEGIN_SRC emacs-lisp
-(use-package gitconfig-mode)
-#+END_SRC
-**** Walking through a file's history
-#+BEGIN_SRC emacs-lisp
-(use-package git-timemachine)
-#+END_SRC
-**** Magit                                                :external:minor:
-Magit is a pretty amazing interface to git.
-#+BEGIN_SRC emacs-lisp
-(use-package magit
-  :bind ("C-c g" . magit-status)
-  :config (setq magit-last-seen-setup-instructions "1.4.0"))
-#+END_SRC
-***** Magit + gitflow
-With this configuration, using C-f in a status buffer will trigger the gitflow selectors.
-#+BEGIN_SRC emacs-lisp
-(use-package magit-gitflow
-  :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
-#+END_SRC
-***** Github pull requests
-This will let us handle pull requests through Github.
-| key | behavior                                        |
-|-----+-------------------------------------------------|
-| # g | refresh list of PRs                             |
-| # f | fetch commits for PR                            |
-| # b | create topic branch for PR                      |
-| # m | merge PR on top of currently checked out branch |
-| # c | create new pull request                         |
-| # o | open PR in browser                              |
-| j q | jump to PR section in magit-status              |
-|-----+-------------------------------------------------|
-#+BEGIN_SRC emacs-lisp
-;; (use-package magit-gh-pulls
-;;  :config (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls))
-#+END_SRC
 ** Email
 *** TODO Add BBDB
 *** TODO Mew (email) (do I stop using mew?)
@@ -1054,6 +1041,12 @@ smtpmail-multi
 #+BEGIN_SRC emacs-lisp
 (use-package circe)
 (use-package slack :pin "melpa")
+#+END_SRC
+*** Confluence
+#+BEGIN_SRC emacs-lisp
+  (use-package confluence
+    :init
+    (setq confluence-url "https://confluence.tapad.com/rpc/xmlrpc"))
 #+END_SRC
 ** Miscellanous
 *** Color themes
