@@ -329,7 +329,8 @@ Magit is a pretty amazing interface to git.
 #+BEGIN_SRC emacs-lisp
 (use-package magit
   :bind ("C-c g" . magit-status)
-  :config (setq magit-last-seen-setup-instructions "1.4.0"))
+  :config (setq magit-last-seen-setup-instructions "1.4.0")
+          (setq magit-completing-read-function 'ivy-completing-read))
 #+END_SRC
 ***** Magit + gitflow
 With this configuration, using C-f in a status buffer will trigger the gitflow selectors.
