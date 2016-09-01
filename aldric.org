@@ -244,13 +244,22 @@ Suspend emacs？ I'll use C-x C-z.
 #+END_SRC
 *** Fuzzy matching
 Enter smex. I like typing "plp" to get to "package-list-packages".
+Temporarily using swiper for this, keeping smex for major mode commands
 #+BEGIN_SRC emacs-lisp
   (use-package smex
     :config
     (smex-initialize)
     (setq smex-auto-update t)
-    :bind (("C-x C-m" . smex)
+    :bind (
+           ;; ("C-x C-m" . smex)
            ("C-x m" . smex-major-mode-commands)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package swiper)
+(use-package counsel
+  :bind (("C-x C-m" . counsel-M-x))
+)
 #+END_SRC
 *** Fonts and stuff
 I found this function online somewhere, before I thought tracking code origin for this config file might matter.
