@@ -1058,7 +1058,7 @@ smtpmail-multi
 #+END_SRC
 *** Confluence
 #+BEGIN_SRC emacs-lisp
-  (use-package confluence
+  (use-package confluence :pin "melpa"
     :init
     (setq confluence-url "https://confluence.tapad.com/rpc/xmlrpc"))
 #+END_SRC
