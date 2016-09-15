@@ -541,7 +541,8 @@ Here are all the extensions where I want web-mode enabled
 
 #+END_SRC
 *** Javascript
-**** js2-mode                                             :major:external:
+**** Actual JS
+***** js2-mode                                           :major:external:
 #+BEGIN_SRC emacs-lisp
   (use-package js2-mode
     :mode "\\.js$"
@@ -552,7 +553,8 @@ Here are all the extensions where I want web-mode enabled
     (setq js2-bounce-indent-p nil) ;; if I want to toggle indentation
     (setq js2-highlight-level 3))
 #+END_SRC
-**** tern-mode
+***** tern-mode
+https://truongtx.me/2014/04/20/emacs-javascript-completion-and-refactoring
 #+BEGIN_SRC emacs-lisp
 (use-package tern
   :init (add-hook 'js2-mode-hook 'tern-mode)
@@ -566,20 +568,40 @@ Here are all the extensions where I want web-mode enabled
   (interactive)
   (delete-process "Tern"))
 #+END_SRC
-**** TODO inferior mode (Pick one? Keep both?)
+***** TODO inferior mode (Pick one? Keep both?)
 #+BEGIN_SRC emacs-lisp
   (use-package js-comint)
   (use-package nodejs-repl)
+#+END_SRC
+***** snippets
+#+BEGIN_SRC emacs-lisp
+  (use-package react-snippets
+    :pin "melpa")
 #+END_SRC
 **** json-mode
 #+BEGIN_SRC emacs-lisp
 (use-package json-mode :mode "\\.babelrc$")
 (use-package json-reformat)
 #+END_SRC
-**** snippets
+**** Typescript
+***** REPL
 #+BEGIN_SRC emacs-lisp
-  (use-package react-snippets
-    :pin "melpa")
+(use-package tide)
+#+END_SRC
+***** On-the-fly checking
+#+BEGIN_SRC emacs-lisp
+  (use-package tss
+    :config
+    (setq tss-popup-help-key "C-:")
+    (setq tss-jump-to-definition-key "C->")
+    (setq tss-implement-definition-key "C-c i")
+    (tss-config-default))
+#+END_SRC
+***** Typescript major mode
+#+BEGIN_SRC emacs-lisp
+(use-package typescript-mode :pin "melpa"
+  :init
+  (add-hook 'typescript-mode-hook 'flymake-mode))
 #+END_SRC
 *** Python
 #+BEGIN_SRC emacs-lisp
@@ -607,6 +629,7 @@ There's a few extra things I want started when I open a Ruby buffer
     :interpreter "ruby"
     :mode "\\.rb$" "Guardfile" "\\.rake$" "\\.pryrc$" "Rakefile" "Capfile" "Gemfile" "\\.ru$"
     :init
+    (setq enh-ruby-bounce-deep-indent t)
     (add-hook 'enh-ruby-mode-hook 'stag-code-modes-hook)
     (add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook))
 #+END_SRC
@@ -673,6 +696,7 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 #+BEGIN_SRC emacs-lisp
 (use-package scala-mode)
 (use-package sbt-mode)
+(use-package play-routes-mode)
 (use-package ensime
   :config
   (add-hook 'scala-mode-hook 'ensime-scala-mode-hook))
@@ -1153,7 +1177,8 @@ Here is a sample function where you could put your Google Calendar information (
     (cfw:ical-create-source "gcal" "gcal-ics-link" "Blue")
     )))
 #+END_QUOTE
-*** File system browsing (dired)
+*** File system browsing
+**** Dired
 dired-jump is awesome (C-x C-j in any buffer)
 #+BEGIN_SRC emacs-lisp
 (require 'dired-x)
@@ -1198,6 +1223,12 @@ It's also nice to have dired with M-< and M-> take you to first and last file
 
 (define-key dired-mode-map
   (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
+#+END_SRC
+**** Tramp
+hadoop with tramp, please.
+=C-x C-f /hdfs:username@hadoop-server:/path/to/dir/or/file=
+#+BEGIN_SRC emacs-lisp
+(use-package tramp-hdfs :pin "melpa")
 #+END_SRC
 *** Editing Tintin++ config files
 #+BEGIN_SRC emacs-lisp
