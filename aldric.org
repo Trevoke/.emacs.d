@@ -188,6 +188,11 @@ Also, ibuffer is nicer than plain-old buffer window
 (setq scroll-margin 5
       scroll-preserve-screen-position 1)
 #+END_SRC
+** Frame management
+*** Transparency
+#+BEGIN_SRC emacs-lisp
+(use-package seethru :pin "melpa")
+#+END_SRC
 ** Window management
 *** Window layout manager (eyebrowse)
 Prefix key is =C-c C-w=
@@ -397,7 +402,6 @@ Here's where I plug in every modification I want in a code buffer
     (smartparens-mode)
     (yas-minor-mode)
 ;;    (ggtags-mode)
-    (eldoc-mode)
     (add-hook 'before-save-hook 'whitespace-cleanup)
     (local-set-key "\C-m" 'stag-enter-key-dwim))
 
