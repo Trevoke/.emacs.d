@@ -623,6 +623,7 @@ https://truongtx.me/2014/04/20/emacs-javascript-completion-and-refactoring
 There's a few extra things I want started when I open a Ruby buffer
 #+BEGIN_SRC emacs-lisp
   (defun stag-ruby-mode-hook ()
+    (use-package ruby-refactor :pin "melpa")
     (ruby-refactor-mode-launch)
     (inf-ruby-minor-mode)
     (modify-syntax-entry ?: ".") ;; Adds ":" to the word definition
