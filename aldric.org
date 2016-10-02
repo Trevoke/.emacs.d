@@ -744,7 +744,8 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 *** SQL
 **** Vertica
 #+BEGIN_SRC emacs-lisp
-(use-package vertica :pin "melpa")
+;; I don't even.
+;; (use-package vertica :pin "melpa")
 #+END_SRC
 **** sqlup                                                :minor:external:
 auto-upcase SQL keywords as I type, please.
