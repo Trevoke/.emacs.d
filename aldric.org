@@ -236,6 +236,11 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
 (global-set-key (kbd "C-x 3") 'stag-hsplit-last-buffer)
 #+END_SRC
 ** Interacting with emacs
+*** evil-mode
+Because sometimes, vim.
+#+BEGIN_SRC emacs-lisp
+(use-package evil)
+#+END_SRC
 *** Folding code
 #+BEGIN_SRC emacs-lisp
   (use-package origami
