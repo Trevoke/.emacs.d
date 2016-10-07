@@ -501,6 +501,10 @@ And let's have gofmt chew my code when I save the file.
 - (use-package gore-mode)
 - (use-package gorepl-mode)
 - (use-package gotest)
+*** Haskell
+#+BEGIN_SRC emacs-lisp
+(use-package intero :pin "melpa-stable")
+#+END_SRC
 *** HTML
 **** Web-mode                                           :external:major:
 Here are all the extensions where I want web-mode enabled
