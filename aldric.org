@@ -416,6 +416,7 @@ Here's where I plug in every modification I want in a code buffer
 One of the features that makes IDEA's editors awesome is the way you can expand selection. This plugin replicates the feature.
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
+    :pin "melpa"
     :bind (("C-c <up>" . er/expand-region)
            ("C-c <down>" . er/contract-region)))
 #+END_SRC
