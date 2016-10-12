@@ -236,6 +236,16 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
 (global-set-key (kbd "C-x 3") 'stag-hsplit-last-buffer)
 #+END_SRC
 ** Interacting with emacs
+*** Fonts and stuff
+I found this function online somewhere, before I thought tracking code origin for this config file might matter.
+All it does is tell you what face is at point.
+#+BEGIN_SRC emacs-lisp
+(defun stag-what-face (pos)
+  (interactive "d")
+  (let ((face (or (get-char-property pos 'read-face-name)
+                  (get-char-property pos 'face))))
+    (if face (message "Face: %s" face) (message "No face at %d" pos))))
+#+END_SRC
 *** evil-mode
 Because sometimes, vim.
 #+BEGIN_SRC emacs-lisp
@@ -252,16 +262,14 @@ Suspend emacs？ I'll use C-x C-z.
 #+BEGIN_SRC emacs-lisp
 (global-unset-key (kbd "C-z"))
 #+END_SRC
-*** Fonts and stuff
-I found this function online somewhere, before I thought tracking code origin for this config file might matter.
-All it does is tell you what face is at point.
+*** Navigating text
+avy is kinda badass.
 #+BEGIN_SRC emacs-lisp
-(defun stag-what-face (pos)
-  (interactive "d")
-  (let ((face (or (get-char-property pos 'read-face-name)
-                  (get-char-property pos 'face))))
-    (if face (message "Face: %s" face) (message "No face at %d" pos))))
+(use-package avy
+    :bind (("C-c j" . avy-goto-char-2)
+           ("C-x j" . avy-po-mark)))
 #+END_SRC
+
 ** Discovering emacs through fuzzy matching
 *** ivy
 Apparently ivy is like ido but cooler, sooooooo
