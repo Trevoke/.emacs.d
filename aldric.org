@@ -1101,7 +1101,6 @@ smtpmail-multi
 ** Communication
 #+BEGIN_SRC emacs-lisp
 (use-package circe)
-(use-package slack :pin "melpa")
 #+END_SRC
 *** Confluence
 #+BEGIN_SRC emacs-lisp
@@ -1114,6 +1113,9 @@ smtpmail-multi
 #+BEGIN_SRC emacs-lisp
 ;; (use-package material-theme :pin "melpa")
 (use-package moe-theme :pin "melpa")
+(use-package sourcerer-theme :pin "melpa")
+(use-package oceanic-theme :pin "melpa")
+(use-package material-theme)
 #+END_SRC
 
 *** Whitespace                                             :minor:builtin:
