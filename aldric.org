@@ -716,12 +716,19 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 *** Scala
 **** Ensime is our key to IDE-like features
 #+BEGIN_SRC emacs-lisp
+(defun stag-scala-enable-eldoc ()
+  (setq-local eldoc-documentation-function
+              (lambda ()
+                (when (ensime-connected-p)
+                  (ensime-print-type-at-point))))
+  (eldoc-mode +1))
 (use-package scala-mode)
 (use-package sbt-mode)
 (use-package play-routes-mode)
 (use-package ensime
   :config
-  (add-hook 'scala-mode-hook 'ensime-scala-mode-hook))
+  (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
+  (add-hook 'ensime-mode-hook 'stag-scala-enable-eldoc))
 
 #+END_SRC
 *** Shells
