@@ -1048,31 +1048,6 @@ Camcorder is a tool to record screencasts, in GIF or other formats
 #+END_SRC
 ** Email
 *** TODO Add BBDB
-*** TODO Mew (email) (do I stop using mew?)
-Mew's config is in ~/.mew.el so you won't see it here. Nee-ner nee-ner nee-----ner.
-#+BEGIN_SRC emacs-lisp
-  (use-package mew
-    :config
-    (autoload 'mew "mew" nil t)
-    (autoload 'mew-send "mew" nil t)
-
-    ;; Optional setup (Read Mail menu):
-    (setq read-mail-command 'mew)
-
-    ;; Optional setup (e.g. C-xm for sending a message):
-    (autoload 'mew-user-agent-compose "mew" nil t)
-    (if (boundp 'mail-user-agent)
-        (setq mail-user-agent 'mew-user-agent))
-    (if (fboundp 'define-mail-user-agent)
-        (define-mail-user-agent
-          'mew-user-agent
-          'mew-user-agent-compose
-          'mew-draft-send-message
-          'mew-draft-kill
-          'mew-send-hook))
-
-    (setq mew-use-master-passwd t))
-#+END_SRC
 *** Sending email
 #+BEGIN_SRC emacs-lisp
 (setq mail-user-agent 'message-user-agent)
