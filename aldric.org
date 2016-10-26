@@ -1118,11 +1118,10 @@ smtpmail-multi
 ** Miscellanous
 *** Color themes
 #+BEGIN_SRC emacs-lisp
-;; (use-package material-theme :pin "melpa")
-(use-package moe-theme :pin "melpa")
-(use-package sourcerer-theme :pin "melpa")
-(use-package oceanic-theme :pin "melpa")
-(use-package material-theme)
+(use-package moe-theme :pin "melpa" :disabled t)
+(use-package sourcerer-theme :pin "melpa" :disabled t)
+(use-package oceanic-theme :pin "melpa" :disabled t)
+(use-package material-theme :disabled t)
 #+END_SRC
 
 *** Whitespace                                             :minor:builtin:
