@@ -42,36 +42,10 @@ I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
 1. it is integrated within emacs.
 2. it allows me to set up emacs on any OS I desire more easily than other options I've encountered so far
 3. it allows me to easily share / steal configuration snippets
-#+BEGIN_SRC emacs-lisp
-  (require 'package)
-  (setq package-enable-at-startup nil)
-  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                           ("marmalade" . "http://marmalade-repo.org/packages/")
-                           ("melpa-stable" . "https://stable.melpa.org/packages/")
-                           ("gnu" . "https://elpa.gnu.org/packages/")))
-  (package-initialize)
 
-  ;; Bootstrap `use-package'
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
-  (require 'use-package)
-
-  ;; ;; This lets use-package install packages that come built-in with emacs, like org-mode
-  ;; (defun package-from-archive (f &rest args)
-  ;;   (and (apply f args)
-  ;;        (assq (car args) package-alist)))
-
-  ;; (advice-add 'package-installed-p :around 'package-from-archive)
-#+END_SRC
-
-*** Configuring the package manager
-I default to melpa-stable.
-#+BEGIN_SRC emacs-lisp
-(setq use-package-always-pin "melpa-stable")
-(setq use-package-always-ensure t)
-;; (setq use-package-always-defer t)
-#+END_SRC
+The configuration for it is inside the init.el because I need to make sure org-mode is loaded
+before I use any org-mode functions... And parsing this org-mode file into code is an org-mode
+function.
 
 *** A new package browser
 #+BEGIN_SRC emacs-lisp
@@ -786,13 +760,7 @@ auto-upcase SQL keywords as I type, please.
   (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 #+END_SRC
 ** Org-mode
-#+BEGIN_SRC emacs-lisp
-  (use-package org
-    :pin "gnu"
-    :config
-    (use-package org-bullets
-      :init (add-hook 'org-mode-hook 'org-bullets-mode)))
-#+END_SRC
+org-mode itself is in the init.el file. here's additional config for it.
 I've been having some issues exporting, so I'm actively loading libraries here.
 #+BEGIN_SRC emacs-lisp
 (load-library "org-macro")
@@ -801,10 +769,9 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 (load-library "org-compat")
 (load-library "ox")
 
-(use-package ox-pandoc)
+;; (use-package ox-pandoc)
 #+END_SRC
-Org-mode is nowadays a BIG part of what I do with emacs...
-**** Generic org-mode configuration
+*** Generic org-mode configuration
 #+BEGIN_SRC emacs-lisp
 (setq org-src-fontify-natively t)
 (add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
@@ -826,8 +793,15 @@ Org-mode is nowadays a BIG part of what I do with emacs...
 (setq org-mobile-directory "~/Dropbox/orgnotes")
 (setq org-mobile-inbox-for-pull "~/Google Drive/notes/from-mobile.org")
 #+END_SRC
+*** Org bullets
+    #+BEGIN_SRC emacs-lisp
+    (use-package org-bullets
+      :init (add-hook 'org-mode-hook 'org-bullets-mode))
+    #+END_SRC
 
-**** Left mouse-click to org-cycle
+#+END_SRC
+
+*** Left mouse-click to org-cycle
 What? My hands aren't ALWAYS on the keyboard.
 This is currently disabled.
 #+BEGIN_SRC emacs-lisp
@@ -1043,9 +1017,9 @@ Camcorder is a tool to record screencasts, in GIF or other formats
 #+BEGIN_SRC emacs-lisp
 (use-package camcorder)
 #+END_SRC
-*** Slides
+*** TODO Slides [ioslide]
 #+BEGIN_SRC emacs-lisp
-  (use-package ox-ioslide)
+;;  (use-package ox-ioslide)
   (use-package ox-reveal
     :pin "melpa"
     :config
