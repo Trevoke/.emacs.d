@@ -322,7 +322,8 @@ Magit is a pretty amazing interface to git.
 (use-package magit
   :bind ("C-c g" . magit-status)
   :config (setq magit-last-seen-setup-instructions "1.4.0")
-          (setq magit-completing-read-function 'ivy-completing-read))
+          (setq magit-completing-read-function 'ivy-completing-read)
+          (setq magit-popup-use-prefix-argument 'default))
 #+END_SRC
 ***** Magit + gitflow
 With this configuration, using C-f in a status buffer will trigger the gitflow selectors.
