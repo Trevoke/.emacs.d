@@ -17,19 +17,23 @@
 
 
 ;; ;; This lets use-package install packages that come built-in with emacs, like org-mode
-;; (defun package-from-archive (f &rest args)
-;;   (and (apply f args)
-;;        (assq (car args) package-alist)))
+(defun package-from-archive (f &rest args)
+  (and (apply f args)
+       (assq (car args) package-alist)))
 
-;; (advice-add 'package-installed-p :around 'package-from-archive)
+(advice-add 'package-installed-p :around 'package-from-archive)
 
 (setq use-package-always-pin "melpa-stable")
 (setq use-package-always-ensure t)
 ;; (setq use-package-always-defer t)
 
-(add-to-list 'load-path "~/.emacs.d/packages/org/lisp")
-(add-to-list 'load-path "~/.emacs.d/packages/org/contrib/lisp" t)
-(require 'org)
+;; (add-to-list 'load-path "~/.emacs.d/packages/org/lisp")
+;; (add-to-list 'load-path "~/.emacs.d/packages/org/contrib/lisp" t)
+;; (require 'org)
+;;
+(use-package org :pin "org")
+
+(advice-remove 'package-installed-p 'package-from-archive)
 
 (org-babel-load-file "~/.emacs.d/aldric.org")
 (put 'dired-find-alternate-file 'disabled nil)
