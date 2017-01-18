@@ -249,14 +249,16 @@ avy is kinda badass.
 Apparently ivy is like ido but cooler, sooooooo
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
+    :init
+    (use-package flx)
+    (use-package smex)
     :config
     (ivy-mode 1)
     (setq ivy-use-virtual-buffers t)
     ;; From http://oremacs.com/2016/01/06/ivy-flx/
     (setq ivy-re-builders-alist
           '((ivy-switch-buffer . ivy--regex-plus)
-            (t . ivy--regex-fuzzy)))
-    (use-package flx))
+            (t . ivy--regex-fuzzy))))
 
   (use-package swiper)
   (use-package counsel
