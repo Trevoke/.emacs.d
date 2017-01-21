@@ -93,7 +93,6 @@ Stolen from https://www.wisdomandwonder.com/wp-content/uploads/2014/03/C3F.html
 #+BEGIN_SRC emacs-lisp
 (setq savehist-file "~/.emacs.d/savehist")
 (savehist-mode 1)
-(setq history-length t)
 (setq history-delete-duplicates t)
 (setq savehist-save-minibuffer-history 1)
 (setq savehist-additional-variables
@@ -253,17 +252,23 @@ Apparently ivy is like ido but cooler, sooooooo
     (use-package flx)
     (use-package smex)
     :config
+    (use-package swiper)
     (ivy-mode 1)
-    (setq ivy-use-virtual-buffers t)
     ;; From http://oremacs.com/2016/01/06/ivy-flx/
-    (setq ivy-re-builders-alist
-          '((ivy-switch-buffer . ivy--regex-plus)
-            (t . ivy--regex-fuzzy))))
+    (setq ivy-re-builders-alist '((swiper . ivy--regex-plus)
+                                  (counsel-ag . ivy--regex-plus)
+                                  (ivy-switch-buffer . ivy--regex-plus)
+                                  (t . ivy--regex-fuzzy))
+          ivy-initial-inputs-alist nil
+          ivy-use-virtual-buffers t))
 
-  (use-package swiper)
   (use-package counsel
+    :config
+    (use-package smex)
     :bind (("C-x C-m" . counsel-M-x)
            ("C-x m" . counsel-descbinds)
+           ;; ("C-h f" . counsel-describe-function)
+           ;; ("C-h v" . counsel-describe-variable)
            ("C-y" . counsel-yank-pop)))
 #+END_SRC
 
@@ -283,8 +288,8 @@ Projectile is pretty sweet.
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
   :init
-  (use-package ivy)
   :config
+  (use-package ivy)
   (projectile-global-mode)
   (setq projectile-completion-system 'ivy))
 #+END_SRC
@@ -354,6 +359,7 @@ This will let us handle pull requests through Github.
 Always spaces. Always.
 #+BEGIN_SRC emacs-lisp
 (setq-default indent-tabs-mode nil)
+(setq backward-delete-char-untabify-method 'untabify)
 #+END_SRC
 *** code tagging                                           :external:minor:
 This is the ggtags plugin, which uses GNU Global.
@@ -797,10 +803,10 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 (setq org-mobile-inbox-for-pull "~/Google Drive/notes/from-mobile.org")
 #+END_SRC
 *** Org bullets
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
     (use-package org-bullets
       :init (add-hook 'org-mode-hook 'org-bullets-mode))
-    #+END_SRC
+#+END_SRC
 
 #+END_SRC
 
@@ -1161,14 +1167,14 @@ Here is a sample function where you could put your Google Calendar information (
 #+BEGIN_QUOTE
 (use-package calfw-gcal)
 (defun stag-calendar ()
-  (interactive)
-  (cfw:open-calendar-buffer
-   :contents-sources
-   (list
-    (cfw:org-create-source "Green")
-    (cfw:cal-create-source "Orange")
-    (cfw:ical-create-source "gcal" "gcal-ics-link" "Blue")
-    )))
+(interactive)
+(cfw:open-calendar-buffer
+:contents-sources
+(list
+(cfw:org-create-source "Green")
+(cfw:cal-create-source "Orange")
+(cfw:ical-create-source "gcal" "gcal-ics-link" "Blue")
+)))
 #+END_QUOTE
 *** File system browsing
 **** Dired
