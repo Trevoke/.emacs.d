@@ -1117,13 +1117,11 @@ smtpmail-multi
 (use-package material-theme :disabled t)
 #+END_SRC
 
-*** Whitespace                                             :minor:builtin:
+*** 80-column limit
 #+BEGIN_SRC emacs-lisp
-(require 'whitespace)
-(setq whitespace-line-column 80) ;; limit line length
-(setq whitespace-style '(face trailing tabs lines-tail))
-(setq whitespace-global-modes '(not org-mode web-mode "Web" markdown-mode text-mode fundamental-mode))
-(global-whitespace-mode)
+(use-package fill-column-indicator
+  :config
+  (add-hook 'prog-mode-hook 'fci-mode))
 #+END_SRC
 *** Interface customization
 **** Smart mode line
