@@ -768,6 +768,11 @@ auto-upcase SQL keywords as I type, please.
   (add-hook 'sql-mode-hook 'sqlup-mode)
   (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 #+END_SRC
+*** tintin
+I maintain a tintin++ config, so this is at least convenient.
+#+BEGIN_SRC emacs-lisp
+(use-package tintin-mode :pin "marmalade")
+#+END_SRC
 ** Org-mode
 org-mode itself is in the init.el file. here's additional config for it.
 I've been having some issues exporting, so I'm actively loading libraries here.
