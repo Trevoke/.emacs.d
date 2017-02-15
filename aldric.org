@@ -714,47 +714,6 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
   (add-hook 'ensime-mode-hook 'stag-scala-enable-eldoc))
 
 #+END_SRC
-*** Shells
-**** Generic shell things
-#+BEGIN_SRC emacs-lisp
-  (use-package shell-command
-    :pin "melpa"
-    :init (add-hook 'shell-mode-hook 'shell-command-completion-mode))
-#+END_SRC
-#+BEGIN_SRC emacs-lisp
-(use-package xterm-color
-  :config
-  (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
-  (setq comint-output-filter-functions (remove 'ansi-color-process-output comint-output-filter-functions))
-  (setq font-lock-unfontify-region-function 'xterm-color-unfontify-region))
-#+END_SRC
-**** Bash
-#+BEGIN_SRC emacs-lisp
-  (setq explicit-bash-args '("--noediting" "--login" "-i"))
-  (require 'em-smart)
-
-  (use-package bash-completion :config (bash-completion-setup))
-
-  ;; (defadvice ansi-term (after advise-ansi-term-coding-system)
-  ;;     (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
-  ;; (ad-activate 'ansi-term)
-#+END_SRC
-
-**** Slime
-#+BEGIN_SRC emacs-lisp
-(use-package slime
-  :config
-  ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
-  ;; ;; Replace "sbcl" with the path to your implementation
-  ;; (setq inferior-lisp-program "clisp")
-  )
-#+END_SRC
-**** Eshell
-#+BEGIN_SRC emacs-lisp
-(use-package eshell-did-you-mean
-  :config
-  (eshell-did-you-mean-setup))
-#+END_SRC
 *** SQL
 **** Vertica
 #+BEGIN_SRC emacs-lisp
@@ -910,6 +869,50 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
         ;;   (setq blog-admin-backend-org-page-drafts "_drafts")) ;; directory to save draft
   ;;        (add-hook 'blog-admin-backend-after-new-post-hook 'find-file))
 
+#+END_SRC
+** REPLs
+*** Generic shell things
+#+BEGIN_SRC emacs-lisp
+  (use-package shell-command
+    :pin "melpa"
+    :init (add-hook 'shell-mode-hook 'shell-command-completion-mode))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+(use-package xterm-color
+  :config
+  (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
+  (setq comint-output-filter-functions (remove 'ansi-color-process-output comint-output-filter-functions))
+  (setq font-lock-unfontify-region-function 'xterm-color-unfontify-region))
+#+END_SRC
+*** Bash
+#+BEGIN_SRC emacs-lisp
+  (setq explicit-bash-args '("--noediting" "--login" "-i"))
+  (require 'em-smart)
+
+  (use-package bash-completion :config (bash-completion-setup))
+
+  ;; (defadvice ansi-term (after advise-ansi-term-coding-system)
+  ;;     (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
+  ;; (ad-activate 'ansi-term)
+#+END_SRC
+*** Eshell
+#+BEGIN_SRC emacs-lisp
+(use-package eshell-did-you-mean
+  :config
+  (eshell-did-you-mean-setup))
+#+END_SRC
+*** Fish
+#+BEGIN_SRC emacs-lisp
+(use-package fish-mode)
+#+END_SRC
+*** Slime
+#+BEGIN_SRC emacs-lisp
+(use-package slime
+  :config
+  ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
+  ;; ;; Replace "sbcl" with the path to your implementation
+  ;; (setq inferior-lisp-program "clisp")
+  )
 #+END_SRC
 ** Writing (specs, docs, blogs...)
 *** Interacting with text
