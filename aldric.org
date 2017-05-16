@@ -1045,13 +1045,14 @@ Camcorder is a tool to record screencasts, in GIF or other formats
 (use-package camcorder)
 #+END_SRC
 *** TODO Slides [ioslide]
+**** revealjs
 #+BEGIN_SRC emacs-lisp
 ;;  (use-package ox-ioslide)
   (use-package ox-reveal
     :pin "melpa"
     :config
     (use-package htmlize)
-    (setq org-reveal-root "file:///Users/aldric/src/vendor/reveal.js-3.3.0"))
+    (setq org-reveal-root "file:///Users/aldric/src/vendor/reveal.js-3.5.0"))
 #+END_SRC
 ** Email
 *** TODO Add BBDB
