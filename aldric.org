@@ -158,8 +158,12 @@ Also, ibuffer is nicer than plain-old buffer window
 #+END_SRC
 *** Scrolling
 #+BEGIN_SRC emacs-lisp
-(setq scroll-margin 5
-      scroll-preserve-screen-position 1)
+(setq scroll-step 1)
+(setq scroll-conservatively 10000)
+(setq auto-window-vscroll nil)
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
+(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
+(setq mouse-wheel-follow-mouse t) ;; scroll window under mouse
 #+END_SRC
 ** Frame management
 *** Transparency
