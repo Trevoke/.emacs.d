@@ -252,6 +252,7 @@ avy is kinda badass.
 Apparently ivy is like ido but cooler, sooooooo
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
+    :diminish ivy-mode
     :init
     (use-package flx)
     (use-package smex)
@@ -285,12 +286,13 @@ Apparently ivy is like ido but cooler, sooooooo
 **** Snippets
 Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
 #+BEGIN_SRC emacs-lisp
-(use-package yasnippet)
+(use-package yasnippet :diminish yas-minor-mode)
 #+END_SRC
 *** Project navigation
 Projectile is pretty sweet.
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
+  :diminish projectile-mode
   :init
   :config
   (use-package ivy)
@@ -451,6 +453,7 @@ Auto-tail, please.
 *** Elixir
 #+BEGIN_SRC emacs-lisp
   (use-package alchemist
+    :diminish "alc"
     :config
     (use-package elixir-yasnippets)
     (use-package flymake-elixir
@@ -627,7 +630,9 @@ https://truongtx.me/2014/04/20/emacs-javascript-completion-and-refactoring
 There's a few extra things I want started when I open a Ruby buffer
 #+BEGIN_SRC emacs-lisp
   (defun stag-ruby-mode-hook ()
-    (use-package ruby-refactor :pin "melpa")
+    (use-package ruby-refactor
+      :diminish "rrf"
+      :pin "melpa")
     (ruby-refactor-mode-launch)
     (inf-ruby-minor-mode)
     (modify-syntax-entry ?: ".") ;; Adds ":" to the word definition
@@ -856,21 +861,21 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
 
 *** Blogging
 #+BEGIN_SRC emacs-lisp
-        (use-package org-page
-          :config
-          (setq op/repository-directory "~/src/projects/trevoke.github.io")
-          (setq op/personal-github-link "https://github.com/trevoke")
-          (setq op/site-domain "http://blog.trevoke.net/")
-          (setq op/site-main-title "Seven Steps")
-          (setq op/site-sub-title "Words... words, they're all we have to go on! — Rosencrantz and Guildenstern are dead"))
+  (use-package org-page
+    :config
+    (setq op/repository-directory "~/src/projects/trevoke.github.io")
+    (setq op/personal-github-link "https://github.com/trevoke")
+    (setq op/site-domain "http://blog.trevoke.net/")
+    (setq op/site-main-title "Seven Steps")
+    (setq op/site-sub-title "Words... words, they're all we have to go on! — Rosencrantz and Guildenstern are dead"))
 
-        ;; (use-package blog-admin
-        ;;   :init
-        ;;   (setq blog-admin-backend-path "~/src/projects/trevoke.github.io")
-        ;;   (setq blog-admin-backend-type 'org-page)
-        ;;   (setq blog-admin-backend-new-post-in-drafts t)
-        ;;   (setq blog-admin-backend-new-post-with-same-name-dir t)
-        ;;   (setq blog-admin-backend-org-page-drafts "_drafts")) ;; directory to save draft
+  ;; (use-package blog-admin
+  ;;   :init
+  ;;   (setq blog-admin-backend-path "~/src/projects/trevoke.github.io")
+  ;;   (setq blog-admin-backend-type 'org-page)
+  ;;   (setq blog-admin-backend-new-post-in-drafts t)
+  ;;   (setq blog-admin-backend-new-post-with-same-name-dir t)
+  ;;   (setq blog-admin-backend-org-page-drafts "_drafts")) ;; directory to save draft
   ;;        (add-hook 'blog-admin-backend-after-new-post-hook 'find-file))
 
 #+END_SRC
