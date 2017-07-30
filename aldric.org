@@ -171,7 +171,7 @@ Also, ibuffer is nicer than plain-old buffer window
 (use-package seethru :pin "melpa")
 #+END_SRC
 ** Window management
-*** Window layout manager (eyebrowse)
+*** [#B] Window layout manager (eyebrowse)
 Prefix key is =C-c C-w=
 #+BEGIN_SRC emacs-lisp
 (use-package eyebrowse
@@ -434,6 +434,12 @@ Auto-tail, please.
   :defer t
   :init
   (add-hook 'csharp-mode-hook 'stag-csharp-mode-hook))
+#+END_SRC
+*** Docker
+#+BEGIN_SRC emacs-lisp
+(use-package docker-compose-mode)
+(use-package docker-tramp)
+(use-package dockerfile-mode)
 #+END_SRC
 *** emacs lisp
 #+BEGIN_SRC emacs-lisp
