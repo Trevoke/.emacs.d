@@ -906,6 +906,12 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
 #+END_SRC
 *** Eshell
 #+BEGIN_SRC emacs-lisp
+(defun eshell/clear ()
+  "Clear the eshell buffer."
+  (let ((inhibit-read-only t))
+    (erase-buffer)
+    (eshell-send-input)))
+
 (use-package eshell-did-you-mean
   :config
   (eshell-did-you-mean-setup))
