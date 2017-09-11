@@ -315,6 +315,7 @@ I forget the basic keybindings all the time: After a search using =ag=, use C-c 
 #+BEGIN_SRC emacs-lisp
 (use-package ag
   :config
+  (setq ag-reuse-buffers 't)
   (use-package wgrep-ag
     :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
     :config (autoload 'wgrep-ag-setup "wgrep-ag")))
@@ -1185,20 +1186,20 @@ This handy little package increases the size of the font in the whole frame.
 #+END_SRC
 **** calfw, the calendar framework
 #+BEGIN_SRC emacs-lisp
-  (use-package calfw
-    :config
-    (require 'calfw-cal)
-    (require 'calfw-ical)
-    (require 'calfw-org)
+  ;; (use-package calfw
+  ;;   :config
+  ;;   (require 'calfw-cal)
+  ;;   (require 'calfw-ical)
+  ;;   (require 'calfw-org)
 
-    (setq cfw:fchar-junction ?╋
-          cfw:fchar-vertical-line ?┃
-          cfw:fchar-horizontal-line ?━
-          cfw:fchar-left-junction ?┣
-          cfw:fchar-right-junction ?┫
-          cfw:fchar-top-junction ?┯
-          cfw:fchar-top-left-corner ?┏
-          cfw:fchar-top-right-corner ?┓))
+  ;;   (setq cfw:fchar-junction ?╋
+  ;;         cfw:fchar-vertical-line ?┃
+  ;;         cfw:fchar-horizontal-line ?━
+  ;;         cfw:fchar-left-junction ?┣
+  ;;         cfw:fchar-right-junction ?┫
+  ;;         cfw:fchar-top-junction ?┯
+  ;;         cfw:fchar-top-left-corner ?┏
+  ;;         cfw:fchar-top-right-corner ?┓))
 #+END_SRC
 ***** TODO calfw-gcal
 Here is a sample function where you could put your Google Calendar information (mostly so I remember how to create the secret file on a new computer).
