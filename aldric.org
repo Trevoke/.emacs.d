@@ -113,6 +113,8 @@ Although of course if you're on OSX, at least the menu bar can be enabled since 
 And I've also added other OSX-specific stuff here... For now.
 #+BEGIN_SRC emacs-lisp
   (when (memq window-system '(mac ns))
+    (setq mac-command-modifier 'super)
+    (setq mac-option-modifier 'meta)
     (use-package exec-path-from-shell
       :config
       (exec-path-from-shell-initialize))
