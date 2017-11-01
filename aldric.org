@@ -1132,6 +1132,11 @@ smtpmail-multi
   (add-hook 'notmuch-message-mode-hook 'stag-email-hook))
 #+END_SRC
 ** Communication
+*** ERC
+#+BEGIN_SRC emacs-lisp
+(setq erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
+#+END_SRC
+*** Circe
 #+BEGIN_SRC emacs-lisp
 (use-package circe)
 #+END_SRC
