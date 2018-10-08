@@ -810,14 +810,6 @@ This is currently disabled.
 ;;   (local-set-key [mouse-1] 'org-cycle))
 ;; (add-hook 'org-mode-hook 'stag-click-to-cycle-org-visibility)
 #+END_SRC
-*** Olivetti                                               :external:minor:
-#+BEGIN_SRC emacs-lisp
-(use-package olivetti
-  :init
-  (add-hook 'org-mode-hook 'turn-on-olivetti-mode)
-  :config
-  (setq olivetti-body-width 80))
-#+END_SRC
 *** Markdown                                               :major:external:
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -939,6 +931,12 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
   )
 #+END_SRC
 ** Writing (specs, docs, blogs...)
+*** Olivetti                                               :external:minor:
+#+BEGIN_SRC emacs-lisp
+(use-package olivetti
+  :config
+  (setq olivetti-body-width 80))
+#+END_SRC
 *** Interacting with text
 **** More fine-grained word-by-word navigation
 #+BEGIN_SRC emacs-lisp
