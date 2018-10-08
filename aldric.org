@@ -51,7 +51,7 @@ function.
 #+BEGIN_SRC emacs-lisp
 (use-package paradox)
 #+END_SRC
-** General emacs config (no external packages)
+** General emacs config
 *** Yes/No => y/n
 #+BEGIN_SRC emacs-lisp
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -167,25 +167,25 @@ Also, ibuffer is nicer than plain-old buffer window
 (setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
 (setq mouse-wheel-follow-mouse t) ;; scroll window under mouse
 #+END_SRC
-** Frame management
-*** Transparency
+*** Frame management
+**** Transparency
 #+BEGIN_SRC emacs-lisp
 (use-package seethru :pin "melpa")
 #+END_SRC
-** Window management
-*** [#B] Window layout manager (eyebrowse)
+*** Window management
+**** [#B] Window layout manager (eyebrowse)
 Prefix key is =C-c C-w=
 #+BEGIN_SRC emacs-lisp
 (use-package eyebrowse
   :init (setq eyebrowse-new-workspace t)
   :config (eyebrowse-mode))
 #+END_SRC
-*** Winner-mode (undo/redo window changes)
+**** Winner-mode (undo/redo window changes)
 Remember: =C-c <left>= and =C-c <right>=
 #+BEGIN_SRC emacs-lisp
 (winner-mode)
 #+END_SRC
-*** Windmove (move across windows with shift+arrow)
+**** Windmove (move across windows with shift+arrow)
 #+BEGIN_SRC emacs-lisp
   (windmove-default-keybindings)
   (add-hook 'org-shiftup-final-hook 'windmove-up)
@@ -194,7 +194,7 @@ Remember: =C-c <left>= and =C-c <right>=
   (add-hook 'org-shiftright-final-hook 'windmove-right)
 
 #+END_SRC
-*** Move to new window when splitting
+**** Move to new window when splitting
 Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
 #+BEGIN_SRC emacs-lisp
 (defun stag-vsplit-last-buffer (prefix)
@@ -214,8 +214,8 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
 (global-set-key (kbd "C-x 2") 'stag-vsplit-last-buffer)
 (global-set-key (kbd "C-x 3") 'stag-hsplit-last-buffer)
 #+END_SRC
-** Interacting with emacs
-*** Fonts and stuff
+*** Interacting with emacs
+**** Fonts and stuff
 I found this function online somewhere, before I thought tracking code origin for this config file might matter.
 All it does is tell you what face is at point.
 #+BEGIN_SRC emacs-lisp
@@ -225,23 +225,23 @@ All it does is tell you what face is at point.
                   (get-char-property pos 'face))))
     (if face (message "Face: %s" face) (message "No face at %d" pos))))
 #+END_SRC
-*** evil-mode
+**** evil-mode
 Because sometimes, vim.
 #+BEGIN_SRC emacs-lisp
 (use-package evil)
 #+END_SRC
-*** Folding code
+**** Folding code
 #+BEGIN_SRC emacs-lisp
   (use-package origami
     :pin "melpa"
     :config (global-origami-mode))
 #+END_SRC
-*** Disable C-z to minimize
+**** Disable C-z to minimize
 Suspend emacs？ I'll use C-x C-z.
 #+BEGIN_SRC emacs-lisp
 (global-unset-key (kbd "C-z"))
 #+END_SRC
-*** Navigating text
+**** Navigating text
 avy is kinda badass.
 #+BEGIN_SRC emacs-lisp
 (use-package avy
