@@ -750,23 +750,8 @@ I maintain a tintin++ config, so this is at least convenient.
 #+BEGIN_SRC emacs-lisp
 (use-package tintin-mode :pin "marmalade")
 #+END_SRC
-** Org-mode
-org-mode itself is in the init.el file. here's additional config for it.
-I've been having some issues exporting, so I'm actively loading libraries here.
+** GTD (Getting Things Done)
 #+BEGIN_SRC emacs-lisp
-(load-library "org-macro")
-(load-library "ob-exp")
-(load-library "org")
-(load-library "org-compat")
-(load-library "ox")
-
-;; (use-package ox-pandoc)
-#+END_SRC
-*** Generic org-mode configuration
-#+BEGIN_SRC emacs-lisp
-    (setq org-src-fontify-natively t)
-    (add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
-
     (setq org-directory "~/Dropbox/orgnotes")
     (setq org-default-notes-file (concat org-directory "/notes.org.txt"))
     (define-key global-map "\C-cc" 'org-capture)
@@ -785,11 +770,29 @@ I've been having some issues exporting, so I'm actively loading libraries here.
     (global-set-key "\C-ca" 'org-agenda)
     (global-set-key "\C-cb" 'org-iswitchb)
 
-    (setq org-startup-indented t)
     (setq org-log-done 'time)
 
     (setq org-todo-keywords '( "TODO(t)" "WAIT(w)" "|" "DONE" "CANCELED(c)"))
     (setq org-tag-alist '(("@home" . ?h) ("@work" . ?w) ("family") ("weiqi") ("ruby") ("lisp") ("emacs")))
+#+END_SRC
+** Org-mode
+org-mode itself is in the init.el file. here's additional config for it.
+I've been having some issues exporting, so I'm actively loading libraries here.
+#+BEGIN_SRC emacs-lisp
+(load-library "org-macro")
+(load-library "ob-exp")
+(load-library "org")
+(load-library "org-compat")
+(load-library "ox")
+
+;; (use-package ox-pandoc)
+#+END_SRC
+*** Generic org-mode configuration
+#+BEGIN_SRC emacs-lisp
+    (setq org-src-fontify-natively t)
+    (add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
+
+    (setq org-startup-indented t)
 
     (setq org-mobile-directory "~/Dropbox/orgnotes")
     (setq org-mobile-inbox-for-pull "~/Dropbox/orgnotes/from-mobile.org")
