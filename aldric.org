@@ -752,28 +752,34 @@ I maintain a tintin++ config, so this is at least convenient.
 #+END_SRC
 ** GTD (Getting Things Done)
 #+BEGIN_SRC emacs-lisp
-    (setq org-directory "~/Dropbox/orgnotes")
-    (setq org-default-notes-file (concat org-directory "/notes.org.txt"))
-    (define-key global-map "\C-cc" 'org-capture)
+  (setq org-directory "~/Dropbox/orgnotes")
+  (setq org-default-notes-file (concat org-directory "/notes.org.txt"))
 
-    (setq org-capture-templates
-          '(
-            ("j" "Journal Entry"
-             entry (file+datetree "journal.org")
-             "* %U\n%?"
-             :empty-lines 1)
-            ("t" "Todo"
-             entry (file "Inbox.org")
-             "* TODO %?\n  %i\n  %a")
-            ))
-    (global-set-key "\C-cl" 'org-store-link)
-    (global-set-key "\C-ca" 'org-agenda)
-    (global-set-key "\C-cb" 'org-iswitchb)
+  (global-set-key "\C-cc" 'org-capture)
 
-    (setq org-log-done 'time)
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-cb" 'org-iswitchb)
 
-    (setq org-todo-keywords '( "TODO(t)" "WAIT(w)" "|" "DONE" "CANCELED(c)"))
-    (setq org-tag-alist '(("@home" . ?h) ("@work" . ?w) ("family") ("weiqi") ("ruby") ("lisp") ("emacs")))
+  (setq org-todo-keywords '( "TODO(t)" "WAIT(w)" "|" "DONE" "CANCELED(c)"))
+  (setq org-log-done 'time)
+
+  (setq org-tag-alist '(("@home" . ?h) ("@work" . ?w) ("family") ("weiqi") ("ruby") ("lisp") ("emacs")))
+
+  (setq org-capture-templates
+        '(
+          ("j" "Journal Entry"
+           entry (file+datetree "journal.org")
+           "* %U\n%?"
+           :empty-lines 1)
+          ("t" "Todo"
+           entry (file "Inbox.org")
+           "* TODO %?\n  %i\n  %a")
+          ("s" "Someday"
+           entry (file+headline "Someday.org" "Someday")
+           "* %i%? \n %U")))
+
+  (org-defkey org-mode-map "\C-cr" 'org-refile)
 #+END_SRC
 ** Org-mode
 org-mode itself is in the init.el file. here's additional config for it.
