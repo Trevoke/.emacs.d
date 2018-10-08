@@ -780,6 +780,7 @@ I maintain a tintin++ config, so this is at least convenient.
            "* %i%? \n %U")))
 
   (org-defkey org-mode-map "\C-cr" 'org-refile)
+  (setq org-refile-targets '(("Projects.org" :level . 1)))
 #+END_SRC
 ** Org-mode
 org-mode itself is in the init.el file. here's additional config for it.
