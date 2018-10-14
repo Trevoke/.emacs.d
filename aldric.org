@@ -8,27 +8,13 @@ Welcome to my emacs configuration.
 I tinker with this file a lot, so I need a quick way to get to it.
 I set a bookmark with =C-x r m= and I can get back here with =C-x r b=
 *** TODO Minor modes?
-I could create here some empty minor modes based on how I think about a buffer, hook those to whatever major modes I care about, and then just hook to the minor mode everywhere else in my configuration
+I could create here some empty minor modes based on how I think about a buffer, hook those to whatever major modes I care about, and then just hook to the minor mode everywhere else in my configuration.
 ** Personal information
 #+BEGIN_SRC emacs-lisp
 (setq user-full-name "Aldric Giacomoni"
       user-mail-address "trevoke@gmail.com")
 #+END_SRC
-** Additional paths
-*** Themes
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-;; (load-theme 'mejelly t)
-#+END_SRC
-*** Packages (without package manglement)
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/packages")
-#+END_SRC
-*** Secrets
-API keys, passwords, etc are kept in here. This file is .gitignored.
-#+BEGIN_SRC emacs-lisp
-(load "~/.emacs.d/emacs.secrets" t)
-#+END_SRC
+** General emacs config
 *** Customizations from customization system
 Keeping these separate makes life easier: they get modified when I load a theme and such, and I don't need that kind of hassle when maintaining my actual configuration, you know?
 In addition, I do keep some somewhat computer-specific stuff in there, like the font, and it's just easier to have this separated there.
@@ -36,8 +22,23 @@ In addition, I do keep some somewhat computer-specific stuff in there, like the 
 (setq custom-file "~/.emacs-custom.el")
 (load custom-file t) ;; t means no error if file does not exist
 #+END_SRC
-** Package management
-*** The package manager: =use-package=
+*** Additional paths
+**** Themes
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+;; (load-theme 'mejelly t)
+#+END_SRC
+**** Packages (without package manglement)
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/packages")
+#+END_SRC
+**** Secrets
+API keys, passwords, etc are kept in here. This file is .gitignored.
+#+BEGIN_SRC emacs-lisp
+(load "~/.emacs.d/emacs.secrets" t)
+#+END_SRC
+*** Package management
+**** The package manager: =use-package=
 I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
 1. it is integrated within emacs.
 2. it allows me to set up emacs on any OS I desire more easily than other options I've encountered so far
@@ -47,11 +48,10 @@ The configuration for it is inside the init.el because I need to make sure org-m
 before I use any org-mode functions... And parsing this org-mode file into code is an org-mode
 function.
 
-*** A new package browser
+**** A new package browser
 #+BEGIN_SRC emacs-lisp
 (use-package paradox)
 #+END_SRC
-** General emacs config
 *** Yes/No => y/n
 #+BEGIN_SRC emacs-lisp
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -248,7 +248,190 @@ avy is kinda badass.
     :bind (("C-c j" . avy-goto-char-2)
            ("C-x j" . avy-po-mark)))
 #+END_SRC
+** File system browsing
+*** Dired
+dired-jump is awesome (C-x C-j in any buffer)
+#+BEGIN_SRC emacs-lisp
+(require 'dired-x)
+#+END_SRC
 
+#+BEGIN_SRC emacs-lisp
+;; Changed my mind. I prefer seeing just the files:
+ (add-hook 'dired-mode-hook 'dired-hide-details-mode)
+
+;; Auto-refresh silently
+ (setq global-auto-revert-non-file-buffers t)
+ (setq auto-revert-verbose nil)
+#+END_SRC
+
+This will make org-mode behave kinda like a two-pane file manager: with two direds open, you can copy/rename and the default target will be the other pane.
+Using split-window-vertically from the first dired might be required to make this work.
+#+BEGIN_SRC emacs-lisp
+(setq dired-dwim-target t)
+#+END_SRC
+
+OSX.. Windows.. *sigh*.
+#+BEGIN_SRC emacs-lisp
+(setq ls-lisp-use-insert-directory-program nil)
+(require 'ls-lisp)
+#+END_SRC
+
+It's also nice to have dired with M-< and M-> take you to first and last file
+#+BEGIN_SRC emacs-lisp
+(require 'dired)
+(defun dired-back-to-top ()
+  (interactive)
+  (beginning-of-buffer)
+  (next-line 2))
+
+(define-key dired-mode-map
+  (vector 'remap 'beginning-of-buffer) 'dired-back-to-top)
+
+(defun dired-jump-to-bottom ()
+  (interactive)
+  (end-of-buffer)
+  (next-line -1))
+
+(define-key dired-mode-map
+  (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
+#+END_SRC
+*** Tramp
+hadoop with tramp, please.
+=C-x C-f /hdfs:username@hadoop-server:/path/to/dir/or/file=
+#+BEGIN_SRC emacs-lisp
+(use-package tramp-hdfs :pin "melpa")
+#+END_SRC
+** GTD (Getting Things Done)
+*** Paths and files
+If the variable exists, do nothing, otherwise prompt for a path and save it, using emacs' customization tool.
+#+BEGIN_SRC emacs-lisp
+  (or org-directory
+      (customize-set-variable 'org-directory
+                              (read-directory-name "What is the root GTD directory? "
+                                                   "~/")))
+
+  (setq org-agenda-files (mapcar (lambda (x) (concat org-directory x))
+                                 '("Projects.org" "Tickler.org")))
+#+END_SRC
+*** Diary
+#+BEGIN_SRC emacs-lisp
+(setq diary-file (concat org-directory "diary-file.org"))
+
+(setq view-diary-entries-initially t
+      mark-diary-entries-in-calendar t
+      diary-number-of-entries 7)
+(add-hook 'diary-display-hook 'diary-fancy-display)
+(add-hook 'today-visible-calendar-hook 'calendar-mark-today)
+#+END_SRC
+*** Calendar, dates, times
+#+BEGIN_SRC emacs-lisp
+(setq calendar-week-start-day 1) ;; Monday
+#+END_SRC
+**** calfw, the calendar framework
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package calfw
+  ;;   :config
+  ;;   (require 'calfw-cal)
+  ;;   (require 'calfw-ical)
+  ;;   (require 'calfw-org)
+
+  ;;   (setq cfw:fchar-junction ?╋
+  ;;         cfw:fchar-vertical-line ?┃
+  ;;         cfw:fchar-horizontal-line ?━
+  ;;         cfw:fchar-left-junction ?┣
+  ;;         cfw:fchar-right-junction ?┫
+  ;;         cfw:fchar-top-junction ?┯
+  ;;         cfw:fchar-top-left-corner ?┏
+  ;;         cfw:fchar-top-right-corner ?┓))
+#+END_SRC
+***** TODO calfw-gcal
+Here is a sample function where you could put your Google Calendar information (mostly so I remember how to create the secret file on a new computer).
+
+#+BEGIN_QUOTE
+(use-package calfw-gcal)
+(defun stag-calendar ()
+(interactive)
+(cfw:open-calendar-buffer
+:contents-sources
+(list
+(cfw:org-create-source "Green")
+(cfw:cal-create-source "Orange")
+(cfw:ical-create-source "gcal" "gcal-ics-link" "Blue")
+)))
+#+END_QUOTE
+*** Action Tags
+These are tags to add to tasks, such as types of action, mindset I need to be in, tool Ι need to have, emotional reward I'll get from doing the action, etc. Whatever helps me pick a task to accomplish.
+#+BEGIN_SRC emacs-lisp
+  (setq org-tag-alist '(("@home" . ?h)
+                        ("@work" . ?w)
+                        ("@nonet" . ?n)
+                        ("code")))
+#+END_SRC
+*** Action Keywords
+These define the relevant states an action can be in. Besides the fundamental states, there is "NEXT" which allows me to filter quickly for "only the actions I can or should do next".
+#+BEGIN_SRC emacs-lisp
+  (setq org-todo-keywords '( "TODO(t/!)" "NEXT(n)" "WAIT(w/!)" "|" "DONE(/!)" "CANCELED(c/!)"))
+  (setq org-log-done 'time)
+#+END_SRC
+*** Captures
+#+BEGIN_SRC emacs-lisp
+  (setq org-default-notes-file (concat org-directory "notes.org"))
+
+  (global-set-key "\C-cc" 'org-capture)
+
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-cb" 'org-switchb)
+
+  (setq org-capture-templates
+        '(
+          ("j" "Journal Entry"
+           entry (file+olp+datetree "journal.org")
+           "* %U\n%?"
+           :kill-buffer t)
+          ("t" "Todo"
+           entry (file "Inbox.org")
+           "* TODO %?\n  %i\n  %a"
+           :kill-buffer t)
+          ("s" "Someday"
+           entry (file "Someday.org")
+           "* %i%? \n %U"
+           :kill-buffer t)
+          ("r" "Remind me"
+           entry (file "Tickler.org")
+           "* TODO %?\nSCHEDULED: %^{Remind me on:}t"
+           :kill-buffer t)))
+
+  (org-defkey org-mode-map "\C-cr" 'org-refile)
+  (setq org-refile-targets '(("Projects.org" :level . 1)
+                             ("Someday.org" :level . 1)
+                             ("Tickler.org" :maxlevel . 2)))
+#+END_SRC
+*** Agenda
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-diary-file 'diary-file)
+  (setq org-agenda-include-diary t)
+  (setq org-agenda-restore-windows-after-quit t)
+  (setq org-agenda-sticky t)
+  (setq org-agenda-window-setup (quote only-window))
+#+END_SRC
+*** references - org-brain
+#+BEGIN_SRC emacs-lisp
+  (use-package org-brain :ensure t :pin "melpa"
+    :init
+    (setq org-brain-path (concat org-directory "brain"))
+    ;; For Evil users
+    ;; (with-eval-after-load 'evil
+    ;;   (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
+    :config
+    (setq org-id-track-globally t)
+    (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
+    (push '("b" "Brain" plain (function org-brain-goto-end)
+            "* %i%?" :empty-lines 1)
+          org-capture-templates)
+    (setq org-brain-visualize-default-choices 'all)
+    (setq org-brain-title-max-length 12))
+#+END_SRC
 ** Discovering emacs through fuzzy matching
 *** ivy
 Apparently ivy is like ido but cooler, sooooooo
@@ -278,7 +461,6 @@ Apparently ivy is like ido but cooler, sooooooo
            ;; ("C-h v" . counsel-describe-variable)
            ("C-y" . counsel-yank-pop)))
 #+END_SRC
-
 ** Extending emacs with engines
 *** Completion
 **** company-mode
@@ -750,38 +932,6 @@ I maintain a tintin++ config, so this is at least convenient.
 #+BEGIN_SRC emacs-lisp
 (use-package tintin-mode :pin "marmalade")
 #+END_SRC
-** GTD (Getting Things Done)
-#+BEGIN_SRC emacs-lisp
-  (setq org-directory "~/Dropbox/orgnotes")
-  (setq org-default-notes-file (concat org-directory "/notes.org.txt"))
-
-  (global-set-key "\C-cc" 'org-capture)
-
-  (global-set-key "\C-cl" 'org-store-link)
-  (global-set-key "\C-ca" 'org-agenda)
-  (global-set-key "\C-cb" 'org-iswitchb)
-
-  (setq org-todo-keywords '( "TODO(t)" "WAIT(w)" "|" "DONE" "CANCELED(c)"))
-  (setq org-log-done 'time)
-
-  (setq org-tag-alist '(("@home" . ?h) ("@work" . ?w) ("family") ("weiqi") ("ruby") ("lisp") ("emacs")))
-
-  (setq org-capture-templates
-        '(
-          ("j" "Journal Entry"
-           entry (file+datetree "journal.org")
-           "* %U\n%?"
-           :empty-lines 1)
-          ("t" "Todo"
-           entry (file "Inbox.org")
-           "* TODO %?\n  %i\n  %a")
-          ("s" "Someday"
-           entry (file+headline "Someday.org" "Someday")
-           "* %i%? \n %U")))
-
-  (org-defkey org-mode-map "\C-cr" 'org-refile)
-  (setq org-refile-targets '(("Projects.org" :level . 1)))
-#+END_SRC
 ** Org-mode
 org-mode itself is in the init.el file. here's additional config for it.
 I've been having some issues exporting, so I'm actively loading libraries here.
@@ -812,14 +962,6 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 
 #+END_SRC
 
-*** Left mouse-click to org-cycle
-What? My hands aren't ALWAYS on the keyboard.
-This is currently disabled.
-#+BEGIN_SRC emacs-lisp
-;; (defun stag-click-to-cycle-org-visibility ()
-;;   (local-set-key [mouse-1] 'org-cycle))
-;; (add-hook 'org-mode-hook 'stag-click-to-cycle-org-visibility)
-#+END_SRC
 *** Markdown                                               :major:external:
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -1173,10 +1315,10 @@ smtpmail-multi
 *** Interface customization
 **** Smart mode line
 #+BEGIN_SRC emacs-lisp
-  (use-package smart-mode-line
-    :config
-    (setq sml/theme 'dark)
-    (sml/setup))
+  ;; (use-package smart-mode-line :pin "melpa"
+  ;;   :config
+  ;;   (setq sml/theme 'dark)
+  ;;   (sml/setup))
 #+END_SRC
 **** Default text scale
 This handy little package increases the size of the font in the whole frame.
@@ -1184,107 +1326,4 @@ This handy little package increases the size of the font in the whole frame.
 (use-package default-text-scale
   :bind (("C-x C-=" . default-text-scale-increase)
          ("C-x C--" . default-text-scale-decrease)))
-#+END_SRC
-*** Calendar, dates, times
-#+BEGIN_SRC emacs-lisp
-(setq calendar-week-start-day 1) ;; Monday
-#+END_SRC
-**** Diary
-#+BEGIN_SRC emacs-lisp
-(setq diary-file "~/Dropbox/orgnotes/journal.org")
-
-(setq view-diary-entries-initially t
-      mark-diary-entries-in-calendar t
-      number-of-diary-entries 7)
-(add-hook 'diary-display-hook 'diary-fancy-display)
-(add-hook 'today-visible-calendar-hook 'calendar-mark-today)
-#+END_SRC
-**** calfw, the calendar framework
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package calfw
-  ;;   :config
-  ;;   (require 'calfw-cal)
-  ;;   (require 'calfw-ical)
-  ;;   (require 'calfw-org)
-
-  ;;   (setq cfw:fchar-junction ?╋
-  ;;         cfw:fchar-vertical-line ?┃
-  ;;         cfw:fchar-horizontal-line ?━
-  ;;         cfw:fchar-left-junction ?┣
-  ;;         cfw:fchar-right-junction ?┫
-  ;;         cfw:fchar-top-junction ?┯
-  ;;         cfw:fchar-top-left-corner ?┏
-  ;;         cfw:fchar-top-right-corner ?┓))
-#+END_SRC
-***** TODO calfw-gcal
-Here is a sample function where you could put your Google Calendar information (mostly so I remember how to create the secret file on a new computer).
-
-#+BEGIN_QUOTE
-(use-package calfw-gcal)
-(defun stag-calendar ()
-(interactive)
-(cfw:open-calendar-buffer
-:contents-sources
-(list
-(cfw:org-create-source "Green")
-(cfw:cal-create-source "Orange")
-(cfw:ical-create-source "gcal" "gcal-ics-link" "Blue")
-)))
-#+END_QUOTE
-*** File system browsing
-**** Dired
-dired-jump is awesome (C-x C-j in any buffer)
-#+BEGIN_SRC emacs-lisp
-(require 'dired-x)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-;; Changed my mind. I prefer seeing just the files:
- (add-hook 'dired-mode-hook 'dired-hide-details-mode)
-
-;; Auto-refresh silently
- (setq global-auto-revert-non-file-buffers t)
- (setq auto-revert-verbose nil)
-#+END_SRC
-
-This will make org-mode behave kinda like a two-pane file manager: with two direds open, you can copy/rename and the default target will be the other pane.
-Using split-window-vertically from the first dired might be required to make this work.
-#+BEGIN_SRC emacs-lisp
-(setq dired-dwim-target t)
-#+END_SRC
-
-OSX.. Windows.. *sigh*.
-#+BEGIN_SRC emacs-lisp
-(setq ls-lisp-use-insert-directory-program nil)
-(require 'ls-lisp)
-#+END_SRC
-
-It's also nice to have dired with M-< and M-> take you to first and last file
-#+BEGIN_SRC emacs-lisp
-(require 'dired)
-(defun dired-back-to-top ()
-  (interactive)
-  (beginning-of-buffer)
-  (next-line 2))
-
-(define-key dired-mode-map
-  (vector 'remap 'beginning-of-buffer) 'dired-back-to-top)
-
-(defun dired-jump-to-bottom ()
-  (interactive)
-  (end-of-buffer)
-  (next-line -1))
-
-(define-key dired-mode-map
-  (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
-#+END_SRC
-**** Tramp
-hadoop with tramp, please.
-=C-x C-f /hdfs:username@hadoop-server:/path/to/dir/or/file=
-#+BEGIN_SRC emacs-lisp
-(use-package tramp-hdfs :pin "melpa")
-#+END_SRC
-*** Editing Tintin++ config files
-#+BEGIN_SRC emacs-lisp
-;; (use-package tintin-mode)
 #+END_SRC
