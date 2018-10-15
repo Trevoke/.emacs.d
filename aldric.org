@@ -312,8 +312,9 @@ If the variable exists, do nothing, otherwise prompt for a path and save it, usi
 #+BEGIN_SRC emacs-lisp
   (or org-directory
       (customize-save-variable 'org-directory
-                              (read-directory-name "What is the root GTD directory? "
-                                                   "~/")))
+                               (file-name-as-directory (read-directory-name
+                                                        "What is the root GTD directory? "
+                                                        "~/"))))
 
   (setq org-agenda-files (mapcar (lambda (x) (concat org-directory x))
                                  '("Projects.org" "Tickler.org")))
@@ -406,11 +407,13 @@ These define the relevant states an action can be in. Besides the fundamental st
            entry (file "Tickler.org")
            "* TODO %?\nSCHEDULED: %^{Remind me on:}t"
            :kill-buffer t)))
-
+#+END_SRC
+*** Refiling
+#+BEGIN_SRC emacs-lisp
   (org-defkey org-mode-map "\C-cr" 'org-refile)
   (setq org-refile-targets '(("Projects.org" :level . 1)
                              ("Someday.org" :level . 1)
-                             ("Tickler.org" :maxlevel . 2)))
+                             ("Tickler.org" :level . 1)))
 #+END_SRC
 *** Agenda
 #+BEGIN_SRC emacs-lisp
@@ -961,12 +964,13 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 #+END_SRC
 *** Org bullets
 #+BEGIN_SRC emacs-lisp
-    (use-package org-bullets
-      :init (add-hook 'org-mode-hook 'org-bullets-mode))
+  (use-package org-bullets
+    :init (add-hook 'org-mode-hook 'org-bullets-mode))
 #+END_SRC
-
+*** Adding images
+#+BEGIN_SRC emacs-lisp
+  (use-package org-download)
 #+END_SRC
-
 *** Markdown                                               :major:external:
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
