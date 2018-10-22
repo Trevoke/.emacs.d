@@ -415,9 +415,17 @@ These define the relevant states an action can be in. Besides the fundamental st
 *** Refiling
 #+BEGIN_SRC emacs-lisp
   (org-defkey org-mode-map "\C-cr" 'org-refile)
-  (setq org-refile-targets '(("Projects.org" :level . 1)
-                             ("Someday.org" :level . 1)
-                             ("Tickler.org" :level . 1)))
+  (org-defkey org-mode-map "\C-cs" '(lambda ()
+                                     (interactive)
+                                     (org-set-tags-command)
+                                     (org-refile)))
+  (setq org-refile-use-outline-path 'file)
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-refile-allow-creating-parent-nodes t)
+  (setq org-log-refile 'time)
+  (setq org-refile-targets '(("Projects.org" :maxlevel . 1)
+                             ("Someday.org" :maxlevel . 1)
+                             ("Tickler.org" :maxlevel . 1)))
 #+END_SRC
 *** Agenda
 #+BEGIN_SRC emacs-lisp
