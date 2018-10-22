@@ -395,7 +395,11 @@ These define the relevant states an action can be in. Besides the fundamental st
            entry (file+olp+datetree "journal.org")
            "* %U\n%?"
            :kill-buffer t)
-          ("t" "Todo"
+          ("i" "Inbox"
+           entry (file "Inbox.org")
+           "* TODO %?\n  %i"
+           :kill-buffer t)
+          ("t" "Todo with link"
            entry (file "Inbox.org")
            "* TODO %?\n  %i\n  %a"
            :kill-buffer t)
