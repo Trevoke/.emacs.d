@@ -315,9 +315,9 @@ If the variable exists, do nothing, otherwise prompt for a path and save it, usi
                                (file-name-as-directory (read-directory-name
                                                         "What is the root GTD directory? "
                                                         "~/"))))
-
-  (setq org-agenda-files (mapcar (lambda (x) (concat org-directory x))
-                                 '("Projects.org" "Tickler.org")))
+  (setq stag-gtd-projects (concat org-directory "Projects.org")
+        stag-gtd-tickler  (concat org-directory "Tickler.org"))
+  (setq org-agenda-files `(,stag-gtd-projects ,stag-gtd-tickler))
 #+END_SRC
 *** Diary
 #+BEGIN_SRC emacs-lisp
@@ -415,10 +415,8 @@ These define the relevant states an action can be in. Besides the fundamental st
 *** Refiling
 #+BEGIN_SRC emacs-lisp
   (org-defkey org-mode-map "\C-cr" 'org-refile)
-  (org-defkey org-mode-map "\C-cs" '(lambda ()
-                                     (interactive)
-                                     (org-set-tags-command)
-                                     (org-refile)))
+  (org-defkey org-mode-map "\C-cs" 'stag-gtd-refile)
+  (org-defkey org-mode-map "\C-co" 'stag-gtd-create-single-task-project)
   (setq org-refile-use-outline-path 'file)
   (setq org-outline-path-complete-in-steps nil)
   (setq org-refile-allow-creating-parent-nodes t)
@@ -426,6 +424,31 @@ These define the relevant states an action can be in. Besides the fundamental st
   (setq org-refile-targets '(("Projects.org" :maxlevel . 1)
                              ("Someday.org" :maxlevel . 1)
                              ("Tickler.org" :maxlevel . 1)))
+
+  (defun stag-gtd-refile ()
+    (interactive)
+    (org-set-tags-command)
+    (org-refile))
+
+  (defun stag-gtd-create-single-task-project ()
+    (interactive)
+    (org-refile nil nil `("Projects.org" ,stag-gtd-projects))
+    (find-file stag-gtd-projects)
+    (end-of-buffer)
+    (previous-line)
+    (kill-ring-save (point-at-bol) (point-at-eol))
+    (org-end-of-line)
+    (insert " [/]")
+    (next-line)
+    (org-end-of-line)
+    (org-return)
+    (org-yank)
+    (org-beginning-of-line)
+    (forward-word)
+    (backward-word)
+    (insert "TODO ")
+    (org-metaright)
+    (org-update-statistics-cookies t))
 #+END_SRC
 *** Agenda
 #+BEGIN_SRC emacs-lisp
