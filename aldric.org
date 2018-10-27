@@ -325,6 +325,7 @@ I've been having some issues exporting, so I'm actively loading libraries here.
     (setq org-startup-indented t)
     (setq org-cycle-separator-lines 0)
     (setq org-goto-interface 'outline-path-completion) ;; useful with C-c C-j
+    (setq org-M-RET-may-split-line '((default .t) (headline . nil)))
 
     (setq org-mobile-directory "~/Dropbox/orgnotes")
     (setq org-mobile-inbox-for-pull "~/Dropbox/orgnotes/from-mobile.org")
