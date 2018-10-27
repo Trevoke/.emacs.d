@@ -1,49 +1,48 @@
 #+TITLE: Trevoke's emacs config
 #+OPTIONS: toc:4 h:4
 
-* Configuration
-** About
+* About
 <<babel-init>>
 Welcome to my emacs configuration.
 I tinker with this file a lot, so I need a quick way to get to it.
 I set a bookmark with =C-x r m= and I can get back here with =C-x r b=
-*** TODO Minor modes?
+** TODO Minor modes?
 I could create here some empty minor modes based on how I think about a buffer, hook those to whatever major modes I care about, and then just hook to the minor mode everywhere else in my configuration.
-** Personal information
+* Personal information
 #+BEGIN_SRC emacs-lisp
 (setq user-full-name "Aldric Giacomoni"
       user-mail-address "trevoke@gmail.com")
 #+END_SRC
-** General emacs config
-*** Spring cleaning
+* General emacs config
+** Spring cleaning
 There are a few things I need to set up manually, because I don't know a smarter way to do it.
 #+BEGIN_SRC emacs-lisp
 (setq org-directory nil) ;; allows the customization to take over
 #+END_SRC
-*** Customizations from customization system
+** Customizations from customization system
 Keeping these separate makes life easier: they get modified when I load a theme and such, and I don't need that kind of hassle when maintaining my actual configuration, you know?
 In addition, I do keep some somewhat computer-specific stuff in there, like the font, and it's just easier to have this separated there.
 #+BEGIN_SRC emacs-lisp
 (setq custom-file "~/.emacs-custom.el")
 (load custom-file t) ;; t means no error if file does not exist
 #+END_SRC
-*** Additional paths
-**** Themes
+** Additional paths
+*** Themes
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 ;; (load-theme 'mejelly t)
 #+END_SRC
-**** Packages (without package manglement)
+*** Packages (without package manglement)
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/packages")
 #+END_SRC
-**** Secrets
+*** Secrets
 API keys, passwords, etc are kept in here. This file is .gitignored.
 #+BEGIN_SRC emacs-lisp
 (load "~/.emacs.d/emacs.secrets" t)
 #+END_SRC
-*** Package management
-**** The package manager: =use-package=
+** Package management
+*** The package manager: =use-package=
 I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
 1. it is integrated within emacs.
 2. it allows me to set up emacs on any OS I desire more easily than other options I've encountered so far
@@ -53,15 +52,15 @@ The configuration for it is inside the init.el because I need to make sure org-m
 before I use any org-mode functions... And parsing this org-mode file into code is an org-mode
 function.
 
-**** A new package browser
+*** A new package browser
 #+BEGIN_SRC emacs-lisp
 (use-package paradox)
 #+END_SRC
-*** Yes/No => y/n
+** Yes/No => y/n
 #+BEGIN_SRC emacs-lisp
 (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
-*** Visual choices
+** Visual choices
 #+BEGIN_SRC emacs-lisp
 (setq inhibit-startup-screen t)
 (setq initial-scratch-message nil)
@@ -81,7 +80,7 @@ This shows the file path in the GUI header
                              (abbreviate-file-name (buffer-file-name))
                            "%f"))))
 #+END_SRC
-*** Backups
+** Backups
 Centralize emacs backups. This directory is gitignored.
 #+BEGIN_SRC emacs-lisp
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
@@ -93,7 +92,7 @@ And I'm not super-worried about old backups and other such things, so I'll just 
 (setq vc-make-backup-files t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
 #+END_SRC
-*** History
+** History
 Stolen from https://www.wisdomandwonder.com/wp-content/uploads/2014/03/C3F.html
 #+BEGIN_SRC emacs-lisp
 (setq savehist-file "~/.emacs.d/savehist")
@@ -105,7 +104,7 @@ Stolen from https://www.wisdomandwonder.com/wp-content/uploads/2014/03/C3F.html
         search-ring
         regexp-search-ring))
 #+END_SRC
-*** TODO Window config (Put OSX stuff somewhere else)
+** TODO Window config (Put OSX stuff somewhere else)
 I don't really care about any of the extra details - emacs helps me out enough in other ways.
 #+BEGIN_SRC emacs-lisp
 (when window-system
@@ -126,7 +125,7 @@ And I've also added other OSX-specific stuff here... For now.
     (setq ns-use-srgb-colorspace t)
     (menu-bar-mode t))
 #+END_SRC
-*** UTF-8
+** UTF-8
 #+BEGIN_SRC emacs-lisp
 ;; Activate UTF-8 mode:
 (setq locale-coding-system 'utf-8)
@@ -150,7 +149,7 @@ And I've also added other OSX-specific stuff here... For now.
 ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
 (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 #+END_SRC
-*** Buffer management
+** Buffer management
 I like unique buffer names. Enter uniquify.
 #+BEGIN_SRC emacs-lisp
 (require 'uniquify)
@@ -163,7 +162,7 @@ Also, ibuffer is nicer than plain-old buffer window
 (global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
 (setq ibuffer-default-sorting-mode 'major-mode)
 #+END_SRC
-*** Scrolling
+** Scrolling
 #+BEGIN_SRC emacs-lisp
 (setq scroll-step 1)
 (setq scroll-conservatively 10000)
@@ -172,25 +171,25 @@ Also, ibuffer is nicer than plain-old buffer window
 (setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
 (setq mouse-wheel-follow-mouse t) ;; scroll window under mouse
 #+END_SRC
-*** Frame management
-**** Transparency
+** Frame management
+*** Transparency
 #+BEGIN_SRC emacs-lisp
 (use-package seethru :pin "melpa")
 #+END_SRC
-*** Window management
-**** [#B] Window layout manager (eyebrowse)
+** Window management
+*** [#B] Window layout manager (eyebrowse)
 Prefix key is =C-c C-w=
 #+BEGIN_SRC emacs-lisp
 (use-package eyebrowse
   :init (setq eyebrowse-new-workspace t)
   :config (eyebrowse-mode))
 #+END_SRC
-**** Winner-mode (undo/redo window changes)
+*** Winner-mode (undo/redo window changes)
 Remember: =C-c <left>= and =C-c <right>=
 #+BEGIN_SRC emacs-lisp
 (winner-mode)
 #+END_SRC
-**** Windmove (move across windows with shift+arrow)
+*** Windmove (move across windows with shift+arrow)
 #+BEGIN_SRC emacs-lisp
   (windmove-default-keybindings)
   (add-hook 'org-shiftup-final-hook 'windmove-up)
@@ -199,7 +198,7 @@ Remember: =C-c <left>= and =C-c <right>=
   (add-hook 'org-shiftright-final-hook 'windmove-right)
 
 #+END_SRC
-**** Move to new window when splitting
+*** Move to new window when splitting
 Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
 #+BEGIN_SRC emacs-lisp
 (defun stag-vsplit-last-buffer (prefix)
@@ -219,8 +218,8 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
 (global-set-key (kbd "C-x 2") 'stag-vsplit-last-buffer)
 (global-set-key (kbd "C-x 3") 'stag-hsplit-last-buffer)
 #+END_SRC
-*** Interacting with emacs
-**** Fonts and stuff
+** Interacting with emacs
+*** Fonts and stuff
 I found this function online somewhere, before I thought tracking code origin for this config file might matter.
 All it does is tell you what face is at point.
 #+BEGIN_SRC emacs-lisp
@@ -230,31 +229,31 @@ All it does is tell you what face is at point.
                   (get-char-property pos 'face))))
     (if face (message "Face: %s" face) (message "No face at %d" pos))))
 #+END_SRC
-**** evil-mode
+*** evil-mode
 Because sometimes, vim.
 #+BEGIN_SRC emacs-lisp
 (use-package evil)
 #+END_SRC
-**** Folding code
+*** Folding code
 #+BEGIN_SRC emacs-lisp
   (use-package origami
     :pin "melpa"
     :config (global-origami-mode))
 #+END_SRC
-**** Disable C-z to minimize
+*** Disable C-z to minimize
 Suspend emacs？ I'll use C-x C-z.
 #+BEGIN_SRC emacs-lisp
 (global-unset-key (kbd "C-z"))
 #+END_SRC
-**** Navigating text
+*** Navigating text
 avy is kinda badass.
 #+BEGIN_SRC emacs-lisp
 (use-package avy
     :bind (("C-c j" . avy-goto-char-2)
            ("C-x j" . avy-po-mark)))
 #+END_SRC
-** File system browsing
-*** Dired
+* File system browsing
+** Dired
 dired-jump is awesome (C-x C-j in any buffer)
 #+BEGIN_SRC emacs-lisp
 (require 'dired-x)
@@ -300,14 +299,116 @@ It's also nice to have dired with M-< and M-> take you to first and last file
 (define-key dired-mode-map
   (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
 #+END_SRC
-*** Tramp
+** Tramp
 hadoop with tramp, please.
 =C-x C-f /hdfs:username@hadoop-server:/path/to/dir/or/file=
 #+BEGIN_SRC emacs-lisp
 (use-package tramp-hdfs :pin "melpa")
 #+END_SRC
-** GTD (Getting Things Done)
-*** Paths and files
+* Org-mode
+org-mode itself is in the init.el file. here's additional config for it.
+I've been having some issues exporting, so I'm actively loading libraries here.
+#+BEGIN_SRC emacs-lisp
+(load-library "org-macro")
+(load-library "ob-exp")
+(load-library "org")
+(load-library "org-compat")
+(load-library "ox")
+
+;; (use-package ox-pandoc)
+#+END_SRC
+** Generic org-mode configuration
+#+BEGIN_SRC emacs-lisp
+    (setq org-cycle-separator-lines 0)
+    (setq org-src-fontify-natively t)
+    (add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
+
+    (setq org-startup-indented t)
+
+    (setq org-mobile-directory "~/Dropbox/orgnotes")
+    (setq org-mobile-inbox-for-pull "~/Dropbox/orgnotes/from-mobile.org")
+#+END_SRC
+** Org bullets
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :init (add-hook 'org-mode-hook 'org-bullets-mode))
+#+END_SRC
+** Adding images
+#+BEGIN_SRC emacs-lisp
+  (use-package org-download)
+#+END_SRC
+** Markdown                                                 :major:external:
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :init
+    (add-hook 'markdown-mode-hook 'turn-on-orgtbl))
+#+END_SRC
+*** TODO Github-Flavored Markdown (requires backend config?)
+#+BEGIN_SRC emacs-lisp
+(require 'ox-md)
+#+END_SRC
+*** TODO My orgtbl-to-gfm conversion (obsoleted by above?)
+It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table. use C-c C-c to generate / update GFM table.
+#+BEGIN_SRC emacs-lisp
+;;; orgtbl-to-gfm conversion function
+;; Usage Example:
+;;
+;; <!-- BEGIN RECEIVE ORGTBL ${1:YOUR_TABLE_NAME} -->
+;; <!-- END RECEIVE ORGTBL $1 -->
+;;
+;; <!--
+;; #+ORGTBL: SEND $1 orgtbl-to-gfm
+;; | $0 |
+;; -->
+
+(defun orgtbl-to-gfm (table params)
+  "Convert the Orgtbl mode TABLE to GitHub Flavored Markdown."
+  (let* ((alignment (mapconcat (lambda (x) (if x "|--:" "|---"))
+                               org-table-last-alignment ""))
+         (params2
+          (list
+           :splice t
+           :hline (concat alignment "|")
+           :lstart "| " :lend " |" :sep " | ")))
+           (orgtbl-to-generic table (org-combine-plists params2 params))))
+
+(defun stag-insert-org-to-gfm-table (table-name)
+  (interactive "*sEnter table name: ")
+  (insert "<!---
+#+ORGTBL: SEND " table-name " orgtbl-to-gfm
+
+-->
+<!--- BEGIN RECEIVE ORGTBL " table-name " -->
+<!--- END RECEIVE ORGTBL " table-name " -->")
+  (previous-line)
+  (previous-line)
+  (previous-line))
+
+  (global-set-key (kbd "C-c t") 'stag-insert-org-to-gfm-table)
+#+END_SRC
+
+** Blogging
+#+BEGIN_SRC emacs-lisp
+  (use-package org-page
+    :config
+    (setq op/repository-directory "~/src/projects/trevoke.github.io")
+    (setq op/personal-github-link "https://github.com/trevoke")
+    (setq op/site-domain "http://blog.trevoke.net/")
+    (setq op/site-main-title "Seven Steps")
+    (setq op/site-sub-title "Words... words, they're all we have to go on! — Rosencrantz and Guildenstern are dead"))
+
+  ;; (use-package blog-admin
+  ;;   :init
+  ;;   (setq blog-admin-backend-path "~/src/projects/trevoke.github.io")
+  ;;   (setq blog-admin-backend-type 'org-page)
+  ;;   (setq blog-admin-backend-new-post-in-drafts t)
+  ;;   (setq blog-admin-backend-new-post-with-same-name-dir t)
+  ;;   (setq blog-admin-backend-org-page-drafts "_drafts")) ;; directory to save draft
+  ;;        (add-hook 'blog-admin-backend-after-new-post-hook 'find-file))
+
+#+END_SRC
+* GTD (Getting Things Done)
+** Paths and files
 If the variable exists, do nothing, otherwise prompt for a path and save it, using emacs' customization tool.
 #+BEGIN_SRC emacs-lisp
   (or org-directory
@@ -319,7 +420,7 @@ If the variable exists, do nothing, otherwise prompt for a path and save it, usi
         stag-gtd-tickler  (concat org-directory "Tickler.org"))
   (setq org-agenda-files `(,stag-gtd-projects ,stag-gtd-tickler))
 #+END_SRC
-*** Diary
+** Diary
 #+BEGIN_SRC emacs-lisp
 (setq diary-file (concat org-directory "diary-file.org"))
 
@@ -329,11 +430,11 @@ If the variable exists, do nothing, otherwise prompt for a path and save it, usi
 (add-hook 'diary-display-hook 'diary-fancy-display)
 (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
 #+END_SRC
-*** Calendar, dates, times
+** Calendar, dates, times
 #+BEGIN_SRC emacs-lisp
 (setq calendar-week-start-day 1) ;; Monday
 #+END_SRC
-**** calfw, the calendar framework
+*** calfw, the calendar framework
 #+BEGIN_SRC emacs-lisp
   ;; (use-package calfw
   ;;   :config
@@ -350,7 +451,7 @@ If the variable exists, do nothing, otherwise prompt for a path and save it, usi
   ;;         cfw:fchar-top-left-corner ?┏
   ;;         cfw:fchar-top-right-corner ?┓))
 #+END_SRC
-***** TODO calfw-gcal
+**** TODO calfw-gcal
 Here is a sample function where you could put your Google Calendar information (mostly so I remember how to create the secret file on a new computer).
 
 #+BEGIN_QUOTE
@@ -365,7 +466,7 @@ Here is a sample function where you could put your Google Calendar information (
 (cfw:ical-create-source "gcal" "gcal-ics-link" "Blue")
 )))
 #+END_QUOTE
-*** Action Tags
+** Action Tags
 These are tags to add to tasks, such as types of action, mindset I need to be in, tool Ι need to have, emotional reward I'll get from doing the action, etc. Whatever helps me pick a task to accomplish.
 #+BEGIN_SRC emacs-lisp
   (setq org-tag-alist '(("@home" . ?h)
@@ -373,13 +474,13 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
                         ("@nonet" . ?n)
                         ("code")))
 #+END_SRC
-*** Action Keywords
+** Action Keywords
 These define the relevant states an action can be in. Besides the fundamental states, there is "NEXT" which allows me to filter quickly for "only the actions I can or should do next".
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keywords '( "TODO(t/!)" "NEXT(n)" "WAIT(w/!)" "|" "DONE(/!)" "CANCELED(c/!)"))
   (setq org-log-done 'time)
 #+END_SRC
-*** Captures
+** Captures
 #+BEGIN_SRC emacs-lisp
   (setq org-default-notes-file (concat org-directory "notes.org"))
 
@@ -412,7 +513,7 @@ These define the relevant states an action can be in. Besides the fundamental st
            "* TODO %?\nSCHEDULED: %^{Remind me on:}t"
            :kill-buffer t)))
 #+END_SRC
-*** Refiling
+** Refiling
 #+BEGIN_SRC emacs-lisp
   (org-defkey org-mode-map "\C-cr" 'org-refile)
   (org-defkey org-mode-map "\C-cs" 'stag-gtd-refile)
@@ -450,7 +551,7 @@ These define the relevant states an action can be in. Besides the fundamental st
     (org-metaright)
     (org-update-statistics-cookies t))
 #+END_SRC
-*** Agenda
+** Agenda
 #+BEGIN_SRC emacs-lisp
   (setq org-agenda-diary-file 'diary-file)
   (setq org-agenda-include-diary t)
@@ -458,7 +559,7 @@ These define the relevant states an action can be in. Besides the fundamental st
   (setq org-agenda-sticky t)
   (setq org-agenda-window-setup 'only-window)
 #+END_SRC
-*** references - org-brain
+** references - org-brain
 #+BEGIN_SRC emacs-lisp
   (use-package org-brain :ensure t :pin "melpa"
     :init
@@ -475,8 +576,8 @@ These define the relevant states an action can be in. Besides the fundamental st
     (setq org-brain-visualize-default-choices 'all)
     (setq org-brain-title-max-length 12))
 #+END_SRC
-** Discovering emacs through fuzzy matching
-*** ivy
+* Discovering emacs through fuzzy matching
+** ivy
 Apparently ivy is like ido but cooler, sooooooo
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
@@ -504,18 +605,18 @@ Apparently ivy is like ido but cooler, sooooooo
            ;; ("C-h v" . counsel-describe-variable)
            ("C-y" . counsel-yank-pop)))
 #+END_SRC
-** Extending emacs with engines
-*** Completion
-**** company-mode
+* Extending emacs with engines
+** Completion
+*** company-mode
 #+BEGIN_SRC emacs-lisp
 (use-package company)
 #+END_SRC
-**** Snippets
+*** Snippets
 Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet :diminish yas-minor-mode)
 #+END_SRC
-*** Project navigation
+** Project navigation
 Projectile is pretty sweet.
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
@@ -527,15 +628,15 @@ Projectile is pretty sweet.
   (setq projectile-completion-system 'ivy))
 #+END_SRC
 
-*** Searching
-**** Anzu (about search results)                          :external:minor:
+** Searching
+*** Anzu (about search results)                            :external:minor:
 #+BEGIN_SRC emacs-lisp
   (use-package anzu
     :config (global-anzu-mode t)
     :bind (("M-%" . anzu-query-replace)
            ("C-M-%" . anzu-query-replace-regexp)))
 #+END_SRC
-**** Silver searcher + Wgrep-ag
+*** Silver searcher + Wgrep-ag
 Sometimes after you've found a bunch of things, you want to edit.. Kind of a find-and-replace sort of deal, maybe?
 
 I forget the basic keybindings all the time: After a search using =ag=, use C-c C-p to start editing the results buffer, and use C-c C-c to save the changes and C-c C-k to cancel.
@@ -547,17 +648,17 @@ I forget the basic keybindings all the time: After a search using =ag=, use C-c 
     :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
     :config (autoload 'wgrep-ag-setup "wgrep-ag")))
 #+END_SRC
-** Version control
-*** Git
-**** Editing various git files
+* Version control
+** Git
+*** Editing various git files
 #+BEGIN_SRC emacs-lisp
 (use-package gitconfig-mode)
 #+END_SRC
-**** Walking through a file's history
+*** Walking through a file's history
 #+BEGIN_SRC emacs-lisp
 (use-package git-timemachine)
 #+END_SRC
-**** Magit                                                :external:minor:
+*** Magit                                                  :external:minor:
 Magit is a pretty amazing interface to git.
 #+BEGIN_SRC emacs-lisp
 (use-package magit
@@ -566,13 +667,13 @@ Magit is a pretty amazing interface to git.
           (setq magit-completing-read-function 'ivy-completing-read)
           (setq magit-popup-use-prefix-argument 'default))
 #+END_SRC
-***** Magit + gitflow
+**** Magit + gitflow
 With this configuration, using C-f in a status buffer will trigger the gitflow selectors.
 #+BEGIN_SRC emacs-lisp
 (use-package magit-gitflow
   :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
 #+END_SRC
-***** Github pull requests
+**** Github pull requests
 This will let us handle pull requests through Github.
 | key | behavior                                        |
 |-----+-------------------------------------------------|
@@ -588,14 +689,14 @@ This will let us handle pull requests through Github.
 ;; (use-package magit-gh-pulls
 ;;  :config (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls))
 #+END_SRC
-** Programming
-*** Indentation
+* Programming
+** Indentation
 Always spaces. Always.
 #+BEGIN_SRC emacs-lisp
 (setq-default indent-tabs-mode nil)
 (setq backward-delete-char-untabify-method 'untabify)
 #+END_SRC
-*** code tagging                                           :external:minor:
+** code tagging                                             :external:minor:
 This is the ggtags plugin, which uses GNU Global.
 #+BEGIN_SRC emacs-lisp
 (use-package ggtags
@@ -603,7 +704,7 @@ This is the ggtags plugin, which uses GNU Global.
   (setq tags-case-fold-search nil)
   :bind ("<f7>" . ggtags-create-tags))
 #+END_SRC
-*** Basic changes I want made to any code buffer
+** Basic changes I want made to any code buffer
 Makes it easy to type things like {} or [] or () and magically add an extra line between the two so you can type there
 #+BEGIN_SRC emacs-lisp
 ;; This function comes from http://stackoverflow.com/a/22109370/234025
@@ -637,23 +738,23 @@ Here's where I plug in every modification I want in a code buffer
 
 (add-hook 'prog-mode-hook 'stag-code-modes-hook)
 #+END_SRC
-*** Expand region                                          :external:minor:
+** Expand region                                            :external:minor:
 One of the features that makes IDEA's editors awesome is the way you can expand selection. This plugin replicates the feature.
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
     :bind (("C-c <up>" . er/expand-region)
            ("C-c <down>" . er/contract-region)))
 #+END_SRC
-*** Log files
+** Log files
 Auto-tail, please.
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-mode))
 #+END_SRC
-*** Cucumber
+** Cucumber
 #+BEGIN_SRC emacs-lisp
 (use-package feature-mode)
 #+END_SRC
-*** C#
+** C#
 #+BEGIN_SRC emacs-lisp
 (defun stag-csharp-mode-hook ()
   (setq c-basic-offset 4))
@@ -663,13 +764,13 @@ Auto-tail, please.
   :init
   (add-hook 'csharp-mode-hook 'stag-csharp-mode-hook))
 #+END_SRC
-*** Docker
+** Docker
 #+BEGIN_SRC emacs-lisp
 (use-package docker-compose-mode)
 (use-package docker-tramp)
 (use-package dockerfile-mode)
 #+END_SRC
-*** emacs lisp
+** emacs lisp
 #+BEGIN_SRC emacs-lisp
   (use-package paredit
     :init
@@ -680,11 +781,11 @@ Auto-tail, please.
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
 #+END_SRC
-*** Elm
+** Elm
 #+BEGIN_SRC emacs-lisp
 (use-package elm-mode)
 #+END_SRC
-*** Elixir
+** Elixir
 #+BEGIN_SRC emacs-lisp
   (use-package alchemist
     :diminish "alc"
@@ -695,7 +796,7 @@ Auto-tail, please.
       :init (use-package flymake-easy)
             (add-hook 'elixir-mode-hook 'flymake-mode)))
 #+END_SRC
-*** CSS
+** CSS
 #+BEGIN_SRC emacs-lisp
   (setq css-indent-offset 2)
 
@@ -710,8 +811,8 @@ Auto-tail, please.
     :init (add-hook 'scss-mode-hook 'flymake-mode))
 
 #+END_SRC
-*** Golang
-**** Golang mode
+** Golang
+*** Golang mode
 Let's run tests easily, shall we?
 And let's have gofmt chew my code when I save the file.
 #+BEGIN_SRC elisp
@@ -726,19 +827,19 @@ And let's have gofmt chew my code when I save the file.
     (use-package company-go
       :config (set (make-local-variable 'company-backends) '(company-go))))
 #+END_SRC
-**** TODO Packages to be added
+*** TODO Packages to be added
 - (use-package go-eldoc)
 - (use-package go-playground)
 - (use-package go-projectile)
 - (use-package gore-mode)
 - (use-package gorepl-mode)
 - (use-package gotest)
-*** Haskell
+** Haskell
 #+BEGIN_SRC emacs-lisp
 (use-package intero :pin "melpa-stable")
 #+END_SRC
-*** HTML
-**** Web-mode                                           :external:major:
+** HTML
+*** Web-mode                                               :external:major:
 Here are all the extensions where I want web-mode enabled
 #+BEGIN_SRC emacs-lisp
   (use-package web-mode
@@ -785,9 +886,9 @@ Here are all the extensions where I want web-mode enabled
     (add-hook 'web-mode-hook 'emmet-mode))
 
 #+END_SRC
-*** Javascript
-**** Actual JS
-***** js2-mode                                           :major:external:
+** Javascript
+*** Actual JS
+**** js2-mode                                             :major:external:
 #+BEGIN_SRC emacs-lisp
   (use-package js2-mode
     :mode "\\.js$"
@@ -798,7 +899,7 @@ Here are all the extensions where I want web-mode enabled
     (setq js2-bounce-indent-p nil) ;; if I want to toggle indentation
     (setq js2-highlight-level 3))
 #+END_SRC
-***** tern-mode
+**** tern-mode
 https://truongtx.me/2014/04/20/emacs-javascript-completion-and-refactoring
 #+BEGIN_SRC emacs-lisp
 (use-package tern
@@ -813,27 +914,27 @@ https://truongtx.me/2014/04/20/emacs-javascript-completion-and-refactoring
   (interactive)
   (delete-process "Tern"))
 #+END_SRC
-***** TODO inferior mode (Pick one? Keep both?)
+**** TODO inferior mode (Pick one? Keep both?)
 #+BEGIN_SRC emacs-lisp
   (use-package js-comint)
   (use-package nodejs-repl)
 #+END_SRC
-***** snippets
+**** snippets
 #+BEGIN_SRC emacs-lisp
   (use-package react-snippets
     :pin "melpa")
 #+END_SRC
-**** json-mode
+*** json-mode
 #+BEGIN_SRC emacs-lisp
 (use-package json-mode :mode "\\.babelrc$")
 (use-package json-reformat)
 #+END_SRC
-**** Typescript
-***** REPL
+*** Typescript
+**** REPL
 #+BEGIN_SRC emacs-lisp
 (use-package tide)
 #+END_SRC
-***** On-the-fly checking
+**** On-the-fly checking
 #+BEGIN_SRC emacs-lisp
   (use-package tss
     :config
@@ -842,13 +943,13 @@ https://truongtx.me/2014/04/20/emacs-javascript-completion-and-refactoring
     (setq tss-implement-definition-key "C-c i")
     (tss-config-default))
 #+END_SRC
-***** Typescript major mode
+**** Typescript major mode
 #+BEGIN_SRC emacs-lisp
 (use-package typescript-mode :pin "melpa"
   :init
   (add-hook 'typescript-mode-hook 'flymake-mode))
 #+END_SRC
-*** Python
+** Python
 #+BEGIN_SRC emacs-lisp
  (use-package elpy
    :config
@@ -859,8 +960,8 @@ https://truongtx.me/2014/04/20/emacs-javascript-completion-and-refactoring
   (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
   (add-hook 'projectile-after-switch-project-hook  'auto-virtualenv-set-virtualenv))
 #+END_SRC
-*** Ruby
-**** Enh-ruby-mode
+** Ruby
+*** Enh-ruby-mode
 There's a few extra things I want started when I open a Ruby buffer
 #+BEGIN_SRC emacs-lisp
   (defun stag-ruby-mode-hook ()
@@ -881,23 +982,23 @@ There's a few extra things I want started when I open a Ruby buffer
     (add-hook 'enh-ruby-mode-hook 'stag-code-modes-hook)
     (add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook))
 #+END_SRC
-**** Project management
-***** rbenv
+*** Project management
+**** rbenv
 #+BEGIN_SRC emacs-lisp
 (use-package rbenv)
 #+END_SRC
-***** Bundler
+**** Bundler
 #+BEGIN_SRC emacs-lisp
 (use-package bundler)
 #+END_SRC
-***** Project navigation
+**** Project navigation
 And I like projectile-rails to handle rails projects.
 #+BEGIN_SRC emacs-lisp
 (use-package projectile-rails
   :init
    (add-hook 'projectile-mode-hook 'projectile-rails-on))
 #+END_SRC
-**** Inferior Ruby
+*** Inferior Ruby
 And I like pry better than irb, so have inf-ruby use pry.
 #+BEGIN_SRC emacs-lisp
   (use-package inf-ruby
@@ -908,14 +1009,14 @@ And I like pry better than irb, so have inf-ruby use pry.
       :config
       (add-to-list 'company-backends 'company-inf-ruby)))
 #+END_SRC
-**** Snippets
+*** Snippets
 I use yasnippets, and I've downloaded a collection of snippets from here: https://github.com/bmaland/yasnippet-ruby-mode
-**** Testing
-***** rspec
+*** Testing
+**** rspec
 #+BEGIN_SRC emacs-lisp
 (use-package rspec-mode)
 #+END_SRC
-**** TODO packages to be added
+*** TODO packages to be added
 - (use-package bundler)
 - (use-package goto-gem)
 - (use-package haml-mode)
@@ -926,7 +1027,7 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 - (use-package ruby-hash-syntax)
 - (use-package ruby-refactor)
 - (use-package yaml-mode)
-*** Rust
+** Rust
 #+BEGIN_SRC emacs-lisp
   (use-package rust-mode
     :pin "melpa"
@@ -939,8 +1040,8 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
     (use-package flymake-rust :pin "melpa")
     (use-package cargo))
 #+END_SRC
-*** Scala
-**** Ensime is our key to IDE-like features
+** Scala
+*** Ensime is our key to IDE-like features
 #+BEGIN_SRC emacs-lisp
 (defun stag-scala-enable-eldoc ()
   (setq-local eldoc-documentation-function
@@ -957,12 +1058,12 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
   (add-hook 'ensime-mode-hook 'stag-scala-enable-eldoc))
 
 #+END_SRC
-*** SQL
-**** Vertica
+** SQL
+*** Vertica
 #+BEGIN_SRC emacs-lisp
 ;;(use-package vertica :pin "melpa")
 #+END_SRC
-**** sqlup                                                :minor:external:
+*** sqlup                                                  :minor:external:
 auto-upcase SQL keywords as I type, please.
 #+BEGIN_SRC emacs-lisp
 (use-package sqlup-mode
@@ -970,114 +1071,13 @@ auto-upcase SQL keywords as I type, please.
   (add-hook 'sql-mode-hook 'sqlup-mode)
   (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 #+END_SRC
-*** tintin
+** tintin
 I maintain a tintin++ config, so this is at least convenient.
 #+BEGIN_SRC emacs-lisp
 (use-package tintin-mode :pin "marmalade")
 #+END_SRC
-** Org-mode
-org-mode itself is in the init.el file. here's additional config for it.
-I've been having some issues exporting, so I'm actively loading libraries here.
-#+BEGIN_SRC emacs-lisp
-(load-library "org-macro")
-(load-library "ob-exp")
-(load-library "org")
-(load-library "org-compat")
-(load-library "ox")
-
-;; (use-package ox-pandoc)
-#+END_SRC
-*** Generic org-mode configuration
-#+BEGIN_SRC emacs-lisp
-    (setq org-src-fontify-natively t)
-    (add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
-
-    (setq org-startup-indented t)
-
-    (setq org-mobile-directory "~/Dropbox/orgnotes")
-    (setq org-mobile-inbox-for-pull "~/Dropbox/orgnotes/from-mobile.org")
-#+END_SRC
-*** Org bullets
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :init (add-hook 'org-mode-hook 'org-bullets-mode))
-#+END_SRC
-*** Adding images
-#+BEGIN_SRC emacs-lisp
-  (use-package org-download)
-#+END_SRC
-*** Markdown                                               :major:external:
-#+BEGIN_SRC emacs-lisp
-  (use-package markdown-mode
-    :init
-    (add-hook 'markdown-mode-hook 'turn-on-orgtbl))
-#+END_SRC
-**** TODO Github-Flavored Markdown (requires backend config?)
-#+BEGIN_SRC emacs-lisp
-(require 'ox-md)
-#+END_SRC
-**** TODO My orgtbl-to-gfm conversion (obsoleted by above?)
-It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table. use C-c C-c to generate / update GFM table.
-#+BEGIN_SRC emacs-lisp
-;;; orgtbl-to-gfm conversion function
-;; Usage Example:
-;;
-;; <!-- BEGIN RECEIVE ORGTBL ${1:YOUR_TABLE_NAME} -->
-;; <!-- END RECEIVE ORGTBL $1 -->
-;;
-;; <!--
-;; #+ORGTBL: SEND $1 orgtbl-to-gfm
-;; | $0 |
-;; -->
-
-(defun orgtbl-to-gfm (table params)
-  "Convert the Orgtbl mode TABLE to GitHub Flavored Markdown."
-  (let* ((alignment (mapconcat (lambda (x) (if x "|--:" "|---"))
-                               org-table-last-alignment ""))
-         (params2
-          (list
-           :splice t
-           :hline (concat alignment "|")
-           :lstart "| " :lend " |" :sep " | ")))
-           (orgtbl-to-generic table (org-combine-plists params2 params))))
-
-(defun stag-insert-org-to-gfm-table (table-name)
-  (interactive "*sEnter table name: ")
-  (insert "<!---
-#+ORGTBL: SEND " table-name " orgtbl-to-gfm
-
--->
-<!--- BEGIN RECEIVE ORGTBL " table-name " -->
-<!--- END RECEIVE ORGTBL " table-name " -->")
-  (previous-line)
-  (previous-line)
-  (previous-line))
-
-  (global-set-key (kbd "C-c t") 'stag-insert-org-to-gfm-table)
-#+END_SRC
-
-*** Blogging
-#+BEGIN_SRC emacs-lisp
-  (use-package org-page
-    :config
-    (setq op/repository-directory "~/src/projects/trevoke.github.io")
-    (setq op/personal-github-link "https://github.com/trevoke")
-    (setq op/site-domain "http://blog.trevoke.net/")
-    (setq op/site-main-title "Seven Steps")
-    (setq op/site-sub-title "Words... words, they're all we have to go on! — Rosencrantz and Guildenstern are dead"))
-
-  ;; (use-package blog-admin
-  ;;   :init
-  ;;   (setq blog-admin-backend-path "~/src/projects/trevoke.github.io")
-  ;;   (setq blog-admin-backend-type 'org-page)
-  ;;   (setq blog-admin-backend-new-post-in-drafts t)
-  ;;   (setq blog-admin-backend-new-post-with-same-name-dir t)
-  ;;   (setq blog-admin-backend-org-page-drafts "_drafts")) ;; directory to save draft
-  ;;        (add-hook 'blog-admin-backend-after-new-post-hook 'find-file))
-
-#+END_SRC
-** REPLs
-*** Generic shell things
+* REPLs
+** Generic shell things
 #+BEGIN_SRC emacs-lisp
   (use-package shell-command
     :pin "melpa"
@@ -1090,7 +1090,7 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
   (setq comint-output-filter-functions (remove 'ansi-color-process-output comint-output-filter-functions))
   (setq font-lock-unfontify-region-function 'xterm-color-unfontify-region))
 #+END_SRC
-*** Bash
+** Bash
 #+BEGIN_SRC emacs-lisp
   (setq explicit-bash-args '("--noediting" "--login" "-i"))
   (require 'em-smart)
@@ -1101,7 +1101,7 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
   ;;     (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
   ;; (ad-activate 'ansi-term)
 #+END_SRC
-*** Eshell
+** Eshell
 #+BEGIN_SRC emacs-lisp
 (defun eshell/clear ()
   "Clear the eshell buffer."
@@ -1113,11 +1113,11 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
   :config
   (eshell-did-you-mean-setup))
 #+END_SRC
-*** Fish
+** Fish
 #+BEGIN_SRC emacs-lisp
 (use-package fish-mode)
 #+END_SRC
-*** Slime
+** Slime
 #+BEGIN_SRC emacs-lisp
 (use-package slime
   :config
@@ -1126,38 +1126,38 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
   ;; (setq inferior-lisp-program "clisp")
   )
 #+END_SRC
-** Writing (specs, docs, blogs...)
-*** Olivetti                                               :external:minor:
+* Writing (specs, docs, blogs...)
+** Olivetti                                                 :external:minor:
 #+BEGIN_SRC emacs-lisp
 (use-package olivetti
   :config
   (setq olivetti-body-width 80))
 #+END_SRC
-*** Interacting with text
-**** More fine-grained word-by-word navigation
+** Interacting with text
+*** More fine-grained word-by-word navigation
 #+BEGIN_SRC emacs-lisp
 ;; (use-package syntax-subword :config (syntax-subword-mode))
 #+END_SRC
-**** Use visual-line-mode
+*** Use visual-line-mode
 #+BEGIN_SRC emacs-lisp
 (remove-hook 'text-mode-hook #'turn-on-auto-fill)
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 #+END_SRC
-**** Redefine kill-region and backward-kill-word
+*** Redefine kill-region and backward-kill-word
 I used Bash for a long time. This allows me to keep using Ctrl-w to delete a word backward.
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-w") 'backward-kill-word)
 (global-set-key (kbd "C-x C-k") 'kill-region)
 #+END_SRC
-**** TODO Move down real line by real line (do I kill this?)
+*** TODO Move down real line by real line (do I kill this?)
 #+BEGIN_SRC emacs-lisp
 (setq line-move-visual nil)
 #+END_SRC
-**** Sentences end with a single space
+*** Sentences end with a single space
 #+BEGIN_SRC emacs-lisp
 (setq sentence-end-double-space nil)
 #+END_SRC
-**** Inserting new lines before/after current one
+*** Inserting new lines before/after current one
 #+BEGIN_SRC emacs-lisp
 (defun stag-insert-line-below ()
   "Insert and auto-indent line below cursor, like in vim."
@@ -1178,7 +1178,7 @@ I used Bash for a long time. This allows me to keep using Ctrl-w to delete a wor
 (global-set-key (kbd "C-M-o") 'stag-insert-line-above)
 #+END_SRC
 
-*** Symbols
+** Symbols
 #+BEGIN_SRC emacs-lisp
 (use-package xah-math-input
   :pin "melpa"
@@ -1186,7 +1186,7 @@ I used Bash for a long time. This allows me to keep using Ctrl-w to delete a wor
   (add-hook 'text-mode-hook 'xah-math-input-mode)
   (add-hook 'org-mode-hook 'xah-math-input-mode))
 #+END_SRC
-*** COMMENT Fixing typos
+** COMMENT Fixing typos
 Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
 
 #+BEGIN_SRC emacs-lisp
@@ -1228,7 +1228,7 @@ Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct
   (setq save-abbrevs 'silently)
   (setq-default abbrev-mode t)
 #+END_SRC
-*** TeX
+** TeX
 #+BEGIN_SRC emacs-lisp
   (require 'flymake)
 
@@ -1256,14 +1256,14 @@ Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct
 (add-hook 'latex-mode-hook 'stag-turn-on-outline-minor-mode)
 (setq outline-minor-mode-prefix "\C-c \C-o") ; Or something else
 #+END_SRC
-** Presentations
-*** Screencasts
+* Presentations
+** Screencasts
 Camcorder is a tool to record screencasts, in GIF or other formats
 #+BEGIN_SRC emacs-lisp
 (use-package camcorder)
 #+END_SRC
-*** TODO Slides [ioslide]
-**** revealjs
+** TODO Slides [ioslide]
+*** revealjs
 #+BEGIN_SRC emacs-lisp
 ;;  (use-package ox-ioslide)
   (use-package ox-reveal
@@ -1272,9 +1272,9 @@ Camcorder is a tool to record screencasts, in GIF or other formats
     (use-package htmlize)
     (setq org-reveal-root "file:///Users/aldric/src/vendor/reveal.js-3.5.0"))
 #+END_SRC
-** Email
-*** TODO Add BBDB
-*** Sending email
+* Email
+** TODO Add BBDB
+** Sending email
 #+BEGIN_SRC emacs-lisp
 (setq mail-user-agent 'message-user-agent)
 
@@ -1315,7 +1315,7 @@ smtpmail-multi
     (setq smtpmail-debug-info t)
     (setq smtpmail-debug-verbose t))
 #+END_SRC
-*** Sending/Reading/Encrypting email
+** Sending/Reading/Encrypting email
 #+BEGIN_SRC emacs-lisp
 (use-package notmuch
   :config
@@ -1325,23 +1325,23 @@ smtpmail-multi
 
   (add-hook 'notmuch-message-mode-hook 'stag-email-hook))
 #+END_SRC
-** Communication
-*** ERC
+* Communication
+** ERC
 #+BEGIN_SRC emacs-lisp
 (setq erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
 #+END_SRC
-*** Circe
+** Circe
 #+BEGIN_SRC emacs-lisp
 (use-package circe)
 #+END_SRC
-*** Confluence
+** Confluence
 #+BEGIN_SRC emacs-lisp
   (use-package confluence :pin "melpa"
     :init
     (setq confluence-url "https://confluence.tapad.com/rpc/xmlrpc"))
 #+END_SRC
-** Miscellanous
-*** Color themes
+* Miscellanous
+** Color themes
 #+BEGIN_SRC emacs-lisp
 (use-package moe-theme :pin "melpa" :disabled t)
 (use-package sourcerer-theme :pin "melpa" :disabled t)
@@ -1349,22 +1349,22 @@ smtpmail-multi
 (use-package material-theme :disabled t)
 #+END_SRC
 
-*** 80-column limit
+** 80-column limit
 #+BEGIN_SRC emacs-lisp
 (use-package fill-column-indicator
   :config
   (setq fci-rule-column 80)
   (add-hook 'prog-mode-hook 'fci-mode))
 #+END_SRC
-*** Interface customization
-**** Smart mode line
+** Interface customization
+*** Smart mode line
 #+BEGIN_SRC emacs-lisp
   ;; (use-package smart-mode-line :pin "melpa"
   ;;   :config
   ;;   (setq sml/theme 'dark)
   ;;   (sml/setup))
 #+END_SRC
-**** Default text scale
+*** Default text scale
 This handy little package increases the size of the font in the whole frame.
 #+BEGIN_SRC emacs-lisp
 (use-package default-text-scale
