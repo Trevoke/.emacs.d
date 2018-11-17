@@ -1373,3 +1373,11 @@ This handy little package increases the size of the font in the whole frame.
   :bind (("C-x C-=" . default-text-scale-increase)
          ("C-x C--" . default-text-scale-decrease)))
 #+END_SRC
+* COMMENT Last items
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+    :init
+    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+    :config
+    (dashboard-setup-startup-hook))
+#+END_SRC
