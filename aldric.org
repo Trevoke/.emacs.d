@@ -561,6 +561,13 @@ These define the relevant states an action can be in. Besides the fundamental st
   (setq org-agenda-sticky t)
   (setq org-agenda-window-setup 'only-window)
 #+END_SRC
+** Projects
+*** Stuck projects
+#+BEGIN_SRC emacs-lisp
+  (setq org-stuck-projects '("+LEVEL=1/-DONE"
+                             ("TODO" "NEXT" "NEXTACTION")
+                             nil ""))
+#+END_SRC
 ** references - org-brain
 #+BEGIN_SRC emacs-lisp
   (use-package org-brain :ensure t :pin "melpa"
