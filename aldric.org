@@ -560,6 +560,15 @@ These define the relevant states an action can be in. Besides the fundamental st
   (setq org-agenda-restore-windows-after-quit t)
   (setq org-agenda-sticky t)
   (setq org-agenda-window-setup 'only-window)
+
+  (setq org-agenda-custom-commands
+        (quote
+         (("n" "Agenda and all TODOs"
+           ((agenda "" nil)
+            (alltodo "" nil))
+           nil)
+          ("N" "All NEXT actions" todo "NEXT"
+           ((org-agenda-overriding-header ""))))))
 #+END_SRC
 ** Projects
 *** Stuck projects
