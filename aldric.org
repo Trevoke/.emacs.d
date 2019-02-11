@@ -807,14 +807,12 @@ Auto-tail, please.
 #+END_SRC
 ** Elixir
 #+BEGIN_SRC emacs-lisp
-  (use-package alchemist
-    :diminish "alc"
-    :config
-    (use-package elixir-yasnippets)
-    (use-package flymake-elixir
-      :pin "melpa"
-      :init (use-package flymake-easy)
-            (add-hook 'elixir-mode-hook 'flymake-mode)))
+  (use-package elixir-mode)
+  (use-package lsp-elixir :pin "melpa"
+    :config (add-hook 'elixir-mode-hook #'lsp))
+  (use-package elixir-yasnippets)
+  (setq projectile-globally-ignored-directories
+    (cons ".elixir-ls" projectile-globally-ignored-directories))
 #+END_SRC
 ** CSS
 #+BEGIN_SRC emacs-lisp
