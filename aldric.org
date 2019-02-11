@@ -812,7 +812,7 @@ Auto-tail, please.
     :config (add-hook 'elixir-mode-hook #'lsp))
   (use-package elixir-yasnippets)
   (setq projectile-globally-ignored-directories
-    (cons ".elixir-ls" projectile-globally-ignored-directories))
+    (cons ".elixir_ls" projectile-globally-ignored-directories))
 #+END_SRC
 ** CSS
 #+BEGIN_SRC emacs-lisp
