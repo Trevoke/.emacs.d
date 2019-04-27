@@ -391,23 +391,14 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
 
 ** Blogging
 #+BEGIN_SRC emacs-lisp
-  (use-package org-page
-    :config
-    (setq op/repository-directory "~/src/projects/trevoke.github.io")
-    (setq op/personal-github-link "https://github.com/trevoke")
-    (setq op/site-domain "http://blog.trevoke.net/")
-    (setq op/site-main-title "Seven Steps")
-    (setq op/site-sub-title "Words... words, they're all we have to go on! — Rosencrantz and Guildenstern are dead"))
-
-  ;; (use-package blog-admin
-  ;;   :init
-  ;;   (setq blog-admin-backend-path "~/src/projects/trevoke.github.io")
-  ;;   (setq blog-admin-backend-type 'org-page)
-  ;;   (setq blog-admin-backend-new-post-in-drafts t)
-  ;;   (setq blog-admin-backend-new-post-with-same-name-dir t)
-  ;;   (setq blog-admin-backend-org-page-drafts "_drafts")) ;; directory to save draft
-  ;;        (add-hook 'blog-admin-backend-after-new-post-hook 'find-file))
-
+  (use-package easy-hugo
+    :init
+    (setq easy-hugo-org-header t)
+    (setq easy-hugo-default-ext ".org")
+    (setq easy-hugo-basedir "~/src/projects/trevoke.github.io-source")
+    (setq easy-hugo-url "http://blog.trevoke.net")
+    (setq easy-hugo-root "~/src/projects/trevoke.github.io")
+    (setq easy-hugo-previewtime "300"))
 #+END_SRC
 * GTD (Getting Things Done)
 ** Paths and files
