@@ -400,6 +400,13 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
     (setq easy-hugo-root "~/src/projects/trevoke.github.io")
     (setq easy-hugo-previewtime "300"))
 #+END_SRC
+** extended dependencies
+#+BEGIN_SRC elisp
+  (use-package org-edna
+    :config
+    (org-edna-load)
+    (setq org-edna-use-inheritance t))
+#+END_SRC
 * GTD (Getting Things Done)
 ** Paths and files
 If the variable exists, do nothing, otherwise prompt for a path and save it, using emacs' customization tool.
@@ -550,7 +557,7 @@ These define the relevant states an action can be in. Besides the fundamental st
   (setq org-agenda-include-diary t)
   (setq org-agenda-restore-windows-after-quit t)
   (setq org-agenda-sticky t)
-  (setq org-agenda-window-setup 'only-window)
+  (setq org-agenda-window-setup 'other-window)
 
   (setq org-agenda-custom-commands
         (quote
@@ -1278,7 +1285,7 @@ Camcorder is a tool to record screencasts, in GIF or other formats
     :pin "melpa"
     :config
     (use-package htmlize)
-    (setq org-reveal-root "file:///Users/aldric/src/vendor/reveal.js-3.5.0"))
+    (setq org-reveal-root "file:///Users/aldricgiacomoni/src/vendor/reveal.js-3.8.0"))
 #+END_SRC
 * Email
 ** TODO Add BBDB
