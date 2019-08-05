@@ -709,6 +709,11 @@ This will let us handle pull requests through Github.
 ;;  :config (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls))
 #+END_SRC
 * Programming
+** Path modification for executables
+#+BEGIN_SRC elisp
+  (setenv "PATH" (concat (getenv "PATH") ":~/.asdf/shims"))
+  (setq exec-path (append exec-path '("~/.asdf/shims")))
+#+END_SRC
 ** Indentation
 Always spaces. Always.
 #+BEGIN_SRC emacs-lisp
