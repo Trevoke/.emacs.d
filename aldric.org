@@ -314,6 +314,7 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 (load-library "org")
 (load-library "org-compat")
 (load-library "ox")
+(load-library "org-tempo") ;; quick templates
 
 ;; (use-package ox-pandoc)
 #+END_SRC
