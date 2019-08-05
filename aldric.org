@@ -559,6 +559,9 @@ These define the relevant states an action can be in. Besides the fundamental st
   (setq org-agenda-restore-windows-after-quit t)
   (setq org-agenda-sticky t)
   (setq org-agenda-window-setup 'other-window)
+  (setq org-agenda-skip-deadline-if-done t)
+  (setq org-agenda-skip-scheduled-if-done t)
+  (setq org-agenda-start-on-weekday nil)
 
   (setq org-agenda-custom-commands
         (quote
