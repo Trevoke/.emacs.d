@@ -811,12 +811,16 @@ Auto-tail, please.
 #+END_SRC
 ** Elixir
 #+BEGIN_SRC emacs-lisp
-  (use-package elixir-mode)
-  (use-package lsp-elixir :pin "melpa"
-    :config (add-hook 'elixir-mode-hook #'lsp))
-  (use-package elixir-yasnippets)
-  (setq projectile-globally-ignored-directories
-    (cons ".elixir_ls" projectile-globally-ignored-directories))
+  (use-package elixir-mode
+    :init
+    (use-package projectile
+      :config
+      (setq projectile-globally-ignored-directories
+            (cons ".elixir_ls" projectile-globally-ignored-directories)))
+    ;; (use-package lsp-elixir :pin "melpa"
+    ;;   :config (add-hook 'elixir-mode-hook #'lsp))
+    (use-package elixir-yasnippets))
+
 #+END_SRC
 ** CSS
 #+BEGIN_SRC emacs-lisp
