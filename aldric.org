@@ -815,15 +815,14 @@ Auto-tail, please.
 ** Elixir
 #+BEGIN_SRC emacs-lisp
   (use-package elixir-mode
-    :init
+    :config
+    ;; (use-package lsp-elixir :pin "melpa"
+    ;;   :config (add-hook 'elixir-mode-hook #'lsp))
+    (use-package elixir-yasnippets)
     (use-package projectile
       :config
       (setq projectile-globally-ignored-directories
-            (cons ".elixir_ls" projectile-globally-ignored-directories)))
-    ;; (use-package lsp-elixir :pin "melpa"
-    ;;   :config (add-hook 'elixir-mode-hook #'lsp))
-    (use-package elixir-yasnippets))
-
+            (cons ".elixir_ls" projectile-globally-ignored-directories))))
 #+END_SRC
 ** CSS
 #+BEGIN_SRC emacs-lisp
