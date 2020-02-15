@@ -400,25 +400,43 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
     (setq easy-hugo-root "~/src/projects/trevoke.github.io")
     (setq easy-hugo-previewtime "300"))
 #+END_SRC
-** extended dependencies
-#+BEGIN_SRC elisp
-  (use-package org-edna
-    :config
-    (org-edna-load)
-    (setq org-edna-use-inheritance t))
-#+END_SRC
 * GTD (Getting Things Done)
-** Paths and files
-If the variable exists, do nothing, otherwise prompt for a path and save it, using emacs' customization tool.
 #+BEGIN_SRC emacs-lisp
-  (or org-directory
-      (customize-save-variable 'org-directory
-                               (file-name-as-directory (read-directory-name
-                                                        "What is the root GTD directory? "
-                                                        "~/"))))
-  (setq stag-gtd-projects (concat org-directory "Projects.org")
-        stag-gtd-tickler  (concat org-directory "Tickler.org"))
-  (setq org-agenda-files `(,stag-gtd-projects ,stag-gtd-tickler))
+(use-package org-agenda-property)
+(setq org-agenda-property-list '("DELEGATED_TO"))
+(setq org-agenda-property-position 'next-line)
+
+(use-package org-edna :pin "gnu")
+(setq org-edna-use-inheritance t)
+(org-edna-load)
+
+(require 'org-gtd "org-gtd.el/org-gtd.el")
+(setq org-gtd-directory "/media/sf_Dropbox/orgnotes/")
+#+END_SRC
+** keybindings
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c d c") 'org-gtd-capture)
+  (global-set-key (kbd "C-c d a") 'org-agenda-list)
+  (global-set-key (kbd "C-c d p") 'org-gtd-process-inbox)
+  (global-set-key (kbd "C-c d n") 'org-gtd-show-all-next)
+  (global-set-key (kbd "C-c d s") 'org-gtd-show-stuck-projects)
+
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-cb" 'org-switchb)
+  (org-defkey org-mode-map "\C-cr" 'org-refile)
+#+END_SRC
+** Agenda
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-diary-file 'diary-file)
+  (setq org-agenda-include-diary t)
+  (setq org-agenda-restore-windows-after-quit t)
+  (setq org-agenda-sticky t)
+  (setq org-agenda-window-setup 'other-window)
+  (setq org-agenda-skip-deadline-if-done t)
+  (setq org-agenda-skip-scheduled-if-done t)
+  (setq org-agenda-start-on-weekday nil)
+
+  (setq org-agenda-files `(,org-gtd-directory))
 #+END_SRC
 ** Diary
 #+BEGIN_SRC emacs-lisp
@@ -428,11 +446,11 @@ If the variable exists, do nothing, otherwise prompt for a path and save it, usi
       mark-diary-entries-in-calendar t
       diary-number-of-entries 7)
 (add-hook 'diary-display-hook 'diary-fancy-display)
-(add-hook 'today-visible-calendar-hook 'calendar-mark-today)
 #+END_SRC
 ** Calendar, dates, times
 #+BEGIN_SRC emacs-lisp
 (setq calendar-week-start-day 1) ;; Monday
+(add-hook 'today-visible-calendar-hook 'calendar-mark-today)
 #+END_SRC
 *** calfw, the calendar framework
 #+BEGIN_SRC emacs-lisp
@@ -474,109 +492,25 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
                         ("@nonet" . ?n)
                         ("code")))
 #+END_SRC
-** Action Keywords
-These define the relevant states an action can be in. Besides the fundamental states, there is "NEXT" which allows me to filter quickly for "only the actions I can or should do next".
-#+BEGIN_SRC emacs-lisp
-  (setq org-todo-keywords '( "TODO(t/!)" "NEXT(n)" "WAIT(w/!)" "|" "DONE(/!)" "CANCELED(c/!)"))
-  (setq org-log-done 'time)
-#+END_SRC
 ** Captures
 #+BEGIN_SRC emacs-lisp
   (setq org-default-notes-file (concat org-directory "notes.org"))
 
-  (global-set-key "\C-cc" 'org-capture)
-
-  (global-set-key "\C-cl" 'org-store-link)
-  (global-set-key "\C-ca" 'org-agenda)
-  (global-set-key "\C-cb" 'org-switchb)
-
-  (setq org-capture-templates
-        '(
-          ("j" "Journal Entry"
-           entry (file+olp+datetree "journal.org")
-           "* %U\n%?"
-           :kill-buffer t)
-          ("i" "Inbox"
-           entry (file "Inbox.org")
-           "* TODO %?\n  %i"
-           :kill-buffer t)
-          ("t" "Todo with link"
-           entry (file "Inbox.org")
-           "* TODO %?\n  %i\n  %a"
-           :kill-buffer t)
-          ("s" "Someday"
-           entry (file "Someday.org")
-           "* %i%? \n %U"
-           :kill-buffer t)
-          ("r" "Remind me"
-           entry (file "Tickler.org")
-           "* TODO %?\nSCHEDULED: %^{Remind me on:}t"
-           :kill-buffer t)))
+  (setq org-capture-templates `(("i" "Inbox"
+                                 entry (file ,(org-gtd--path org-gtd-inbox-file-basename))
+                                 "* %?\n%U\n\n  %i"
+                                 :kill-buffer t)
+                                ("t" "Todo with link"
+                                 entry (file ,(org-gtd--path org-gtd-inbox-file-basename))
+                                 "* %?\n%U\n\n  %i\n  %a"
+                                 :kill-buffer t)))
 #+END_SRC
 ** Refiling
 #+BEGIN_SRC emacs-lisp
-  (org-defkey org-mode-map "\C-cr" 'org-refile)
-  (org-defkey org-mode-map "\C-cs" 'stag-gtd-refile)
-  (org-defkey org-mode-map "\C-co" 'stag-gtd-create-single-task-project)
   (setq org-refile-use-outline-path 'file)
   (setq org-outline-path-complete-in-steps nil)
   (setq org-refile-allow-creating-parent-nodes t)
   (setq org-log-refile 'time)
-  (setq org-refile-targets '(("Projects.org" :maxlevel . 1)
-                             ("Someday.org" :maxlevel . 1)
-                             ("Tickler.org" :maxlevel . 1)))
-
-  (defun stag-gtd-refile ()
-    (interactive)
-    (org-set-tags-command)
-    (org-refile))
-
-  (defun stag-gtd-create-single-task-project ()
-    (interactive)
-    (org-refile nil nil `("Projects.org" ,stag-gtd-projects))
-    (find-file stag-gtd-projects)
-    (end-of-buffer)
-    (previous-line)
-    (kill-ring-save (point-at-bol) (point-at-eol))
-    (org-end-of-line)
-    (insert " [/]")
-    (next-line)
-    (org-end-of-line)
-    (org-return)
-    (org-yank)
-    (org-beginning-of-line)
-    (forward-word)
-    (backward-word)
-    (insert "TODO ")
-    (org-metaright)
-    (org-update-statistics-cookies t))
-#+END_SRC
-** Agenda
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-diary-file 'diary-file)
-  (setq org-agenda-include-diary t)
-  (setq org-agenda-restore-windows-after-quit t)
-  (setq org-agenda-sticky t)
-  (setq org-agenda-window-setup 'other-window)
-  (setq org-agenda-skip-deadline-if-done t)
-  (setq org-agenda-skip-scheduled-if-done t)
-  (setq org-agenda-start-on-weekday nil)
-
-  (setq org-agenda-custom-commands
-        (quote
-         (("n" "Agenda and all TODOs"
-           ((agenda "" nil)
-            (alltodo "" nil))
-           nil)
-          ("N" "All NEXT actions" todo "NEXT"
-           ((org-agenda-overriding-header ""))))))
-#+END_SRC
-** Projects
-*** Stuck projects
-#+BEGIN_SRC emacs-lisp
-  (setq org-stuck-projects '("+LEVEL=1/-DONE"
-                             ("TODO" "NEXT" "NEXTACTION")
-                             nil ""))
 #+END_SRC
 ** references - org-brain
 #+BEGIN_SRC emacs-lisp
