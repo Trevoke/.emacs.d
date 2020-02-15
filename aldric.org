@@ -452,38 +452,7 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
 (setq calendar-week-start-day 1) ;; Monday
 (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
 #+END_SRC
-*** calfw, the calendar framework
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package calfw
-  ;;   :config
-  ;;   (require 'calfw-cal)
-  ;;   (require 'calfw-ical)
-  ;;   (require 'calfw-org)
 
-  ;;   (setq cfw:fchar-junction ?╋
-  ;;         cfw:fchar-vertical-line ?┃
-  ;;         cfw:fchar-horizontal-line ?━
-  ;;         cfw:fchar-left-junction ?┣
-  ;;         cfw:fchar-right-junction ?┫
-  ;;         cfw:fchar-top-junction ?┯
-  ;;         cfw:fchar-top-left-corner ?┏
-  ;;         cfw:fchar-top-right-corner ?┓))
-#+END_SRC
-**** TODO calfw-gcal
-Here is a sample function where you could put your Google Calendar information (mostly so I remember how to create the secret file on a new computer).
-
-#+BEGIN_QUOTE
-(use-package calfw-gcal)
-(defun stag-calendar ()
-(interactive)
-(cfw:open-calendar-buffer
-:contents-sources
-(list
-(cfw:org-create-source "Green")
-(cfw:cal-create-source "Orange")
-(cfw:ical-create-source "gcal" "gcal-ics-link" "Blue")
-)))
-#+END_QUOTE
 ** Action Tags
 These are tags to add to tasks, such as types of action, mindset I need to be in, tool Ι need to have, emotional reward I'll get from doing the action, etc. Whatever helps me pick a task to accomplish.
 #+BEGIN_SRC emacs-lisp
