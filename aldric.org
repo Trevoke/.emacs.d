@@ -411,7 +411,7 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
 (org-edna-load)
 
 (require 'org-gtd "org-gtd.el/org-gtd.el")
-(setq org-gtd-directory "/media/sf_Dropbox/orgnotes/")
+(setq org-gtd-directory "/media/sf_Dropbox/orgnotes/gtd")
 #+END_SRC
 ** keybindings
 #+BEGIN_SRC emacs-lisp
@@ -463,7 +463,7 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
 #+END_SRC
 ** Captures
 #+BEGIN_SRC emacs-lisp
-  (setq org-default-notes-file (concat org-directory "notes.org"))
+  (setq org-default-notes-file (concat org-gtd-directory "notes.org"))
 
   (setq org-capture-templates `(("i" "Inbox"
                                  entry (file ,(org-gtd--path org-gtd-inbox-file-basename))
@@ -480,6 +480,24 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
   (setq org-outline-path-complete-in-steps nil)
   (setq org-refile-allow-creating-parent-nodes t)
   (setq org-log-refile 'time)
+#+END_SRC
+** references -org-roam
+#+BEGIN_SRC emacs-lisp
+(use-package org-roam
+      :after org
+      :hook
+      ((org-mode . org-roam-mode)
+       (after-init . org-roam--build-cache-async) ;; optional!
+       )
+      :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
+      :custom
+      (org-roam-directory "/media/sf_Dropbox/orgnotes/roam")
+      :bind
+      ("C-c n l" . org-roam)
+      ("C-c n t" . org-roam-today)
+      ("C-c n f" . org-roam-find-file)
+      ("C-c n i" . org-roam-insert)
+      ("C-c n g" . org-roam-show-graph))
 #+END_SRC
 ** references - org-brain
 #+BEGIN_SRC emacs-lisp
