@@ -892,6 +892,16 @@ https://truongtx.me/2014/04/20/emacs-javascript-completion-and-refactoring
   :init
   (add-hook 'typescript-mode-hook 'flymake-mode))
 #+END_SRC
+** Lisp
+*** Slime
+#+BEGIN_SRC emacs-lisp
+(use-package slime
+  :config
+  ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
+  ;; ;; Replace "sbcl" with the path to your implementation
+  ;; (setq inferior-lisp-program "clisp")
+  )
+#+END_SRC
 ** Python
 #+BEGIN_SRC emacs-lisp
  (use-package elpy
@@ -1043,15 +1053,6 @@ try ~native-complete~
 ** Fish
 #+BEGIN_SRC emacs-lisp
 (use-package fish-mode)
-#+END_SRC
-** Slime
-#+BEGIN_SRC emacs-lisp
-(use-package slime
-  :config
-  ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
-  ;; ;; Replace "sbcl" with the path to your implementation
-  ;; (setq inferior-lisp-program "clisp")
-  )
 #+END_SRC
 * Writing (specs, docs, blogs...)
 ** Interacting with text
