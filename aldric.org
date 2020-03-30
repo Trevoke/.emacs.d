@@ -1006,7 +1006,7 @@ I maintain a tintin++ config, so this is at least convenient.
 #+BEGIN_SRC emacs-lisp
 (use-package tintin-mode :pin "marmalade")
 #+END_SRC
-* REPLs
+* Shells
 ** Generic shell things
 *** TODO
 try ~native-complete~
