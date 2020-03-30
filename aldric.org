@@ -1061,10 +1061,6 @@ try ~native-complete~
   (setq olivetti-body-width 80))
 #+END_SRC
 ** Interacting with text
-*** More fine-grained word-by-word navigation
-#+BEGIN_SRC emacs-lisp
-;; (use-package syntax-subword :config (syntax-subword-mode))
-#+END_SRC
 *** Use visual-line-mode
 #+BEGIN_SRC emacs-lisp
 (remove-hook 'text-mode-hook #'turn-on-auto-fill)
