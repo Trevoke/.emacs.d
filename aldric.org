@@ -696,16 +696,6 @@ Auto-tail, please.
 #+BEGIN_SRC emacs-lisp
 (use-package feature-mode)
 #+END_SRC
-** C#
-#+BEGIN_SRC emacs-lisp
-(defun stag-csharp-mode-hook ()
-  (setq c-basic-offset 4))
-
-(use-package csharp-mode
-  :defer t
-  :init
-  (add-hook 'csharp-mode-hook 'stag-csharp-mode-hook))
-#+END_SRC
 ** Docker
 #+BEGIN_SRC emacs-lisp
 (use-package docker-compose-mode)
