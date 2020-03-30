@@ -627,7 +627,8 @@ This will let us handle pull requests through Github.
 ;;  :config (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls))
 #+END_SRC
 * Programming
-** Path modification for executables
+** TODO get a LSP configuration going in here
+** Path modification for executable versioning
 #+BEGIN_SRC elisp
   (setenv "PATH" (concat (getenv "PATH") ":~/.asdf/shims"))
   (setq exec-path (append exec-path '("~/.asdf/shims")))
@@ -638,8 +639,8 @@ Always spaces. Always.
 (setq-default indent-tabs-mode nil)
 (setq backward-delete-char-untabify-method 'untabify)
 #+END_SRC
-** code tagging                                             :external:minor:
-This is the ggtags plugin, which uses GNU Global.
+** code tagging
+This is using GNU Global.
 #+BEGIN_SRC emacs-lisp
 (use-package ggtags
   :config
@@ -680,7 +681,7 @@ Here's where I plug in every modification I want in a code buffer
 
 (add-hook 'prog-mode-hook 'stag-code-modes-hook)
 #+END_SRC
-** Expand region                                            :external:minor:
+** Expand region
 One of the features that makes IDEA's editors awesome is the way you can expand selection. This plugin replicates the feature.
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
