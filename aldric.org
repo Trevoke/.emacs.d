@@ -989,6 +989,49 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
     (use-package flymake-rust :pin "melpa")
     (use-package cargo))
 #+END_SRC
+** Shells
+*** Generic shell things
+**** TODO
+try ~native-complete~
+**** Existing
+#+BEGIN_SRC emacs-lisp
+  (use-package shell-command
+    :pin "melpa"
+    :init (add-hook 'shell-mode-hook 'shell-command-completion-mode))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+(use-package xterm-color
+  :config
+  (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
+  (setq comint-output-filter-functions (remove 'ansi-color-process-output comint-output-filter-functions)))
+#+END_SRC
+*** Bash
+#+BEGIN_SRC emacs-lisp
+  (setq explicit-bash-args '("--noediting" "--login" "-i"))
+  (require 'em-smart)
+
+  (use-package bash-completion :config (bash-completion-setup))
+
+  ;; (defadvice ansi-term (after advise-ansi-term-coding-system)
+  ;;     (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
+  ;; (ad-activate 'ansi-term)
+#+END_SRC
+*** Eshell
+#+BEGIN_SRC emacs-lisp
+(defun eshell/clear ()
+  "Clear the eshell buffer."
+  (let ((inhibit-read-only t))
+    (erase-buffer)
+    (eshell-send-input)))
+
+(use-package eshell-did-you-mean
+  :config
+  (eshell-did-you-mean-setup))
+#+END_SRC
+*** Fish
+#+BEGIN_SRC emacs-lisp
+(use-package fish-mode)
+#+END_SRC
 ** SQL
 *** sqlup                                                  :minor:external:
 auto-upcase SQL keywords as I type, please.
@@ -1003,50 +1046,7 @@ I maintain a tintin++ config, so this is at least convenient.
 #+BEGIN_SRC emacs-lisp
 (use-package tintin-mode :pin "marmalade")
 #+END_SRC
-* Shells
-** Generic shell things
-*** TODO
-try ~native-complete~
-*** Existing
-#+BEGIN_SRC emacs-lisp
-  (use-package shell-command
-    :pin "melpa"
-    :init (add-hook 'shell-mode-hook 'shell-command-completion-mode))
-#+END_SRC
-#+BEGIN_SRC emacs-lisp
-(use-package xterm-color
-  :config
-  (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
-  (setq comint-output-filter-functions (remove 'ansi-color-process-output comint-output-filter-functions)))
-#+END_SRC
-** Bash
-#+BEGIN_SRC emacs-lisp
-  (setq explicit-bash-args '("--noediting" "--login" "-i"))
-  (require 'em-smart)
-
-  (use-package bash-completion :config (bash-completion-setup))
-
-  ;; (defadvice ansi-term (after advise-ansi-term-coding-system)
-  ;;     (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
-  ;; (ad-activate 'ansi-term)
-#+END_SRC
-** Eshell
-#+BEGIN_SRC emacs-lisp
-(defun eshell/clear ()
-  "Clear the eshell buffer."
-  (let ((inhibit-read-only t))
-    (erase-buffer)
-    (eshell-send-input)))
-
-(use-package eshell-did-you-mean
-  :config
-  (eshell-did-you-mean-setup))
-#+END_SRC
-** Fish
-#+BEGIN_SRC emacs-lisp
-(use-package fish-mode)
-#+END_SRC
-* Writing (specs, docs, blogs...)
+* Writing
 ** Interacting with text
 *** Use visual-line-mode
 #+BEGIN_SRC emacs-lisp
@@ -1169,25 +1169,20 @@ Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct
 (add-hook 'latex-mode-hook 'stag-turn-on-outline-minor-mode)
 (setq outline-minor-mode-prefix "\C-c \C-o") ; Or something else
 #+END_SRC
-* Presentations
-** Screencasts
+** Presentations
+*** Screencasts
 Camcorder is a tool to record screencasts, in GIF or other formats
 #+BEGIN_SRC emacs-lisp
 (use-package camcorder)
 #+END_SRC
-** TODO Slides
-*** revealjs
+*** TODO Slides
+**** revealjs
 #+BEGIN_SRC emacs-lisp
   (use-package ox-reveal
     :pin "melpa"
     :config
     (use-package htmlize)
     (setq org-reveal-root "file:///~/src/vendor/reveal.js-3.8.0"))
-#+END_SRC
-* Communication
-** IRC
-#+BEGIN_SRC emacs-lisp
-(setq erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
 #+END_SRC
 ** Email
 *** TODO Add BBDB
@@ -1233,6 +1228,11 @@ It seems I may want to use orgalist.
     (epa-mail-mode))
 
   (add-hook 'notmuch-message-mode-hook 'stag-email-hook))
+#+END_SRC
+* Communication Clients
+** IRC
+#+BEGIN_SRC emacs-lisp
+(setq erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
 #+END_SRC
 * Dashboard
 This is the buffer I see when I start up emacs.
