@@ -1288,13 +1288,6 @@ smtpmail-multi
   (add-hook 'prog-mode-hook 'fci-mode))
 #+END_SRC
 ** Interface customization
-*** Smart mode line
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package smart-mode-line :pin "melpa"
-  ;;   :config
-  ;;   (setq sml/theme 'dark)
-  ;;   (sml/setup))
-#+END_SRC
 *** Default text scale
 This handy little package increases the size of the font in the whole frame.
 #+BEGIN_SRC emacs-lisp
