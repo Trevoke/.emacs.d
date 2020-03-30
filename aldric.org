@@ -9,7 +9,7 @@ I set a bookmark with =C-x r m= and I can get back here with =C-x r b=
 ** TODO Minor modes?
 I could create here some empty minor modes based on how I think about a buffer, hook those to whatever major modes I care about, and then just hook to the minor mode everywhere else in my configuration.
 * Personal information
-Stored in ~~/.emacs.secrets~.
+Stored in ~~/.emacs.d/emacs.secrets~.
 * General emacs config
 ** Spring cleaning
 There are a few things I need to set up manually, because I don't know a smarter way to do it.
@@ -1238,13 +1238,14 @@ smtpmail-multi
     (setq smtpmail-debug-info t)
     (setq smtpmail-debug-verbose t))
 #+END_SRC
-*** Sending/Reading/Encrypting email
+*** TODO Sending/Reading/Encrypting email
+orgstruct++ was removed in org 9.2
+It seems I may want to use orgalist.
 #+BEGIN_SRC emacs-lisp
 (use-package notmuch
   :config
   (defun stag-email-hook ()
-    (epa-mail-mode)
-    (orgstruct++-mode))
+    (epa-mail-mode))
 
   (add-hook 'notmuch-message-mode-hook 'stag-email-hook))
 #+END_SRC
