@@ -1054,12 +1054,6 @@ try ~native-complete~
   )
 #+END_SRC
 * Writing (specs, docs, blogs...)
-** Olivetti                                                 :external:minor:
-#+BEGIN_SRC emacs-lisp
-(use-package olivetti
-  :config
-  (setq olivetti-body-width 80))
-#+END_SRC
 ** Interacting with text
 *** Use visual-line-mode
 #+BEGIN_SRC emacs-lisp
