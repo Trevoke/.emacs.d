@@ -252,6 +252,78 @@ avy is kinda badass.
     :bind (("C-c j" . avy-goto-char-2)
            ("C-x j" . avy-po-mark)))
 #+END_SRC
+* Extending emacs with engines
+** Completion
+*** company-mode
+#+BEGIN_SRC emacs-lisp
+(use-package company)
+#+END_SRC
+*** Snippets
+Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
+#+BEGIN_SRC emacs-lisp
+(use-package yasnippet :diminish yas-minor-mode)
+#+END_SRC
+** Project navigation
+Projectile is pretty sweet.
+#+BEGIN_SRC emacs-lisp
+(use-package projectile
+  :diminish projectile-mode
+  :init
+  :config
+  (use-package ivy)
+  (projectile-global-mode)
+  (setq projectile-completion-system 'ivy)
+  :bind (("C-c p" . projectile-command-map)))
+#+END_SRC
+
+** Searching
+*** Anzu (about search results)                            :external:minor:
+#+BEGIN_SRC emacs-lisp
+  (use-package anzu
+    :config (global-anzu-mode t)
+    :bind (("M-%" . anzu-query-replace)
+           ("C-M-%" . anzu-query-replace-regexp)))
+#+END_SRC
+*** Silver searcher + Wgrep-ag
+Sometimes after you've found a bunch of things, you want to edit.. Kind of a find-and-replace sort of deal, maybe?
+
+I forget the basic keybindings all the time: After a search using =ag=, use C-c C-p to start editing the results buffer, and use C-c C-c to save the changes and C-c C-k to cancel.
+#+BEGIN_SRC emacs-lisp
+(use-package ag
+  :config
+  (setq ag-reuse-buffers 't)
+  (use-package wgrep-ag
+    :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
+    :config (autoload 'wgrep-ag-setup "wgrep-ag")))
+#+END_SRC
+** ivy
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy
+    :diminish ivy-mode
+    :init
+    (use-package flx)
+    (use-package smex)
+    :config
+    (use-package swiper)
+    (ivy-mode 1)
+    ;; From http://oremacs.com/2016/01/06/ivy-flx/
+    (setq ivy-re-builders-alist '((swiper . ivy--regex-plus)
+                                  (counsel-ag . ivy--regex-plus)
+                                  (ivy-switch-buffer . ivy--regex-plus)
+                                  (t . ivy--regex-fuzzy))
+          ivy-initial-inputs-alist nil
+          ivy-use-virtual-buffers t))
+
+  (use-package counsel
+    :config
+    (use-package smex)
+    :bind (("C-x C-m" . counsel-M-x)
+           ("C-x m" . counsel-descbinds)
+           ;; ("C-h f" . counsel-describe-function)
+           ;; ("C-h v" . counsel-describe-variable)
+           ("C-y" . counsel-yank-pop)
+           ("C-c y" . yank)))
+#+END_SRC
 * File system browsing
 ** Dired
 dired-jump is awesome (C-x C-j in any buffer)
@@ -515,80 +587,6 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
           org-capture-templates)
     (setq org-brain-visualize-default-choices 'all)
     (setq org-brain-title-max-length 12))
-#+END_SRC
-* Discovering emacs through fuzzy matching
-** ivy
-Apparently ivy is like ido but cooler, sooooooo
-#+BEGIN_SRC emacs-lisp
-  (use-package ivy
-    :diminish ivy-mode
-    :init
-    (use-package flx)
-    (use-package smex)
-    :config
-    (use-package swiper)
-    (ivy-mode 1)
-    ;; From http://oremacs.com/2016/01/06/ivy-flx/
-    (setq ivy-re-builders-alist '((swiper . ivy--regex-plus)
-                                  (counsel-ag . ivy--regex-plus)
-                                  (ivy-switch-buffer . ivy--regex-plus)
-                                  (t . ivy--regex-fuzzy))
-          ivy-initial-inputs-alist nil
-          ivy-use-virtual-buffers t))
-
-  (use-package counsel
-    :config
-    (use-package smex)
-    :bind (("C-x C-m" . counsel-M-x)
-           ("C-x m" . counsel-descbinds)
-           ;; ("C-h f" . counsel-describe-function)
-           ;; ("C-h v" . counsel-describe-variable)
-           ("C-y" . counsel-yank-pop)
-           ("C-c y" . yank)))
-#+END_SRC
-* Extending emacs with engines
-** Completion
-*** company-mode
-#+BEGIN_SRC emacs-lisp
-(use-package company)
-#+END_SRC
-*** Snippets
-Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
-#+BEGIN_SRC emacs-lisp
-(use-package yasnippet :diminish yas-minor-mode)
-#+END_SRC
-** Project navigation
-Projectile is pretty sweet.
-#+BEGIN_SRC emacs-lisp
-(use-package projectile
-  :diminish projectile-mode
-  :init
-  :config
-  (use-package ivy)
-  (projectile-global-mode)
-  (setq projectile-completion-system 'ivy)
-  :bind (("C-c p" . projectile-command-map)))
-#+END_SRC
-
-** Searching
-*** Anzu (about search results)                            :external:minor:
-#+BEGIN_SRC emacs-lisp
-  (use-package anzu
-    :config (global-anzu-mode t)
-    :bind (("M-%" . anzu-query-replace)
-           ("C-M-%" . anzu-query-replace-regexp)))
-#+END_SRC
-*** Silver searcher + Wgrep-ag
-Sometimes after you've found a bunch of things, you want to edit.. Kind of a find-and-replace sort of deal, maybe?
-
-I forget the basic keybindings all the time: After a search using =ag=, use C-c C-p to start editing the results buffer, and use C-c C-c to save the changes and C-c C-k to cancel.
-#+BEGIN_SRC emacs-lisp
-(use-package ag
-  :config
-  (setq ag-reuse-buffers 't)
-  (use-package wgrep-ag
-    :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
-    :config (autoload 'wgrep-ag-setup "wgrep-ag")))
 #+END_SRC
 * Version control
 ** Git
