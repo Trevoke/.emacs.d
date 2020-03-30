@@ -1008,6 +1008,9 @@ I maintain a tintin++ config, so this is at least convenient.
 #+END_SRC
 * REPLs
 ** Generic shell things
+*** TODO
+try ~native-complete~
+*** Existing
 #+BEGIN_SRC emacs-lisp
   (use-package shell-command
     :pin "melpa"
