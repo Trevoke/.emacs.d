@@ -250,7 +250,7 @@ avy is kinda badass.
            ("C-x j" . avy-po-mark)))
 #+END_SRC
 * Extending emacs with engines
-** Completion
+** Text Completion
 *** company-mode
 #+BEGIN_SRC emacs-lisp
 (use-package company)
@@ -293,7 +293,7 @@ I forget the basic keybindings all the time: After a search using =ag=, use C-c 
     :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
     :config (autoload 'wgrep-ag-setup "wgrep-ag")))
 #+END_SRC
-** ivy
+** Command completion
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
     :diminish ivy-mode
