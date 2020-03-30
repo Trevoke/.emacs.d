@@ -1224,26 +1224,17 @@ smtpmail-multi
     :pin "melpa"
     :config
     (setq smtpmail-multi-accounts
-          (quote
-           ((stride . ("aldric@stridenyc.com"
-                       "smtp.gmail.com"
-                       587
-                       "aldric@stridenyc.com"
-                       starttls
-                       nil nil nil))
-            (home . ("trevoke@gmail.com"
+          '((home . ("trevoke@gmail.com"
                      "smtp.gmail.com"
                      587
                      "trevoke@gmail.com"
                      starttls
-                     nil nil nil)))))
+                     nil nil nil))))
 
     (setq smtpmail-multi-associations
-          (quote
-           (("trevoke@gmail.com" home)
-            ("aldric@stridenyc.com" stride))))
+          '(("trevoke@gmail.com" home)))
 
-    (setq smtpmail-multi-default-account (quote home))
+    (setq smtpmail-multi-default-account 'home)
 
     (setq message-send-mail-function 'smtpmail-multi-send-it)
 
