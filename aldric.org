@@ -1260,16 +1260,6 @@ smtpmail-multi
 #+BEGIN_SRC emacs-lisp
 (setq erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
 #+END_SRC
-** Circe
-#+BEGIN_SRC emacs-lisp
-(use-package circe)
-#+END_SRC
-** Confluence
-#+BEGIN_SRC emacs-lisp
-  (use-package confluence :pin "melpa"
-    :init
-    (setq confluence-url "https://confluence.tapad.com/rpc/xmlrpc"))
-#+END_SRC
 * Miscellanous
 ** Color themes
 #+BEGIN_SRC emacs-lisp
