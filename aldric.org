@@ -9,10 +9,7 @@ I set a bookmark with =C-x r m= and I can get back here with =C-x r b=
 ** TODO Minor modes?
 I could create here some empty minor modes based on how I think about a buffer, hook those to whatever major modes I care about, and then just hook to the minor mode everywhere else in my configuration.
 * Personal information
-#+BEGIN_SRC emacs-lisp
-(setq user-full-name "Aldric Giacomoni"
-      user-mail-address "trevoke@gmail.com")
-#+END_SRC
+Stored in ~~/.emacs.secrets~.
 * General emacs config
 ** Spring cleaning
 There are a few things I need to set up manually, because I don't know a smarter way to do it.
@@ -1224,15 +1221,15 @@ smtpmail-multi
     :pin "melpa"
     :config
     (setq smtpmail-multi-accounts
-          '((home . ("trevoke@gmail.com"
+          `((home . (user-mail-address
                      "smtp.gmail.com"
                      587
-                     "trevoke@gmail.com"
+                     user-mail-address
                      starttls
                      nil nil nil))))
 
     (setq smtpmail-multi-associations
-          '(("trevoke@gmail.com" home)))
+          `((user-mail-address home)))
 
     (setq smtpmail-multi-default-account 'home)
 
