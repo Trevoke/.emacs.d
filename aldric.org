@@ -1076,7 +1076,7 @@ I used Bash for a long time. This allows me to keep using Ctrl-w to delete a wor
 (global-set-key (kbd "C-w") 'backward-kill-word)
 (global-set-key (kbd "C-x C-k") 'kill-region)
 #+END_SRC
-*** TODO Move down real line by real line (do I kill this?)
+*** Move down real line by real line
 #+BEGIN_SRC emacs-lisp
 (setq line-move-visual nil)
 #+END_SRC
