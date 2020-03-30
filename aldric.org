@@ -595,7 +595,7 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
 #+BEGIN_SRC emacs-lisp
 (use-package git-timemachine)
 #+END_SRC
-*** Magit                                                  :external:minor:
+*** Magit
 Magit is a pretty amazing interface to git.
 #+BEGIN_SRC emacs-lisp
 (use-package magit
@@ -609,22 +609,6 @@ With this configuration, using C-f in a status buffer will trigger the gitflow s
 #+BEGIN_SRC emacs-lisp
 (use-package magit-gitflow
   :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
-#+END_SRC
-**** Github pull requests
-This will let us handle pull requests through Github.
-| key | behavior                                        |
-|-----+-------------------------------------------------|
-| # g | refresh list of PRs                             |
-| # f | fetch commits for PR                            |
-| # b | create topic branch for PR                      |
-| # m | merge PR on top of currently checked out branch |
-| # c | create new pull request                         |
-| # o | open PR in browser                              |
-| j q | jump to PR section in magit-status              |
-|-----+-------------------------------------------------|
-#+BEGIN_SRC emacs-lisp
-;; (use-package magit-gh-pulls
-;;  :config (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls))
 #+END_SRC
 * Programming
 ** TODO get a LSP configuration going in here
