@@ -1275,10 +1275,9 @@ smtpmail-multi
 * Miscellanous
 ** Color themes
 #+BEGIN_SRC emacs-lisp
-(use-package moe-theme :pin "melpa" :disabled t)
-(use-package sourcerer-theme :pin "melpa" :disabled t)
-(use-package oceanic-theme :pin "melpa" :disabled t)
-(use-package material-theme :disabled t)
+(use-package moe-theme :defer t)
+(use-package material-theme :defer t)
+(use-package fantom-theme :defer t)
 #+END_SRC
 
 ** 80-column limit
