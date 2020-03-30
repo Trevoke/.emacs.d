@@ -1202,9 +1202,14 @@ Camcorder is a tool to record screencasts, in GIF or other formats
     (use-package htmlize)
     (setq org-reveal-root "file:///Users/aldricgiacomoni/src/vendor/reveal.js-3.8.0"))
 #+END_SRC
-* Email
-** TODO Add BBDB
-** Sending email
+* Communication
+** IRC
+#+BEGIN_SRC emacs-lisp
+(setq erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
+#+END_SRC
+** Email
+*** TODO Add BBDB
+*** Sending email
 #+BEGIN_SRC emacs-lisp
 (setq mail-user-agent 'message-user-agent)
 
@@ -1245,7 +1250,7 @@ smtpmail-multi
     (setq smtpmail-debug-info t)
     (setq smtpmail-debug-verbose t))
 #+END_SRC
-** Sending/Reading/Encrypting email
+*** Sending/Reading/Encrypting email
 #+BEGIN_SRC emacs-lisp
 (use-package notmuch
   :config
@@ -1254,11 +1259,6 @@ smtpmail-multi
     (orgstruct++-mode))
 
   (add-hook 'notmuch-message-mode-hook 'stag-email-hook))
-#+END_SRC
-* Communication
-** ERC
-#+BEGIN_SRC emacs-lisp
-(setq erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
 #+END_SRC
 * Color themes
 #+BEGIN_SRC emacs-lisp
