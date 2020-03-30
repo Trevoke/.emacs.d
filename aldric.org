@@ -1114,6 +1114,9 @@ I used Bash for a long time. This allows me to keep using Ctrl-w to delete a wor
   (add-hook 'org-mode-hook 'xah-math-input-mode))
 #+END_SRC
 ** COMMENT Fixing typos
+
+Commented out because Ι had some issues writing in more than just English.
+
 Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
 
 #+BEGIN_SRC emacs-lisp
