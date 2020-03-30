@@ -1260,23 +1260,21 @@ smtpmail-multi
 #+BEGIN_SRC emacs-lisp
 (setq erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
 #+END_SRC
-* Miscellanous
-** Color themes
+* Color themes
 #+BEGIN_SRC emacs-lisp
 (use-package moe-theme :defer t)
 (use-package material-theme :defer t)
 (use-package fantom-theme :defer t)
 #+END_SRC
 
-** 80-column limit
+* 80-column limit
 #+BEGIN_SRC emacs-lisp
 (use-package fill-column-indicator
   :config
   (setq fci-rule-column 80)
   (add-hook 'prog-mode-hook 'fci-mode))
 #+END_SRC
-** Interface customization
-*** Default text scale
+* text scaling
 This handy little package increases the size of the font in the whole frame.
 #+BEGIN_SRC emacs-lisp
 (use-package default-text-scale
