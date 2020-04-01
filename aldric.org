@@ -263,6 +263,47 @@ This handy little package increases the size of the font in the whole frame.
 (use-package fantom-theme :defer t)
 #+END_SRC
 
+** Define text interactions
+*** Use visual-line-mode
+#+BEGIN_SRC emacs-lisp
+(remove-hook 'text-mode-hook #'turn-on-auto-fill)
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+#+END_SRC
+*** Redefine kill-region and backward-kill-word
+I used Bash for a long time. This allows me to keep using Ctrl-w to delete a word backward.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-w") 'backward-kill-word)
+(global-set-key (kbd "C-x C-k") 'kill-region)
+#+END_SRC
+*** Move down real line by real line
+#+BEGIN_SRC emacs-lisp
+(setq line-move-visual nil)
+#+END_SRC
+*** Sentences end with a single space
+#+BEGIN_SRC emacs-lisp
+(setq sentence-end-double-space nil)
+#+END_SRC
+*** Inserting new lines before/after current one
+#+BEGIN_SRC emacs-lisp
+(defun stag-insert-line-below ()
+  "Insert and auto-indent line below cursor, like in vim."
+  (interactive)
+  (move-end-of-line 1)
+  (open-line 1)
+  (next-line)
+  (indent-for-tab-command))
+
+(defun stag-insert-line-above ()
+  "Insert and auto-indent line above cursor, like in vim."
+  (interactive)
+  (previous-line)
+  (move-end-of-line 1)
+  (stag-insert-line-below))
+
+(global-set-key (kbd "C-o") 'stag-insert-line-below)
+(global-set-key (kbd "C-M-o") 'stag-insert-line-above)
+#+END_SRC
+
 * Extending emacs with engines
 ** Text Completion
 *** company-mode
@@ -986,47 +1027,6 @@ I maintain a tintin++ config, so this is at least convenient.
 (use-package tintin-mode :pin "marmalade")
 #+END_SRC
 * Writing
-** Interacting with text
-*** Use visual-line-mode
-#+BEGIN_SRC emacs-lisp
-(remove-hook 'text-mode-hook #'turn-on-auto-fill)
-(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
-#+END_SRC
-*** Redefine kill-region and backward-kill-word
-I used Bash for a long time. This allows me to keep using Ctrl-w to delete a word backward.
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-w") 'backward-kill-word)
-(global-set-key (kbd "C-x C-k") 'kill-region)
-#+END_SRC
-*** Move down real line by real line
-#+BEGIN_SRC emacs-lisp
-(setq line-move-visual nil)
-#+END_SRC
-*** Sentences end with a single space
-#+BEGIN_SRC emacs-lisp
-(setq sentence-end-double-space nil)
-#+END_SRC
-*** Inserting new lines before/after current one
-#+BEGIN_SRC emacs-lisp
-(defun stag-insert-line-below ()
-  "Insert and auto-indent line below cursor, like in vim."
-  (interactive)
-  (move-end-of-line 1)
-  (open-line 1)
-  (next-line)
-  (indent-for-tab-command))
-
-(defun stag-insert-line-above ()
-  "Insert and auto-indent line above cursor, like in vim."
-  (interactive)
-  (previous-line)
-  (move-end-of-line 1)
-  (stag-insert-line-below))
-
-(global-set-key (kbd "C-o") 'stag-insert-line-below)
-(global-set-key (kbd "C-M-o") 'stag-insert-line-above)
-#+END_SRC
-
 ** Symbols
 #+BEGIN_SRC emacs-lisp
 (use-package xah-math-input
