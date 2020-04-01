@@ -433,6 +433,12 @@ hadoop with tramp, please.
 org-mode itself is in the init.el file. here's additional config for it.
 I've been having some issues exporting, so I'm actively loading libraries here.
 #+BEGIN_SRC emacs-lisp
+
+;; have to do this because org comes preinstalled with emacs
+(advice-add 'package-installed-p :around 'package-from-archive)
+(use-package org :pin "org")
+(advice-remove 'package-installed-p 'package-from-archive)
+
 (load-library "org-macro")
 (load-library "ob-exp")
 (load-library "org")
@@ -465,16 +471,26 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 #+END_SRC
 * GTD (Getting Things Done)
 #+BEGIN_SRC emacs-lisp
-(use-package org-agenda-property)
-(setq org-agenda-property-list '("DELEGATED_TO"))
-(setq org-agenda-property-position 'next-line)
+  (use-package org-gtd
+    :after org
+    :straight (:host github :repo "trevoke/org-gtd.el" :branch "master")
+    :custom
+    (org-gtd-directory "/media/sf_Dropbox/orgnotes/gtd")
+    (org-agenda-property-list '("DELEGATED_TO"))
+    (org-agenda-property-position 'next-line)
+    (org-edna-use-inheritance t)
+    (org-edna-load))
 
-(use-package org-edna :pin "gnu")
-(setq org-edna-use-inheritance t)
-(org-edna-load)
+  ;; (use-package org-agenda-property)
+  ;; (setq org-agenda-property-list '("DELEGATED_TO"))
+  ;; (setq org-agenda-property-position 'next-line)
 
-(require 'org-gtd "org-gtd.el/org-gtd.el")
-(setq org-gtd-directory "/media/sf_Dropbox/orgnotes/gtd")
+  ; (use-package org-edna :pin "gnu")
+  ; (setq org-edna-use-inheritance t)
+  ; (org-edna-load)
+
+  ; (require 'org-gtd "org-gtd.el/org-gtd.el")
+  ; (setq org-gtd-directory "/media/sf_Dropbox/orgnotes/gtd")
 #+END_SRC
 ** keybindings
 #+BEGIN_SRC emacs-lisp
@@ -490,16 +506,19 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 #+END_SRC
 ** Agenda
 #+BEGIN_SRC emacs-lisp
-  (setq org-agenda-diary-file 'diary-file)
-  (setq org-agenda-include-diary t)
-  (setq org-agenda-restore-windows-after-quit t)
-  (setq org-agenda-sticky t)
-  (setq org-agenda-window-setup 'other-window)
-  (setq org-agenda-skip-deadline-if-done t)
-  (setq org-agenda-skip-scheduled-if-done t)
-  (setq org-agenda-start-on-weekday nil)
-
-  (setq org-agenda-files `(,org-gtd-directory))
+  (use-package org-agenda
+  :ensure nil
+    :after org-gtd
+    :custom
+  (org-agenda-diary-file 'diary-file)
+  (org-agenda-include-diary t)
+  (org-agenda-restore-windows-after-quit t)
+  (org-agenda-sticky t)
+  (org-agenda-window-setup 'other-window)
+  (org-agenda-skip-deadline-if-done t)
+  (org-agenda-skip-scheduled-if-done t)
+  (org-agenda-start-on-weekday nil)
+  (org-agenda-files `(,org-gtd-directory)))
 #+END_SRC
 ** Diary
 #+BEGIN_SRC emacs-lisp
@@ -526,16 +545,20 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
 #+END_SRC
 ** Captures
 #+BEGIN_SRC emacs-lisp
-  (setq org-default-notes-file (concat org-gtd-directory "notes.org"))
+  (use-package org-capture
+:ensure nil
+    :after org-gtd
+    :config
+    (setq org-default-notes-file (concat org-gtd-directory "notes.org"))
 
-  (setq org-capture-templates `(("i" "Inbox"
+    (setq org-capture-templates `(("i" "Inbox"
                                  entry (file ,(org-gtd--path org-gtd-inbox-file-basename))
                                  "* %?\n%U\n\n  %i"
                                  :kill-buffer t)
                                 ("t" "Todo with link"
                                  entry (file ,(org-gtd--path org-gtd-inbox-file-basename))
                                  "* %?\n%U\n\n  %i\n  %a"
-                                 :kill-buffer t)))
+                                 :kill-buffer t))))
 #+END_SRC
 ** Refiling
 #+BEGIN_SRC emacs-lisp
@@ -552,7 +575,7 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
       ((org-mode . org-roam-mode)
        (after-init . org-roam--build-cache-async) ;; optional!
        )
-      :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
+      ; :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
       :custom
       (org-roam-directory "/media/sf_Dropbox/orgnotes/roam")
       :bind
@@ -565,6 +588,7 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
 ** references - org-brain
 #+BEGIN_SRC emacs-lisp
   (use-package org-brain :ensure t :pin "melpa"
+:after org-capture
     :init
     (setq org-brain-path (concat org-directory "brain"))
     ;; For Evil users
@@ -1239,6 +1263,7 @@ This is the buffer I see when I start up emacs.
 https://github.com/emacs-dashboard/emacs-dashboard#configuration
 #+BEGIN_SRC emacs-lisp
   (use-package dashboard
+    :after org
     :config
     (setq initial-buffer-choice "*dashboard*")
     (dashboard-setup-startup-hook))

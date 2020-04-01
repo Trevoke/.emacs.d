@@ -34,10 +34,6 @@
   (and (apply f args)
        (assq (car args) package-alist)))
 
-(advice-add 'package-installed-p :around 'package-from-archive)
-(use-package org :pin "org")
-(advice-remove 'package-installed-p 'package-from-archive)
-
 (setq use-package-always-pin "melpa-stable")
 (setq use-package-always-ensure t)
 
