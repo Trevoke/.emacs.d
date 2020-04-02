@@ -45,6 +45,11 @@ API keys, passwords, etc are kept in here. This file is .gitignored.
 #+BEGIN_SRC emacs-lisp
 (load "~/.emacs.d/emacs.secrets" t)
 #+END_SRC
+*** executable versioning (mostly programming languages)
+#+BEGIN_SRC elisp
+  (setenv "PATH" (concat (getenv "PATH") ":~/.asdf/shims"))
+  (setq exec-path (append exec-path '("~/.asdf/shims")))
+#+END_SRC
 ** Package management
 *** The package manager: =use-package=
 I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
@@ -634,11 +639,6 @@ With this configuration, using C-f in a status buffer will trigger the gitflow s
 #+END_SRC
 * Programming
 ** TODO get a LSP configuration going in here
-** Path modification for executable versioning
-#+BEGIN_SRC elisp
-  (setenv "PATH" (concat (getenv "PATH") ":~/.asdf/shims"))
-  (setq exec-path (append exec-path '("~/.asdf/shims")))
-#+END_SRC
 ** Indentation
 Always spaces. Always.
 #+BEGIN_SRC emacs-lisp
