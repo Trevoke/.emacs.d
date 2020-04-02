@@ -8,6 +8,13 @@ I tinker with this file a lot, so I need a quick way to get to it.
 I set a bookmark with =C-x r m= and I can get back here with =C-x r b=
 ** TODO Minor modes?
 I could create here some empty minor modes based on how I think about a buffer, hook those to whatever major modes I care about, and then just hook to the minor mode everywhere else in my configuration.
+* External links
+This is here so it's easier for me to remember what Ι need to set up on a new machine.
+#+begin_quote emacs-lisp
+(setq stag-easy-hugo-basedir "~/src/projects/trevoke.github.io-source")
+(setq stag-easy-hugo-root "~/src/projects/trevoke.github.io")
+(setq stag-org-reveal-root "file:///~/src/vendor/reveal.js-3.8.0")
+#+end_quote
 * Personal information
 Stored in ~~/.emacs.d/emacs.secrets~.
 * General emacs config
@@ -456,9 +463,6 @@ I've been having some issues exporting, so I'm actively loading libraries here.
     (setq org-cycle-separator-lines 0)
     (setq org-goto-interface 'outline-path-completion) ;; useful with C-c C-j
     (setq org-M-RET-may-split-line '((default .t) (headline . nil)))
-
-    (setq org-mobile-directory "~/Dropbox/orgnotes")
-    (setq org-mobile-inbox-for-pull "~/Dropbox/orgnotes/from-mobile.org")
 #+END_SRC
 ** Org bullets
 #+BEGIN_SRC emacs-lisp
@@ -1145,7 +1149,7 @@ Camcorder is a tool to record screencasts, in GIF or other formats
     :pin "melpa"
     :config
     (use-package htmlize)
-    (setq org-reveal-root "file:///~/src/vendor/reveal.js-3.8.0"))
+    (setq org-reveal-root stag-org-reveal-root))
 #+END_SRC
 ** Email
 *** TODO Add BBDB
@@ -1164,15 +1168,15 @@ smtpmail-multi
     :pin "melpa"
     :config
     (setq smtpmail-multi-accounts
-          `((home . (user-mail-address
+          `((home . (,user-mail-address
                      "smtp.gmail.com"
                      587
-                     user-mail-address
+                     ,user-mail-address
                      starttls
                      nil nil nil))))
 
     (setq smtpmail-multi-associations
-          `((user-mail-address home)))
+          `((,user-mail-address home)))
 
     (setq smtpmail-multi-default-account 'home)
 
@@ -1198,9 +1202,9 @@ It seems I may want to use orgalist.
     :init
     (setq easy-hugo-org-header t)
     (setq easy-hugo-default-ext ".org")
-    (setq easy-hugo-basedir "~/src/projects/trevoke.github.io-source")
+    (setq easy-hugo-basedir stag-easy-hugo-basedir)
     (setq easy-hugo-url "http://blog.trevoke.net")
-    (setq easy-hugo-root "~/src/projects/trevoke.github.io")
+    (setq easy-hugo-root stag-easy-hugo-root)
     (setq easy-hugo-previewtime "300"))
 #+END_SRC
 ** Markdown
