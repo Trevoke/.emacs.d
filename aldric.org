@@ -1268,6 +1268,9 @@ https://github.com/emacs-dashboard/emacs-dashboard#configuration
 #+BEGIN_SRC emacs-lisp
   (use-package dashboard
     :after org
+    :init
+    (setq org-priority-highest org-highest-priority)
+    (setq org-priority-lowest org-lowest-priority)
     :config
     (setq initial-buffer-choice "*dashboard*")
     (dashboard-setup-startup-hook))
