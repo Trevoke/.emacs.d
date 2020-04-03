@@ -451,7 +451,9 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 
 ;; have to do this because org comes preinstalled with emacs
 (advice-add 'package-installed-p :around 'package-from-archive)
-(use-package org :pin "org")
+(use-package org
+  :pin "org"
+  :ensure org-plus-contrib)
 (advice-remove 'package-installed-p 'package-from-archive)
 
 (load-library "org-macro")
@@ -1193,7 +1195,9 @@ orgstruct++ was removed in org 9.2
 It seems I may want to use orgalist.
 #+BEGIN_SRC emacs-lisp
 (use-package notmuch
+  :after org
   :config
+  (require 'ol-notmuch)
   (defun stag-email-hook ()
     (epa-mail-mode))
 
