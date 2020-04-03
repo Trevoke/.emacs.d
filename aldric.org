@@ -14,6 +14,9 @@ This is here so it's easier for me to remember what Ι need to set up on a new m
 (setq stag-easy-hugo-basedir "~/src/projects/trevoke.github.io-source")
 (setq stag-easy-hugo-root "~/src/projects/trevoke.github.io")
 (setq stag-org-reveal-root "file:///~/src/vendor/reveal.js-3.8.0")
+(setq stag-org-gtd-directory "~/my-life/orgnotes/gtd")
+(setq stag-org-roam-directory "~/my-life/orgnotes/roam")
+(setq stag-org-brain-directory "~/my-life/from-dropbox/orgnotes/brain")
 #+end_src
 * Personal information
 Stored in ~~/.emacs.d/emacs.secrets~.
@@ -484,7 +487,7 @@ I've been having some issues exporting, so I'm actively loading libraries here.
     :after org
     :straight (:host github :repo "trevoke/org-gtd.el" :branch "master")
     :custom
-    (org-gtd-directory "/media/sf_Dropbox/orgnotes/gtd")
+    (org-gtd-directory stag-org-gtd-directory)
     (org-agenda-property-list '("DELEGATED_TO"))
     (org-agenda-property-position 'next-line)
     (org-edna-use-inheritance t)
@@ -586,7 +589,7 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
        )
       ; :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
       :custom
-      (org-roam-directory "/media/sf_Dropbox/orgnotes/roam")
+      (org-roam-directory stag-org-roam-directory)
       :bind
       ("C-c n l" . org-roam)
       ("C-c n t" . org-roam-today)
@@ -599,7 +602,7 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
   (use-package org-brain :ensure t :pin "melpa"
 :after org-capture
     :init
-    (setq org-brain-path (concat org-directory "brain"))
+    `(setq org-brain-path ,stag-org-brain-directory)
     ;; For Evil users
     ;; (with-eval-after-load 'evil
     ;;   (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
