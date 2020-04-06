@@ -1158,6 +1158,12 @@ Camcorder is a tool to record screencasts, in GIF or other formats
 #+END_SRC
 ** Email
 *** TODO Add BBDB
+#+begin_src emacs-lisp
+(use-package bbdb
+  :after org
+  :config
+  (require 'ol-bbdb)
+#+end_src
 *** Sending email
 #+BEGIN_SRC emacs-lisp
 (setq mail-user-agent 'message-user-agent)
