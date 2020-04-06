@@ -16,6 +16,7 @@ This is here so it's easier for me to remember what Ι need to set up on a new m
 (setq stag-org-reveal-root "file:///~/src/vendor/reveal.js-3.8.0")
 (setq stag-org-gtd-directory "~/my-life/orgnotes/gtd")
 (setq stag-org-roam-directory "~/my-life/orgnotes/roam")
+(setq stag-bbdb-file "~/my-life/orgnotes/big-brother-database")
 (setq stag-org-brain-directory "~/my-life/from-dropbox/orgnotes/brain")
 #+end_src
 * Personal information
@@ -1162,7 +1163,8 @@ Camcorder is a tool to record screencasts, in GIF or other formats
 (use-package bbdb
   :after org
   :config
-  (require 'ol-bbdb)
+  (setq bbdb-file stag-bbdb-file)
+  (require 'ol-bbdb))
 #+end_src
 *** Sending email
 #+BEGIN_SRC emacs-lisp
