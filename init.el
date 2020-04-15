@@ -16,9 +16,10 @@
 (require 'use-package)
 
 ;; staight.el is an alternative to package.el
+(setq straight-base-dir "~/.emacs.d/local-files/")
 (defvar bootstrap-version)
 (let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" "~/.emacs.d/local-files/")) 
       (bootstrap-version 5))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
