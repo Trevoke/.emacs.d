@@ -591,7 +591,7 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
   (setq org-refile-allow-creating-parent-nodes t)
   (setq org-log-refile 'time)
 #+END_SRC
-** references -org-roam
+** references - org-roam
 #+BEGIN_SRC emacs-lisp
 (use-package org-roam
       :after org
