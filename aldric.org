@@ -466,11 +466,11 @@ I've been having some issues exporting, so I'm actively loading libraries here.
   (setq org-id-locations-file "~/.emacs.d/local-files/.org-id-locations"))
 (advice-remove 'package-installed-p 'package-from-archive)
 
-(load-library "org-macro")
-(load-library "ob-exp")
-(load-library "org")
-(load-library "org-compat")
-(load-library "ox")
+(use-package org-macro :ensure nil :after org)
+(use-package ob-exp :ensure nil :after org)
+(use-package org-compat :ensure nil :after org)
+(use-package ox :ensure nil :after org)
+(use-package ox-md :ensure nil :after ox)
 
 ;; (use-package ox-pandoc)
 #+END_SRC
