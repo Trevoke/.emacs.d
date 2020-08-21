@@ -594,12 +594,12 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
 ** references - org-roam
 #+BEGIN_SRC emacs-lisp
 (use-package org-roam
+      :pin melpa
       :after org
       :init
       (setq org-roam-db-location stag-org-roam-db-location)
       :hook
-      ((org-mode . org-roam-mode)
-       (after-init . org-roam--build-cache-async))
+      (after-init . org-roam-mode)
       :custom
       (org-roam-directory stag-org-roam-directory)
       :bind
