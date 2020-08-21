@@ -493,56 +493,59 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 #+BEGIN_SRC emacs-lisp
   (use-package org-download)
 #+END_SRC
-* GTD (Getting Things Done)
-#+BEGIN_SRC emacs-lisp
-  (use-package org-gtd
-    :after org
-    :straight (:host github :repo "trevoke/org-gtd.el" :branch "master")
-    :custom
-    (org-gtd-directory stag-org-gtd-directory)
-    (org-agenda-property-list '("DELEGATED_TO"))
-    (org-agenda-property-position 'next-line)
-    (org-edna-use-inheritance t)
-    (org-edna-load))
-
-  ;; (use-package org-agenda-property)
-  ;; (setq org-agenda-property-list '("DELEGATED_TO"))
-  ;; (setq org-agenda-property-position 'next-line)
-
-  ; (use-package org-edna :pin "gnu")
-  ; (setq org-edna-use-inheritance t)
-  ; (org-edna-load)
-
-  ; (require 'org-gtd "org-gtd.el/org-gtd.el")
-  ; (setq org-gtd-directory "/media/sf_Dropbox/orgnotes/gtd")
-#+END_SRC
 ** keybindings
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-c d c") 'org-gtd-capture)
-  (global-set-key (kbd "C-c d a") 'org-agenda-list)
-  (global-set-key (kbd "C-c d p") 'org-gtd-process-inbox)
-  (global-set-key (kbd "C-c d n") 'org-gtd-show-all-next)
-  (global-set-key (kbd "C-c d s") 'org-gtd-show-stuck-projects)
-
   (global-set-key "\C-cl" 'org-store-link)
   (global-set-key "\C-cb" 'org-switchb)
   (org-defkey org-mode-map "\C-cr" 'org-refile)
 #+END_SRC
+* GTD (Getting Things Done)
+#+BEGIN_SRC emacs-lisp
+
+  (use-package org-gtd
+    :after org
+    :demand t
+    :pin melpa
+    :custom
+    ;; where org-gtd will put its files. This value is also the default one.
+    (org-gtd-directory stag-org-gtd-directory)
+    ;; package: https://github.com/Malabarba/org-agenda-property
+    ;; this is so you can see who an item was delegated to in the agenda
+    (org-agenda-property-list '("DELEGATED_TO"))
+    ;; I think this makes the agenda easier to read
+    (org-agenda-property-position 'next-line)
+    ;; package: https://www.nongnu.org/org-edna-el/
+    ;; org-edna is used to make sure that when a project task gets DONE,
+    ;; the next TODO is automatically changed to NEXT.
+    (org-edna-use-inheritance t)
+    (org-edna-load)
+    :bind
+    (("C-c d c" . org-gtd-capture) ;; add item to inbox
+     ("C-c d a" . org-agenda-list) ;; see what's on your plate today
+     ("C-c d p" . org-gtd-process-inbox) ;; process entire inbox
+     ("C-c d n" . org-gtd-show-all-next) ;; see all NEXT items
+     ("C-c d s" . org-gtd-show-stuck-projects)) ;; see projects that don't have a NEXT item
+    :init
+    ;; the keybinding to hit when you're done editing an item in the processing phase
+    (bind-key "C-c c" 'org-gtd-clarify-finalize))
+#+END_SRC
 ** Agenda
 #+BEGIN_SRC emacs-lisp
   (use-package org-agenda
-  :ensure nil
-    :after org-gtd
+    :ensure nil
+    :no-require t
+    :after (org-gtd)
+    ;; :demand t
     :custom
-  (org-agenda-diary-file 'diary-file)
-  (org-agenda-include-diary t)
-  (org-agenda-restore-windows-after-quit t)
-  (org-agenda-sticky t)
-  (org-agenda-window-setup 'other-window)
-  (org-agenda-skip-deadline-if-done t)
-  (org-agenda-skip-scheduled-if-done t)
-  (org-agenda-start-on-weekday nil)
-  (org-agenda-files `(,org-gtd-directory)))
+    (org-agenda-diary-file 'diary-file)
+    (org-agenda-include-diary t)
+    (org-agenda-restore-windows-after-quit t)
+    (org-agenda-sticky t)
+    (org-agenda-window-setup 'other-window)
+    (org-agenda-skip-deadline-if-done t)
+    (org-agenda-skip-scheduled-if-done t)
+    (org-agenda-start-on-weekday nil)
+    (org-agenda-files `(,org-gtd-directory)))
 #+END_SRC
 ** Diary
 #+BEGIN_SRC emacs-lisp
@@ -608,22 +611,6 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
       ("C-c n f" . org-roam-find-file)
       ("C-c n i" . org-roam-insert)
       ("C-c n g" . org-roam-show-graph))
-#+END_SRC
-** references - org-brain
-#+BEGIN_SRC emacs-lisp
-  (use-package org-brain :ensure t :pin "melpa"
-:after org-capture
-    :init
-    `(setq org-brain-path ,stag-org-brain-directory)
-    ;; For Evil users
-    ;; (with-eval-after-load 'evil
-    ;;   (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
-    :config
-    (push '("b" "Brain" plain (function org-brain-goto-end)
-            "* %i%?" :empty-lines 1)
-          org-capture-templates)
-    (setq org-brain-visualize-default-choices 'all)
-    (setq org-brain-title-max-length 12))
 #+END_SRC
 * Version control
 ** Git
