@@ -857,11 +857,7 @@ https://truongtx.me/2014/04/20/emacs-javascript-completion-and-refactoring
 #+BEGIN_SRC emacs-lisp
 (use-package tern
   :init (add-hook 'js2-mode-hook 'tern-mode)
-  :config
-  (use-package company-tern
-  :config
-  (add-to-list 'company-backends 'company-tern)
-  (setq company-tern-meta-as-single-line t)))
+  :config)
 
 (defun delete-tern-process ()
   (interactive)
@@ -949,10 +945,6 @@ There's a few extra things I want started when I open a Ruby buffer
 **** rbenv
 #+BEGIN_SRC emacs-lisp
 (use-package rbenv)
-#+END_SRC
-**** Bundler
-#+BEGIN_SRC emacs-lisp
-(use-package bundler)
 #+END_SRC
 **** Project navigation
 And I like projectile-rails to handle rails projects.
@@ -1143,11 +1135,6 @@ Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct
   (setq outline-minor-mode-prefix "\C-c \C-o") ; Or something else
 #+END_SRC
 ** Presentations
-*** Screencasts
-Camcorder is a tool to record screencasts, in GIF or other formats
-#+BEGIN_SRC emacs-lisp
-(use-package camcorder)
-#+END_SRC
 *** TODO Slides
 **** revealjs
 #+BEGIN_SRC emacs-lisp
