@@ -271,7 +271,6 @@ This handy little package increases the size of the font in the whole frame.
 #+BEGIN_SRC emacs-lisp
 (use-package moe-theme :defer t)
 (use-package material-theme :defer t)
-(use-package fantom-theme :defer t)
 #+END_SRC
 
 ** Define text interactions
