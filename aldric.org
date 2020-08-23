@@ -26,6 +26,10 @@ This is here so it's easier for me to remember what Ι need to set up on a new m
 * Personal information
 Stored in ~~/.emacs.d/emacs.secrets~.
 * General emacs config
+** Low-level behavior
+#+begin_src emacs-lisp
+(setq gc-cons-threshold (* 100 1024 1024))
+#+end_src
 ** Customizations from customization system
 Keeping these separate makes life easier: they get modified when I load a theme and such, and I don't need that kind of hassle when maintaining my actual configuration, you know?
 In addition, I do keep some somewhat computer-specific stuff in there, like the font, and it's just easier to have this separated there.
@@ -70,6 +74,8 @@ I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
 ** Visual choices
 #+BEGIN_SRC emacs-lisp
 (setq inhibit-startup-screen t)
+(setq inhibit-startup-echo-area-message t)
+(setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
 (show-paren-mode t)
 (setq show-paren-delay 0)
