@@ -336,12 +336,12 @@ Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes
 Projectile is pretty sweet.
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
+  :after ivy
   :diminish projectile-mode
   :init
   (setq projectile-known-projects-file "~/.emacs.d/local-files/projectile-bookmarks.eld")
   (setq projectile-cache-file "~/.emacs.d/local-files/projectile.cache")
   :config
-  (use-package ivy)
   (projectile-global-mode)
   (setq projectile-completion-system 'ivy)
   :bind (("C-c p" . projectile-command-map)))
@@ -362,21 +362,36 @@ I forget the basic keybindings all the time: After a search using =ag=, use C-c 
 #+BEGIN_SRC emacs-lisp
 (use-package ag
   :config
-  (setq ag-reuse-buffers 't)
-  (use-package wgrep-ag
+  (setq ag-reuse-buffers 't))
+
+(use-package wgrep-ag
+  :after ag
     :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
-    :config (autoload 'wgrep-ag-setup "wgrep-ag")))
+    :config (autoload 'wgrep-ag-setup "wgrep-ag"))
 #+END_SRC
 ** Command completion
 #+BEGIN_SRC emacs-lisp
-  (use-package ivy
-    :diminish ivy-mode
+  (use-package flx)
+  (use-package swiper)
+
+  (use-package smex
     :init
-    (use-package flx)
-    (use-package smex
-      :init (setq smex-save-file "~/.emacs.d/local-files/smex-items"))
+    (setq smex-save-file "~/.emacs.d/local-files/smex-items"))
+
+  (use-package counsel
+    :after smex
+    :bind (("C-x C-m" . counsel-M-x)
+           ("C-x m" . counsel-descbinds)
+           ("C-h f" . counsel-describe-function)
+           ("C-h v" . counsel-describe-variable)
+           ("C-y" . counsel-yank-pop)
+           ("C-c y" . yank)))
+
+  (use-package ivy
+    :after (flx smex swiper counsel)
+    :diminish ivy-mode
+
     :config
-    (use-package swiper)
     (ivy-mode 1)
     ;; From http://oremacs.com/2016/01/06/ivy-flx/
     (setq ivy-re-builders-alist '((swiper . ivy--regex-plus)
@@ -385,16 +400,6 @@ I forget the basic keybindings all the time: After a search using =ag=, use C-c 
                                   (t . ivy--regex-fuzzy))
           ivy-initial-inputs-alist nil
           ivy-use-virtual-buffers t))
-
-  (use-package counsel
-    :config
-    (use-package smex)
-    :bind (("C-x C-m" . counsel-M-x)
-           ("C-x m" . counsel-descbinds)
-           ;; ("C-h f" . counsel-describe-function)
-           ;; ("C-h v" . counsel-describe-variable)
-           ("C-y" . counsel-yank-pop)
-           ("C-c y" . yank)))
 #+END_SRC
 * File system browsing
 ** Dired
@@ -634,6 +639,7 @@ Magit is a pretty amazing interface to git.
 With this configuration, using C-f in a status buffer will trigger the gitflow selectors.
 #+BEGIN_SRC emacs-lisp
 (use-package magit-gitflow
+  :after magit
   :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
 #+END_SRC
 * Programming
@@ -739,14 +745,13 @@ Auto-tail, please.
 ** Elixir
 #+BEGIN_SRC emacs-lisp
   (use-package elixir-mode
+    :after projectile
     :config
-    ;; (use-package lsp-elixir :pin "melpa"
-    ;;   :config (add-hook 'elixir-mode-hook #'lsp))
-    (use-package elixir-yasnippets)
-    (use-package projectile
-      :config
-      (setq projectile-globally-ignored-directories
-            (cons ".elixir_ls" projectile-globally-ignored-directories))))
+    (setq projectile-globally-ignored-directories
+    (cons ".elixir_ls" projectile-globally-ignored-directories)))
+
+  (use-package elixir-yasnippets
+    :after elixir-mode)
 #+END_SRC
 ** CSS
 #+BEGIN_SRC emacs-lisp
@@ -774,10 +779,11 @@ And let's have gofmt chew my code when I save the file.
     :init
     (defun stag-go-mode ()
       (add-hook 'before-save-hook 'gofmt-before-save nil t)) ;; chew my code
-    (add-hook 'go-mode-hook 'stag-go-mode)
-    :config
-    (use-package company-go
-      :config (set (make-local-variable 'company-backends) '(company-go))))
+    (add-hook 'go-mode-hook 'stag-go-mode))
+
+(use-package company-go
+  :after (go-mode company)
+  :config (set (make-local-variable 'company-backends) '(company-go)))
 #+END_SRC
 *** TODO Packages to be added
 - (use-package go-eldoc)
@@ -794,15 +800,12 @@ And let's have gofmt chew my code when I save the file.
 *** Web-mode                                               :external:major:
 Here are all the extensions where I want web-mode enabled
 #+BEGIN_SRC emacs-lisp
+  (use-package flycheck)
+
   (use-package web-mode
+    :after flycheck
     :mode "\\.mustache$" "\\.html$" "\\.erb$" "\\.jsx$" "\\.eex$" "\\.php$"
     :config
-    (use-package company-web
-      :config
-      (add-to-list 'company-backends 'company-web-html)
-      (add-to-list 'company-backends 'company-web-jade)
-      (add-to-list 'company-backends 'company-web-slim))
-
     (flycheck-define-checker eslint-checker
       "A JSX syntax and style checker based on JSXHint."
 
@@ -832,7 +835,15 @@ Here are all the extensions where I want web-mode enabled
           ad-do-it)
         ad-do-it)))
 
+(use-package company-web
+      :after web-mode
+      :config
+      (add-to-list 'company-backends 'company-web-html)
+      (add-to-list 'company-backends 'company-web-jade)
+      (add-to-list 'company-backends 'company-web-slim))
+
   (use-package emmet-mode
+    :after web-mode
     :init
     (add-hook 'html-mode-hook 'emmet-mode)
     (add-hook 'web-mode-hook 'emmet-mode))
@@ -988,11 +999,18 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
     :init
     (add-hook 'rust-mode-hook 'stag-code-modes-hook)
     (add-hook 'rust-mode-hook 'flycheck-mode)
-    (add-hook 'rust-mode-hook 'flymake-mode)
-    :config
-    (use-package flycheck-rust :pin "melpa")
-    (use-package flymake-rust :pin "melpa")
-    (use-package cargo))
+    (add-hook 'rust-mode-hook 'flymake-mode))
+
+    (use-package flycheck-rust
+      :after rust-mode
+      :pin "melpa")
+
+    (use-package flymake-rust
+      :after rust-mode
+      :pin "melpa")
+
+    (use-package cargo
+      :after rust-mode)
 #+END_SRC
 ** Shells
 *** Generic shell things
@@ -1137,10 +1155,11 @@ Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct
 *** TODO Slides
 **** revealjs
 #+BEGIN_SRC emacs-lisp
+  (use-package htmlize)
   (use-package ox-reveal
+    :after htmlize
     :pin "melpa"
     :config
-    (use-package htmlize)
     (setq org-reveal-root stag-org-reveal-root))
 #+END_SRC
 ** Email
