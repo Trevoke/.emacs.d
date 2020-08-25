@@ -327,6 +327,13 @@ avy is kinda badass.
     :bind (("C-c j" . avy-goto-char-2)
            ("C-x j" . avy-po-mark)))
 #+END_SRC
+** persist library
+#+begin_src emacs-lisp
+  (use-package persist
+    :ensure nil
+    :config
+    (setq persist--directory-location "~/.emacs.d/local-files/"))
+#+end_src
 * Extending emacs with engines
 ** Text Completion
 *** company-mode
@@ -513,8 +520,8 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 #+begin_src emacs-lisp
   (use-package org-gcal
     :pin "melpa"
-    :after org-agenda
-    :init
+    :after (org-agenda persist)
+    :config
     (setq org-gcal-dir "~/.emacs.d/local-files/org-gcal/"))
 
   (use-package calfw-gcal :pin "melpa"
