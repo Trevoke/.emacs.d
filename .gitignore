@@ -5,7 +5,7 @@ local-files/
 \#*
 aldric.el
 elpa
-emacs.secrets
+.emacs.secrets
 eshell/history
 eshell/lastdir
 games
@@ -15,3 +15,5 @@ var
 ensime/
 network-security.data
 transient/
+straight/
+request/

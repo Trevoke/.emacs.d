@@ -24,7 +24,7 @@ This is here so it's easier for me to remember what Ι need to set up on a new m
 (setq stag-org-brain-directory "~/my-life/from-dropbox/orgnotes/brain")
 #+end_src
 * Personal information
-Stored in ~~/.emacs.d/emacs.secrets~.
+Stored in ~~/.emacs.d/.emacs.secrets~.
 * General emacs config
 ** Low-level behavior
 #+begin_src emacs-lisp
@@ -50,7 +50,7 @@ In addition, I do keep some somewhat computer-specific stuff in there, like the 
 *** Secrets
 API keys, passwords, etc are kept in here. This file is .gitignored.
 #+BEGIN_SRC emacs-lisp
-(load "~/.emacs.d/emacs.secrets" t)
+(load "~/.emacs.d/.emacs.secrets" t)
 #+END_SRC
 *** executable versioning (mostly programming languages)
 #+BEGIN_SRC elisp
@@ -509,6 +509,33 @@ I've been having some issues exporting, so I'm actively loading libraries here.
   (global-set-key "\C-cb" 'org-switchb)
   (org-defkey org-mode-map "\C-cr" 'org-refile)
 #+END_SRC
+** Calendar
+#+begin_src emacs-lisp
+  (use-package org-gcal
+    :pin "melpa"
+    :after org-agenda
+    :init
+    (setq org-gcal-dir "~/.emacs.d/local-files/org-gcal/")
+
+  (use-package calfw-gcal :pin "melpa"
+    :after calfw-org)
+
+  (use-package calfw-org
+    :after (org-gcal calfw)
+    :config
+    (require 'calfw-org))
+
+  (use-package calfw
+    :config
+    (setq cfw:fchar-junction ?╋
+          cfw:fchar-vertical-line ?┃
+          cfw:fchar-horizontal-line ?━
+          cfw:fchar-left-junction ?┣
+          cfw:fchar-right-junction ?┫
+          cfw:fchar-top-junction ?┯
+          cfw:fchar-top-left-corner ?┏
+          cfw:fchar-top-right-corner ?┓))
+#+end_src
 * GTD (Getting Things Done)
 #+BEGIN_SRC emacs-lisp
 
