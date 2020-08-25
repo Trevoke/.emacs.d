@@ -515,7 +515,7 @@ I've been having some issues exporting, so I'm actively loading libraries here.
     :pin "melpa"
     :after org-agenda
     :init
-    (setq org-gcal-dir "~/.emacs.d/local-files/org-gcal/")
+    (setq org-gcal-dir "~/.emacs.d/local-files/org-gcal/"))
 
   (use-package calfw-gcal :pin "melpa"
     :after calfw-org)
