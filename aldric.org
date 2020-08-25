@@ -589,7 +589,8 @@ I've been having some issues exporting, so I'm actively loading libraries here.
     (org-agenda-skip-deadline-if-done t)
     (org-agenda-skip-scheduled-if-done t)
     (org-agenda-start-on-weekday nil)
-    (org-agenda-files `(,org-gtd-directory)))
+    (org-agenda-files `(,org-gtd-directory))
+    (org-agenda-custom-commands '(("g" "org gtd" ((agenda "d") (todo "NEXT"))))))
 #+END_SRC
 ** Diary
 #+BEGIN_SRC emacs-lisp
