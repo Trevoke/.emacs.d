@@ -20,7 +20,7 @@ This is here so it's easier for me to remember what Ι need to set up on a new m
 (setq stag-org-gtd-directory "~/my-life/orgnotes/gtd")
 (setq stag-org-roam-directory "~/my-life/orgnotes/roam")
 (setq stag-org-roam-db-location "~/.emacs.d/local-files/org-roam.db")
-(setq stag-bbdb-file "~/my-life/orgnotes/big-brother-database")
+(setq stag-bbdb-file "~/my-life/orgnotes/bbdb/big-brother-database")
 (setq stag-org-brain-directory "~/my-life/from-dropbox/orgnotes/brain")
 #+end_src
 * Personal information
@@ -265,6 +265,7 @@ Because sometimes, vim.
 Suspend emacs？ I'll use C-x C-z.
 #+BEGIN_SRC emacs-lisp
 (global-unset-key (kbd "C-z"))
+(global-unset-key (kbd "C-x C-z"))
 #+END_SRC
 ** text scaling
 This handy little package increases the size of the font in the whole frame.
@@ -275,8 +276,8 @@ This handy little package increases the size of the font in the whole frame.
 #+END_SRC
 ** Color themes
 #+BEGIN_SRC emacs-lisp
-(use-package moe-theme :defer t)
-(use-package material-theme :defer t)
+(use-package modus-operandi-theme)
+(use-package modus-vivendi-theme)
 #+END_SRC
 
 ** Define text interactions
@@ -327,14 +328,75 @@ avy is kinda badass.
     :bind (("C-c j" . avy-goto-char-2)
            ("C-x j" . avy-po-mark)))
 #+END_SRC
-** persist library
-#+begin_src emacs-lisp
-  (use-package persist
-    :ensure nil
-    :config
-    (setq persist--directory-location "~/.emacs.d/local-files/"))
-#+end_src
 * Extending emacs with engines
+** input completion
+#+begin_src emacs-lisp
+  (use-package orderless
+    :config
+    (setq orderless-regexp-separator "[/\s_-]+")
+    (setq orderless-matching-styles
+          '(orderless-flex
+            orderless-strict-leading-initialism
+            orderless-regexp
+            orderless-prefixes
+            orderless-literal))
+    (setq completion-category-defaults nil)
+    (setq completion-cycle-threshold 3)
+    (setq completion-flex-nospace nil)
+    (setq completion-pcm-complete-word-inserts-delimiters t)
+    (setq completion-pcm-word-delimiters "-_./:| ")
+    (setq completion-show-help nil)
+    (setq completion-ignore-case t)
+    (setq read-buffer-completion-ignore-case t)
+    (setq read-file-name-completion-ignore-case t)
+    (setq completions-format 'vertical)   ; *Completions* buffer
+    (setq enable-recursive-minibuffers t)
+    (setq read-answer-short t)
+    (setq resize-mini-windows t))
+#+end_src
+** minibuffer
+#+begin_src emacs-lisp
+(use-package minibuffer
+  :ensure nil
+  :after orderless
+  :demand
+  :config
+  (file-name-shadow-mode 1)
+  (minibuffer-depth-indicate-mode 1)
+  (minibuffer-electric-default-mode 1)
+  :bind (("C-x C-m" . execute-extended-command)))
+
+
+#+end_src
+** Command completion
+#+BEGIN_SRC emacs-lisp
+  (use-package icomplete
+    :after orderless
+    :ensure nil
+    :demand
+    :config
+    (setq icomplete-delay-completions-threshold 100)
+    (setq icomplete-max-delay-chars 2)
+    (setq icomplete-compute-delay 0.2)
+    (setq icomplete-show-matches-on-no-input t)
+    (setq icomplete-hide-common-prefix nil)
+    (setq icomplete-prospects-height 1)
+    (setq icomplete-separator (propertize " · " 'face 'shadow))
+    ;; (setq icomplete-separator " │ ")
+    ;; (setq icomplete-separator " ┆ ")
+    ;; (setq icomplete-separator " ¦ ")
+    ;; (setq icomplete-separator " ┆ ")
+    (setq icomplete-with-completion-tables t)
+    (setq icomplete-tidy-shadowed-file-names t)
+    (icomplete-mode 1))
+
+  (use-package icomplete-vertical
+    :after (minibuffer icomplete)
+    :config
+    (setq icomplete-vertical-prospects-height 10)
+    (setq icomplete-prospects-height 10)
+    (icomplete-vertical-mode 1))
+#+END_SRC
 ** Text Completion
 *** company-mode
 #+BEGIN_SRC emacs-lisp
@@ -345,18 +407,36 @@ Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet :diminish yas-minor-mode)
 #+END_SRC
+** In-buffer navigation
+#+begin_src emacs-lisp
+(use-package imenu
+  :ensure nil
+  :demand
+  :config
+  (setq imenu-use-markers t)
+  (setq imenu-auto-rescan t)
+  (setq imenu-auto-rescan-maxout 600000)
+  (setq imenu-max-item-length 100)
+  (setq imenu-use-popup-menu nil)
+  (setq imenu-eager-completion-buffer t)
+  (setq imenu-space-replacement " ")
+  (setq imenu-level-separator "/"))
+
+(use-package imenu-list
+  :after imenu)
+#+end_src
 ** Project navigation
 Projectile is pretty sweet.
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
-  :after ivy
+  :after icomplete
   :diminish projectile-mode
   :init
   (setq projectile-known-projects-file "~/.emacs.d/local-files/projectile-bookmarks.eld")
   (setq projectile-cache-file "~/.emacs.d/local-files/projectile.cache")
   :config
   (projectile-global-mode)
-  (setq projectile-completion-system 'ivy)
+  (setq projectile-completion-system 'default)
   :bind (("C-c p" . projectile-command-map)))
 #+END_SRC
 
@@ -381,38 +461,6 @@ I forget the basic keybindings all the time: After a search using =ag=, use C-c 
   :after ag
     :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
     :config (autoload 'wgrep-ag-setup "wgrep-ag"))
-#+END_SRC
-** Command completion
-#+BEGIN_SRC emacs-lisp
-  (use-package flx)
-  (use-package swiper)
-
-  (use-package smex
-    :init
-    (setq smex-save-file "~/.emacs.d/local-files/smex-items"))
-
-  (use-package counsel
-    :after smex
-    :bind (("C-x C-m" . counsel-M-x)
-           ("C-x m" . counsel-descbinds)
-           ("C-h f" . counsel-describe-function)
-           ("C-h v" . counsel-describe-variable)
-           ("C-y" . counsel-yank-pop)
-           ("C-c y" . yank)))
-
-  (use-package ivy
-    :after (flx smex swiper counsel)
-    :diminish ivy-mode
-
-    :config
-    (ivy-mode 1)
-    ;; From http://oremacs.com/2016/01/06/ivy-flx/
-    (setq ivy-re-builders-alist '((swiper . ivy--regex-plus)
-                                  (counsel-ag . ivy--regex-plus)
-                                  (ivy-switch-buffer . ivy--regex-plus)
-                                  (t . ivy--regex-fuzzy))
-          ivy-initial-inputs-alist nil
-          ivy-use-virtual-buffers t))
 #+END_SRC
 * File system browsing
 ** Dired
@@ -467,6 +515,7 @@ hadoop with tramp, please.
 #+BEGIN_SRC emacs-lisp
 (use-package tramp-hdfs :pin "melpa")
 #+END_SRC
+
 * Org-mode
 org-mode itself is in the init.el file. here's additional config for it.
 I've been having some issues exporting, so I'm actively loading libraries here.
@@ -520,8 +569,9 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 #+begin_src emacs-lisp
   (use-package org-gcal
     :pin "melpa"
-    :after (org-agenda persist)
-    :config
+    :after org-agenda
+    :init
+    (setq persist--directory-location "~/.emacs.d/local-files/")
     (setq org-gcal-dir "~/.emacs.d/local-files/org-gcal/"))
 
   (use-package calfw-gcal :pin "melpa"
@@ -590,7 +640,7 @@ I've been having some issues exporting, so I'm actively loading libraries here.
     (org-agenda-skip-scheduled-if-done t)
     (org-agenda-start-on-weekday nil)
     (org-agenda-files `(,org-gtd-directory))
-    (org-agenda-custom-commands '(("g" "org gtd" ((agenda "d") (todo "NEXT"))))))
+    (org-agenda-custom-commands '(("g" "Scheduled today and all NEXT items" ((agenda "" ((org-agenda-span 1))) (todo "NEXT"))))))
 #+END_SRC
 ** Diary
 #+BEGIN_SRC emacs-lisp
@@ -673,7 +723,7 @@ Magit is a pretty amazing interface to git.
 (use-package magit
   :bind ("C-c g" . magit-status)
   :config (setq magit-last-seen-setup-instructions "1.4.0")
-          (setq magit-completing-read-function 'ivy-completing-read)
+          (setq magit-completing-read-function 'magit-builtin-completing-read)
           (setq magit-popup-use-prefix-argument 'default))
 #+END_SRC
 **** Magit + gitflow
