@@ -329,37 +329,30 @@ avy is kinda badass.
            ("C-x j" . avy-po-mark)))
 #+END_SRC
 * Extending emacs with engines
-** input completion
-#+begin_src emacs-lisp
-  (use-package orderless
-    :config
-    (setq orderless-regexp-separator "[/\s_-]+")
-    (setq orderless-matching-styles
-          '(orderless-flex
-            orderless-strict-leading-initialism
-            orderless-regexp
-            orderless-prefixes
-            orderless-literal))
-    (setq completion-category-defaults nil)
-    (setq completion-cycle-threshold 3)
-    (setq completion-flex-nospace nil)
-    (setq completion-pcm-complete-word-inserts-delimiters t)
-    (setq completion-pcm-word-delimiters "-_./:| ")
-    (setq completion-show-help nil)
-    (setq completion-ignore-case t)
-    (setq read-buffer-completion-ignore-case t)
-    (setq read-file-name-completion-ignore-case t)
-    (setq completions-format 'vertical)   ; *Completions* buffer
-    (setq enable-recursive-minibuffers t)
-    (setq read-answer-short t)
-    (setq resize-mini-windows t))
-#+end_src
+
 ** minibuffer
 #+begin_src emacs-lisp
+    ;;   (setq completion-flex-nospace nil)
+  ;;   (setq completion-pcm-complete-word-inserts-delimiters t)
+  ;;   (setq completion-pcm-word-delimiters "-_./:| ")
+  ;;   (setq completion-show-help nil)
+    ;;   (setq completions-format 'vertical)   ; *Completions* buffer
+  ;;   (setq enable-recursive-minibuffers t)
+  ;;   (setq read-answer-short t)
+
 (use-package minibuffer
   :ensure nil
-  :after orderless
   :demand
+  :custom
+  (completion-styles '(partial-completion initials))
+  (completion-category-defaults nil)
+  (completion-cycle-threshold t)
+  (completion-ignore-case t)
+  (completion-prompt-speed-threshold 80)
+  (read-buffer-completion-ignore-case t)
+  (read-file-name-completion-ignore-case t)
+;;  (completions-format 'vertical)
+  (resize-mini-windows t)
   :config
   (file-name-shadow-mode 1)
   (minibuffer-depth-indicate-mode 1)
@@ -371,7 +364,6 @@ avy is kinda badass.
 ** Command completion
 #+BEGIN_SRC emacs-lisp
   (use-package icomplete
-    :after orderless
     :ensure nil
     :demand
     :config
