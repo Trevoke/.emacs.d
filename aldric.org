@@ -1162,17 +1162,25 @@ I maintain a tintin++ config, so this is at least convenient.
   (add-hook 'text-mode-hook 'xah-math-input-mode)
   (add-hook 'org-mode-hook 'xah-math-input-mode))
 #+END_SRC
-** COMMENT Fixing typos
+** TODO Multiple languages
+We need ~aspell~ installed on the local machine - and I just have to do ~C-x i d~ to change the dictionary to the correct language.
+** Fixing typos
 
-Commented out because Ι had some issues writing in more than just English.
+Whenever I make a typo:
+
+1. Hit C-x C-i, instead of erasing the mistake;
+2. Select the appropriate correction (thanks to Ispell);
+3. Sleep easier at night knowing I'll never see that mistake again (thanks to abbrev).
+
+This is not intended to be a good way to work on multiple languages -- but using a spellchecker for the correct language tends to help.
 
 Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
 
 #+BEGIN_SRC emacs-lisp
   (define-key ctl-x-map "\C-i"
-    #'endless/ispell-word-then-abbrev)
+    #'stag/ispell-word-then-abbrev)
 
-  (defun endless/ispell-word-then-abbrev (p)
+  (defun stag/ispell-word-then-abbrev (p)
     "Call `ispell-word', then create an abbrev for it.
   With prefix P, create local abbrev. Otherwise it will
   be global.
@@ -1204,6 +1212,7 @@ Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct
                      bef aft (if p "loc" "glob")))
         (user-error "No typo at or before point"))))
 
+  (setq abbrev-file-name "~/.emacs.d/local-files/abbrev_defs")
   (setq save-abbrevs 'silently)
   (setq-default abbrev-mode t)
 #+END_SRC
