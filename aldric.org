@@ -605,7 +605,8 @@ I've been having some issues exporting, so I'm actively loading libraries here.
     ;; org-edna is used to make sure that when a project task gets DONE,
     ;; the next TODO is automatically changed to NEXT.
     (org-edna-use-inheritance t)
-    (org-edna-load)
+     :config
+     (org-edna-load)
     :bind
     (("C-c d c" . org-gtd-capture) ;; add item to inbox
      ("C-c d a" . org-agenda-list) ;; see what's on your plate today
