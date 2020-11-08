@@ -1149,10 +1149,10 @@ auto-upcase SQL keywords as I type, please.
   (add-hook 'sql-mode-hook 'sqlup-mode)
   (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 #+END_SRC
-** tintin
+** TODO tintin (get marmalade working again?)
 I maintain a tintin++ config, so this is at least convenient.
 #+BEGIN_SRC emacs-lisp
-(use-package tintin-mode :pin "marmalade")
+;; (use-package tintin-mode :pin "marmalade")
 #+END_SRC
 * Writing
 ** Symbols
