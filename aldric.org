@@ -13,7 +13,7 @@ This is here so it's easier for me to remember what Ι need to set up on a new m
 #+begin_src emacs-lisp
 (setq stag-easy-hugo-basedir "~/src/projects/trevoke.github.io-source")
 (setq stag-easy-hugo-root "~/src/projects/trevoke.github.io")
-(setq stag-org-reveal-root "file:///~/src/vendor/reveal.js-3.8.0")
+(setq stag-org-reveal-root "/home/stag/mnt/internal/src/vendor/reveal.js")
 
 (setq stag-org-directory "~/my-life/orgnotes/")
 
@@ -67,11 +67,43 @@ I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
 #+BEGIN_SRC emacs-lisp
 (use-package paradox)
 #+END_SRC
-** Yes/No => y/n
+** Quality of life
+*** Yes/No => y/n
 #+BEGIN_SRC emacs-lisp
 (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
-** Visual choices
+*** Backups
+Centralize emacs backups. This directory is gitignored.
+#+BEGIN_SRC emacs-lisp
+(setq backup-directory-alist '(("." . "~/.emacs.d/local-files/backups")))
+#+END_SRC
+And I'm not super-worried about old backups and other such things, so I'll just tell emacs to stop worrying about it.
+#+BEGIN_SRC emacs-lisp
+(setq delete-old-versions -1)
+(setq version-control t)
+(setq vc-make-backup-files t)
+(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/local-files/auto-save-list/" t)))
+#+END_SRC
+*** Recent files
+#+begin_src emacs-lisp
+(use-package recentf
+  :ensure nil
+  :init
+  (setq recentf-save-file "~/.emacs.d/local-files/recentf"))
+#+end_src
+*** History
+Stolen from https://www.wisdomandwonder.com/wp-content/uploads/2014/03/C3F.html
+#+BEGIN_SRC emacs-lisp
+(setq savehist-file "~/.emacs.d/local-files/savehist")
+(savehist-mode 1)
+(setq history-delete-duplicates t)
+(setq savehist-save-minibuffer-history 1)
+(setq savehist-additional-variables
+      '(kill-ring
+        search-ring
+        regexp-search-ring))
+#+END_SRC
+*** Visual choices
 #+BEGIN_SRC emacs-lisp
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message t)
@@ -94,44 +126,13 @@ This shows the file path in the GUI header
                              (abbreviate-file-name (buffer-file-name))
                            "%f"))))
 #+END_SRC
-** Backups
-Centralize emacs backups. This directory is gitignored.
-#+BEGIN_SRC emacs-lisp
-(setq backup-directory-alist '(("." . "~/.emacs.d/local-files/backups")))
-#+END_SRC
-And I'm not super-worried about old backups and other such things, so I'll just tell emacs to stop worrying about it.
-#+BEGIN_SRC emacs-lisp
-(setq delete-old-versions -1)
-(setq version-control t)
-(setq vc-make-backup-files t)
-(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/local-files/auto-save-list/" t)))
-#+END_SRC
-** Recent files
-#+begin_src emacs-lisp
-(use-package recentf
-  :ensure nil
-  :init
-  (setq recentf-save-file "~/.emacs.d/local-files/recentf"))
-#+end_src
-** Bookmarks
+*** Bookmarks
 #+begin_src emacs-lisp
 (use-package bookmark
   :ensure nil
   :init
   (setq bookmark-default-file "~/.emacs.d/local-files/bookmarks"))
 #+end_src
-** History
-Stolen from https://www.wisdomandwonder.com/wp-content/uploads/2014/03/C3F.html
-#+BEGIN_SRC emacs-lisp
-(setq savehist-file "~/.emacs.d/local-files/savehist")
-(savehist-mode 1)
-(setq history-delete-duplicates t)
-(setq savehist-save-minibuffer-history 1)
-(setq savehist-additional-variables
-      '(kill-ring
-        search-ring
-        regexp-search-ring))
-#+END_SRC
 ** TODO Window config (Put OSX stuff somewhere else)
 I don't really care about any of the extra details - emacs helps me out enough in other ways.
 #+BEGIN_SRC emacs-lisp
@@ -330,66 +331,53 @@ avy is kinda badass.
            ("C-x j" . avy-po-mark)))
 #+END_SRC
 * Extending emacs with engines
-
 ** minibuffer
 #+begin_src emacs-lisp
-    ;;   (setq completion-flex-nospace nil)
-  ;;   (setq completion-pcm-complete-word-inserts-delimiters t)
-  ;;   (setq completion-pcm-word-delimiters "-_./:| ")
-  ;;   (setq completion-show-help nil)
-    ;;   (setq completions-format 'vertical)   ; *Completions* buffer
-  ;;   (setq enable-recursive-minibuffers t)
-  ;;   (setq read-answer-short t)
-
-(use-package minibuffer
-  :ensure nil
-  :demand
-  :custom
-  (completion-styles '(partial-completion initials))
-  (completion-category-defaults nil)
-  (completion-cycle-threshold t)
-  (completion-ignore-case t)
-  (completion-prompt-speed-threshold 80)
-  (read-buffer-completion-ignore-case t)
-  (read-file-name-completion-ignore-case t)
-;;  (completions-format 'vertical)
-  (resize-mini-windows t)
-  :config
-  (file-name-shadow-mode 1)
-  (minibuffer-depth-indicate-mode 1)
-  (minibuffer-electric-default-mode 1)
-  :bind (("C-x C-m" . execute-extended-command)))
-
-
-#+end_src
-** Command completion
-#+BEGIN_SRC emacs-lisp
-  (use-package icomplete
+  (use-package minibuffer
     :ensure nil
     :demand
     :config
-    (setq icomplete-delay-completions-threshold 100)
-    (setq icomplete-max-delay-chars 2)
-    (setq icomplete-compute-delay 0.2)
-    (setq icomplete-show-matches-on-no-input t)
-    (setq icomplete-hide-common-prefix nil)
-    (setq icomplete-prospects-height 1)
-    (setq icomplete-separator (propertize " · " 'face 'shadow))
-    ;; (setq icomplete-separator " │ ")
-    ;; (setq icomplete-separator " ┆ ")
-    ;; (setq icomplete-separator " ¦ ")
-    ;; (setq icomplete-separator " ┆ ")
-    (setq icomplete-with-completion-tables t)
-    (setq icomplete-tidy-shadowed-file-names t)
-    (icomplete-mode 1))
+    (file-name-shadow-mode 1)
+    (minibuffer-depth-indicate-mode 1)
+    (minibuffer-electric-default-mode 1)
+    :bind (("C-x C-m" . execute-extended-command)))
 
-  (use-package icomplete-vertical
-    :after (minibuffer icomplete)
-    :config
-    (setq icomplete-vertical-prospects-height 10)
-    (setq icomplete-prospects-height 10)
-    (icomplete-vertical-mode 1))
+  (use-package marginalia
+    :after (selectrum embark consult)
+    :init
+    (marginalia-mode)
+    (advice-add #'marginalia-cycle :after
+                (lambda () (when (bound-and-true-p selectrum-mode) (selectrum-exhibit 'keep-selected)))))
+#+end_src
+** Command completion
+#+BEGIN_SRC emacs-lisp
+  (use-package selectrum
+    :after minibuffer
+    :init
+    (selectrum-mode +1)
+    :custom
+    (completion-styles '(flex basic partial-completion emacs22)))
+
+  (use-package selectrum-prescient
+    :after selectrum
+    :init
+    (selectrum-prescient-mode +1)
+    (prescient-persist-mode +1)
+    :custom
+    (prescient-sort-length-enable nil)
+    (prescient-filter-method '(literal initialism anchored fuzzy)))
 #+END_SRC
+** Input completion
+#+begin_src emacs-lisp
+  (use-package consult
+  :after selectrum)
+#+end_src
+** Actions
+#+begin_src emacs-lisp
+    (use-package embark)
+  (use-package embark-consult
+  :after (embark consult))
+#+end_src
 ** Text Completion
 *** company-mode
 #+BEGIN_SRC emacs-lisp
