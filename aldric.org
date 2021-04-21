@@ -725,6 +725,10 @@ With this configuration, using C-f in a status buffer will trigger the gitflow s
   :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
 #+END_SRC
 * Programming
+** Terminal
+#+begin_src elisp
+(use-package vterm :pin melpa)
+#+end_src
 ** TODO get a LSP configuration going in here
 ** Folding code
 #+BEGIN_SRC emacs-lisp
