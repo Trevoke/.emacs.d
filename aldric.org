@@ -546,6 +546,15 @@ I've been having some issues exporting, so I'm actively loading libraries here.
   (org-defkey org-mode-map "\C-cr" 'org-refile)
 #+END_SRC
 
+** Weiqi
+Note - package is downloaded manually
+source is https://github.com/misohena/el-igo
+#+begin_src emacs-lisp
+  (use-package igo-org
+    :load-path "packages/el-igo-master"
+    :config
+    (igo-org-setup))
+#+end_src
 * GTD (Getting Things Done)
 #+begin_src emacs-lisp
   (defun stag-gtd-sync()
@@ -1379,14 +1388,4 @@ This is the buffer I see when I start up emacs.
   (add-hook 'after-init-hook (lambda ()
                                (org-agenda nil "g")
                                (delete-other-windows)))
-#+end_src
-
-* Weiqi
-Note - package is downloaded manually
-source is https://github.com/misohena/el-igo
-#+begin_src emacs-lisp
-  (use-package igo-org
-    :load-path "packages/el-igo-master"
-    :config
-    (igo-org-setup))
 #+end_src
