@@ -3,11 +3,14 @@
 (setq package-enable-at-startup nil)
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")
+                         ;; ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa-stable" . "https://stable.melpa.org/packages/")
                          ("gnu" . "https://elpa.gnu.org/packages/")
                          ("org" . "http://orgmode.org/elpa/")))
 (package-initialize)
+
+(setq package-archive-priorities
+      '(("melpa-stable" . 10000)))
 
 ;; Bootstrap `use-package'
 (unless (package-installed-p 'use-package)
@@ -19,7 +22,7 @@
 (setq straight-base-dir "~/.emacs.d/local-files/")
 (defvar bootstrap-version)
 (let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" "~/.emacs.d/local-files/")) 
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" "~/.emacs.d/local-files/"))
       (bootstrap-version 5))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer

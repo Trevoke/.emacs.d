@@ -38,14 +38,14 @@ In addition, I do keep some somewhat computer-specific stuff in there, like the 
 (load custom-file t) ;; t means no error if file does not exist
 #+END_SRC
 ** Additional paths
+*** Packages (without package management)
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/packages")
+#+END_SRC
 *** Themes
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 ;; (load-theme 'mejelly t)
-#+END_SRC
-*** Packages (without package management)
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/packages")
 #+END_SRC
 *** Secrets
 API keys, passwords, etc are kept in here. This file is .gitignored.
@@ -278,8 +278,7 @@ This handy little package increases the size of the font in the whole frame.
 #+END_SRC
 ** Color themes
 #+BEGIN_SRC emacs-lisp
-(use-package modus-operandi-theme :defer t)
-(use-package modus-vivendi-theme :defer t)
+(use-package modus-themes :defer t)
 #+END_SRC
 
 ** Define text interactions
@@ -546,8 +545,82 @@ I've been having some issues exporting, so I'm actively loading libraries here.
   (global-set-key "\C-cb" 'org-switchb)
   (org-defkey org-mode-map "\C-cr" 'org-refile)
 #+END_SRC
-** Calendar
+
+* GTD (Getting Things Done)
 #+begin_src emacs-lisp
+  (defun stag-gtd-sync()
+    (interactive)
+    (org-gcal-sync)
+    (notmuch-poll))
+#+end_src
+#+BEGIN_SRC emacs-lisp
+  (use-package org-gtd
+    :after org
+    :demand t
+    :pin melpa
+    :custom
+    ;; where org-gtd will put its files. This value is also the default one.
+    (org-gtd-directory stag-org-gtd-directory)
+    ;; package: https://github.com/Malabarba/org-agenda-property
+    ;; this is so you can see who an item was delegated to in the agenda
+    (org-agenda-property-list '("DELEGATED_TO"))
+    ;; I think this makes the agenda easier to read
+    (org-agenda-property-position 'next-line)
+    ;; package: https://www.nongnu.org/org-edna-el/
+    ;; org-edna is used to make sure that when a project task gets DONE,
+    ;; the next TODO is automatically changed to NEXT.
+    (org-edna-use-inheritance t)
+     :config
+     (org-edna-load)
+    :bind
+    (("C-c d c" . org-gtd-capture) ;; add item to inbox
+     ;; ("C-c d a" . (org-agenda nil "g")) ;; see what's on your plate today
+     ("C-c d p" . org-gtd-process-inbox) ;; process entire inbox
+     ("C-c d n" . org-gtd-show-all-next) ;; see all NEXT items
+     ("C-c d s" . org-gtd-show-stuck-projects)) ;; see projects that don't have a NEXT item
+    :init
+    ;; the keybinding to hit when you're done editing an item in the processing phase
+    (bind-key "C-c c" 'org-gtd-clarify-finalize))
+#+END_SRC
+** Agenda
+#+BEGIN_SRC emacs-lisp
+  (defun stag-org-agenda ()
+    (interactive)
+    (org-agenda nil "g"))
+
+  (use-package org-agenda
+    :ensure nil
+    :no-require t
+    :after (org-gtd)
+    ;; :demand t
+    :bind
+    (("C-c d a" . stag-org-agenda))
+    :custom
+    (org-agenda-diary-file 'diary-file)
+    (org-agenda-include-diary t)
+    (org-agenda-restore-windows-after-quit t)
+    (org-agenda-sticky t)
+    (org-agenda-window-setup 'other-window)
+    (org-agenda-skip-deadline-if-done t)
+    (org-agenda-skip-scheduled-if-done t)
+    (org-agenda-start-on-weekday nil)
+    (org-agenda-files `(,org-gtd-directory))
+    (org-agenda-custom-commands '(("g" "Scheduled today and all NEXT items" ((agenda "" ((org-agenda-span 1))) (todo "NEXT"))))))
+#+END_SRC
+** Diary
+#+BEGIN_SRC emacs-lisp
+(setq diary-file (concat org-directory "diary-file.org"))
+
+(setq view-diary-entries-initially t
+      mark-diary-entries-in-calendar t
+      diary-number-of-entries 7)
+(add-hook 'diary-display-hook 'diary-fancy-display)
+#+END_SRC
+** Calendar, dates, times
+#+BEGIN_SRC emacs-lisp
+  (setq calendar-week-start-day 1) ;; Monday
+  (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
+
   (use-package org-gcal
     :pin "melpa"
     :after org-agenda
@@ -573,70 +646,6 @@ I've been having some issues exporting, so I'm actively loading libraries here.
           cfw:fchar-top-junction ?┯
           cfw:fchar-top-left-corner ?┏
           cfw:fchar-top-right-corner ?┓))
-#+end_src
-* GTD (Getting Things Done)
-#+BEGIN_SRC emacs-lisp
-
-  (use-package org-gtd
-    :after org
-    :demand t
-    :pin melpa
-    :custom
-    ;; where org-gtd will put its files. This value is also the default one.
-    (org-gtd-directory stag-org-gtd-directory)
-    ;; package: https://github.com/Malabarba/org-agenda-property
-    ;; this is so you can see who an item was delegated to in the agenda
-    (org-agenda-property-list '("DELEGATED_TO"))
-    ;; I think this makes the agenda easier to read
-    (org-agenda-property-position 'next-line)
-    ;; package: https://www.nongnu.org/org-edna-el/
-    ;; org-edna is used to make sure that when a project task gets DONE,
-    ;; the next TODO is automatically changed to NEXT.
-    (org-edna-use-inheritance t)
-     :config
-     (org-edna-load)
-    :bind
-    (("C-c d c" . org-gtd-capture) ;; add item to inbox
-     ("C-c d a" . org-agenda-list) ;; see what's on your plate today
-     ("C-c d p" . org-gtd-process-inbox) ;; process entire inbox
-     ("C-c d n" . org-gtd-show-all-next) ;; see all NEXT items
-     ("C-c d s" . org-gtd-show-stuck-projects)) ;; see projects that don't have a NEXT item
-    :init
-    ;; the keybinding to hit when you're done editing an item in the processing phase
-    (bind-key "C-c c" 'org-gtd-clarify-finalize))
-#+END_SRC
-** Agenda
-#+BEGIN_SRC emacs-lisp
-  (use-package org-agenda
-    :ensure nil
-    :no-require t
-    :after (org-gtd)
-    ;; :demand t
-    :custom
-    (org-agenda-diary-file 'diary-file)
-    (org-agenda-include-diary t)
-    (org-agenda-restore-windows-after-quit t)
-    (org-agenda-sticky t)
-    (org-agenda-window-setup 'other-window)
-    (org-agenda-skip-deadline-if-done t)
-    (org-agenda-skip-scheduled-if-done t)
-    (org-agenda-start-on-weekday nil)
-    (org-agenda-files `(,org-gtd-directory))
-    (org-agenda-custom-commands '(("g" "Scheduled today and all NEXT items" ((agenda "" ((org-agenda-span 1))) (todo "NEXT"))))))
-#+END_SRC
-** Diary
-#+BEGIN_SRC emacs-lisp
-(setq diary-file (concat org-directory "diary-file.org"))
-
-(setq view-diary-entries-initially t
-      mark-diary-entries-in-calendar t
-      diary-number-of-entries 7)
-(add-hook 'diary-display-hook 'diary-fancy-display)
-#+END_SRC
-** Calendar, dates, times
-#+BEGIN_SRC emacs-lisp
-(setq calendar-week-start-day 1) ;; Monday
-(add-hook 'today-visible-calendar-hook 'calendar-mark-today)
 #+END_SRC
 
 ** Action Tags
@@ -865,10 +874,6 @@ And let's have gofmt chew my code when I save the file.
 - (use-package gore-mode)
 - (use-package gorepl-mode)
 - (use-package gotest)
-** Haskell
-#+BEGIN_SRC emacs-lisp
-(use-package intero :pin "melpa-stable")
-#+END_SRC
 ** HTML
 *** Web-mode                                               :external:major:
 Here are all the extensions where I want web-mode enabled
@@ -1370,4 +1375,14 @@ This is the buffer I see when I start up emacs.
   (add-hook 'after-init-hook (lambda ()
                                (org-agenda nil "g")
                                (delete-other-windows)))
+#+end_src
+
+* Weiqi
+Note - package is downloaded manually
+source is https://github.com/misohena/el-igo
+#+begin_src emacs-lisp
+  (use-package igo-org
+    :load-path "packages/el-igo-master"
+    :config
+    (igo-org-setup))
 #+end_src
