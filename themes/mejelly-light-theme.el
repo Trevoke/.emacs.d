@@ -180,8 +180,8 @@
 
    `(mode-line                               ((,class ( :foreground ,mejelly-light-fg
                                                         :background ,mejelly-light-yellow-3))))
-   `(mode-line-inactive                      ((,class ( :foreground ,mejelly-light-grey-3
-                                                        :background nil))))
+   `(mode-line-inactive                      ((,class ( :foreground ,mejelly-light-grey-1
+                                                        :background ,mejelly-light-grey-2))))
 
    `(org-hide                                ((,class ( :foreground ,mejelly-light-bg))))
    `(org-checkbox                            ((,class ( :foreground ,mejelly-light-green-0))))
