@@ -5,8 +5,7 @@
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ;; ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa-stable" . "https://stable.melpa.org/packages/")
-                         ("gnu" . "https://elpa.gnu.org/packages/")
-                         ("org" . "http://orgmode.org/elpa/")))
+                         ("gnu" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
 
 (setq package-archive-priorities
