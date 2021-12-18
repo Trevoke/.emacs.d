@@ -50,7 +50,7 @@ In addition, I do keep some somewhat computer-specific stuff in there, like the 
 *** Secrets
 API keys, passwords, etc are kept in here. This file is .gitignored.
 #+BEGIN_SRC emacs-lisp
-(load "~/.emacs.d/.emacs.secrets" t)
+(load "~/.emacs.secrets" t)
 #+END_SRC
 *** executable versioning (mostly programming languages)
 #+BEGIN_SRC elisp
@@ -273,7 +273,8 @@ This handy little package increases the size of the font in the whole frame.
 #+END_SRC
 ** Color themes
 #+BEGIN_SRC emacs-lisp
-(use-package modus-themes :defer t)
+  (use-package solarized-theme :defer t)
+  (use-package modus-themes :defer t)
 #+END_SRC
 
 ** Define text interactions
@@ -404,7 +405,6 @@ Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes
 Projectile is pretty sweet.
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
-  :after icomplete
   :diminish projectile-mode
   :init
   (setq projectile-known-projects-file "~/.emacs.d/local-files/projectile-bookmarks.eld")
@@ -496,24 +496,25 @@ org-mode itself is in the init.el file. here's additional config for it.
 I've been having some issues exporting, so I'm actively loading libraries here.
 #+BEGIN_SRC emacs-lisp
 
-;; have to do this because org comes preinstalled with emacs
-(advice-add 'package-installed-p :around 'package-from-archive)
-(use-package org
-  :pin "org"
-  :ensure org-plus-contrib
-  :init
-  (setq org-directory stag-org-directory)
-  (setq org-id-track-globally t)
-  (setq org-id-locations-file "~/.emacs.d/local-files/.org-id-locations"))
-(advice-remove 'package-installed-p 'package-from-archive)
+;;  have to do this because org comes preinstalled with emacs
+  (advice-add 'package-installed-p :around 'package-from-archive)
+  (use-package org
+    :pin "gnu"
+    :init
+    (setq org-directory stag-org-directory)
+    (setq org-id-track-globally t)
+    (setq org-id-locations-file "~/.emacs.d/local-files/.org-id-locations"))
+  (advice-remove 'package-installed-p 'package-from-archive)
 
-(use-package org-macro :ensure nil :after org)
-(use-package ob-exp :ensure nil :after org)
-(use-package org-compat :ensure nil :after org)
-(use-package ox :ensure nil :after org)
-(use-package ox-md :ensure nil :after ox)
+  (use-package ol-notmuch)
 
-;; (use-package ox-pandoc)
+  (use-package org-macro :ensure nil :after org)
+  (use-package ob-exp :ensure nil :after org)
+  (use-package org-compat :ensure nil :after org)
+  (use-package ox :ensure nil :after org)
+  (use-package ox-md :ensure nil :after ox)
+
+;  (use-package ox-pandoc)
 #+END_SRC
 ** Generic org-mode configuration
 #+BEGIN_SRC emacs-lisp
@@ -532,7 +533,7 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 #+END_SRC
 ** Adding images
 #+BEGIN_SRC emacs-lisp
-  (use-package org-download)
+  (use-package org-download :pin "melpa")
 #+END_SRC
 ** keybindings
 #+BEGIN_SRC emacs-lisp
@@ -561,30 +562,23 @@ source is https://github.com/misohena/el-igo
   (use-package org-gtd
     :after org
     :demand t
-    :pin melpa
+    :load-path "~/src/projects/org-gtd.el"
     :custom
-    ;; where org-gtd will put its files. This value is also the default one.
+    ;; where org-gtd will put its files.
     (org-gtd-directory stag-org-gtd-directory)
-    ;; package: https://github.com/Malabarba/org-agenda-property
-    ;; this is so you can see who an item was delegated to in the agenda
-    (org-agenda-property-list '("DELEGATED_TO"))
-    ;; I think this makes the agenda easier to read
     (org-agenda-property-position 'next-line)
-    ;; package: https://www.nongnu.org/org-edna-el/
-    ;; org-edna is used to make sure that when a project task gets DONE,
-    ;; the next TODO is automatically changed to NEXT.
     (org-edna-use-inheritance t)
-     :config
-     (org-edna-load)
+    :config
+    (org-edna-mode)
     :bind
     (("C-c d c" . org-gtd-capture) ;; add item to inbox
-     ;; ("C-c d a" . (org-agenda nil "g")) ;; see what's on your plate today
-     ("C-c d p" . org-gtd-process-inbox) ;; process entire inbox
+     ("C-c d p" . org-gtd-process-inbox) ;; process inbox
      ("C-c d n" . org-gtd-show-all-next) ;; see all NEXT items
      ("C-c d s" . org-gtd-show-stuck-projects)) ;; see projects that don't have a NEXT item
     :init
     ;; the keybinding to hit when you're done editing an item in the processing phase
-    (bind-key "C-c c" 'org-gtd-clarify-finalize))
+    :bind (:map org-gtd-process-map
+                ("C-c c" . org-gtd-choose)))
 #+END_SRC
 ** Agenda
 #+BEGIN_SRC emacs-lisp
@@ -609,7 +603,7 @@ source is https://github.com/misohena/el-igo
     (org-agenda-skip-scheduled-if-done t)
     (org-agenda-start-on-weekday nil)
     (org-agenda-files `(,org-gtd-directory))
-    (org-agenda-custom-commands '(("g" "Scheduled today and all NEXT items" ((agenda "" ((org-agenda-span 1))) (todo "NEXT"))))))
+    (org-agenda-custom-commands '(("g" "Scheduled today and all NEXT items" ((agenda "" ((org-agenda-span 1))) (todo "NEXT|WAIT"))))))
 #+END_SRC
 ** Diary
 #+BEGIN_SRC emacs-lisp
@@ -669,45 +663,62 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
     (setq org-default-notes-file (concat org-directory "notes.org"))
 
     (setq org-capture-templates `(("i" "Inbox"
-                                 entry (file ,(org-gtd--path org-gtd-inbox-file-basename))
+                                 entry (file ,(org-gtd-inbox-path))
                                  "* %?\n%U\n\n  %i"
                                  :kill-buffer t)
                                 ("t" "Todo with link"
-                                 entry (file ,(org-gtd--path org-gtd-inbox-file-basename))
+                                 entry (file ,(org-gtd-inbox-path))
                                  "* %?\n%U\n\n  %i\n  %a"
                                  :kill-buffer t))))
 #+END_SRC
 ** Refiling
 #+BEGIN_SRC emacs-lisp
-  (setq org-refile-use-outline-path 'file)
+  (setq org-refile-use-outline-path nil)
   (setq org-outline-path-complete-in-steps nil)
-  (setq org-refile-allow-creating-parent-nodes t)
+  (setq org-refile-allow-creating-parent-nodes nil)
   (setq org-log-refile 'time)
 #+END_SRC
 ** references - org-roam
 #+BEGIN_SRC emacs-lisp
-(use-package org-roam
-      :pin melpa
-      :after org
-      :init
-      (setq org-roam-db-location stag-org-roam-db-location)
-      :hook
-      (after-init . org-roam-mode)
-      :custom
-      (org-roam-directory stag-org-roam-directory)
-      :bind
-      ("C-c n l" . org-roam)
-      ("C-c n t" . org-roam-today)
-      ("C-c n f" . org-roam-find-file)
-      ("C-c n i" . org-roam-insert)
-      ("C-c n g" . org-roam-show-graph))
+  (use-package org-roam
+    :pin melpa
+    :after org
+    :ensure t
+    :init
+    (setq org-roam-db-location stag-org-roam-db-location
+          org-roam-v2-ack t)
+    :config
+    (org-roam-db-autosync-mode)
+    :hook
+    (after-init . org-roam-mode)
+    :custom
+    (org-roam-directory stag-org-roam-directory)
+    :bind
+    ("C-c n l" . org-roam-buffer-toggle)
+    ("C-c n t" . org-roam-dailies-goto-today)
+    ("C-c n f" . org-roam-node-find)
+    ("C-c n i" . org-roam-node-insert)
+    ("C-c n g" . org-roam-graph))
+
+  (use-package org-roam-ui
+    :pin "melpa"
+    :ensure t
+    :after org-roam
+
+    :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+
+  (use-package org-roam-timestamps
+    :pin "melpa"
+    :after org-roam
+    :config (org-roam-timestamps-mode))
 #+END_SRC
 * Version control
 ** Git
-*** Editing various git files
-#+BEGIN_SRC emacs-lisp
-(use-package gitconfig-mode)
-#+END_SRC
 *** Walking through a file's history
 #+BEGIN_SRC emacs-lisp
 (use-package git-timemachine)
@@ -730,6 +741,18 @@ With this configuration, using C-f in a status buffer will trigger the gitflow s
 #+END_SRC
 * Programming
 ** TODO get a LSP configuration going in here
+#+begin_src elisp
+  (use-package lsp-mode
+    :commands lsp
+    :ensure t
+    :diminish lsp-mode
+    :hook
+    (elixir-mode . lsp)
+    :init
+    (add-to-list 'exec-path "/home/stag/src/vendor/elixir-ls-1.11")
+    :custom
+    (lsp-keymap-prefix "C-c i"))
+#+end_src
 ** Folding code
 #+BEGIN_SRC emacs-lisp
   (use-package origami
@@ -1074,65 +1097,7 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 - (use-package ruby-hash-syntax)
 - (use-package ruby-refactor)
 - (use-package yaml-mode)
-** Rust
-#+BEGIN_SRC emacs-lisp
-  (use-package rust-mode
-    :pin "melpa"
-    :init
-    (add-hook 'rust-mode-hook 'stag-code-modes-hook)
-    (add-hook 'rust-mode-hook 'flycheck-mode)
-    (add-hook 'rust-mode-hook 'flymake-mode))
-
-    (use-package flycheck-rust
-      :after rust-mode
-      :pin "melpa")
-
-    (use-package flymake-rust
-      :after rust-mode
-      :pin "melpa")
-
-    (use-package cargo
-      :after rust-mode)
-#+END_SRC
 ** Shells
-*** Generic shell things
-**** TODO setup for shell
-try ~native-complete~
-**** Existing
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package shell-command
-  ;;   :pin "melpa"
-  ;;   :init (add-hook 'shell-mode-hook 'shell-command-completion-mode))
-#+END_SRC
-#+BEGIN_SRC emacs-lisp
-(use-package xterm-color
-  :config
-  (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
-  (setq comint-output-filter-functions (remove 'ansi-color-process-output comint-output-filter-functions)))
-#+END_SRC
-*** Bash
-#+BEGIN_SRC emacs-lisp
-  (setq explicit-bash-args '("--noediting" "--login" "-i"))
-  (require 'em-smart)
-
-  (use-package bash-completion :config (bash-completion-setup))
-
-  ;; (defadvice ansi-term (after advise-ansi-term-coding-system)
-  ;;     (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
-  ;; (ad-activate 'ansi-term)
-#+END_SRC
-*** Eshell
-#+BEGIN_SRC emacs-lisp
-(defun eshell/clear ()
-  "Clear the eshell buffer."
-  (let ((inhibit-read-only t))
-    (erase-buffer)
-    (eshell-send-input)))
-
-(use-package eshell-did-you-mean
-  :config
-  (eshell-did-you-mean-setup))
-#+END_SRC
 *** Fish
 #+BEGIN_SRC emacs-lisp
 (use-package fish-mode)
@@ -1156,14 +1121,7 @@ I maintain a tintin++ config, so this is at least convenient.
 ;; (use-package tintin-mode :pin "marmalade")
 #+END_SRC
 * Writing
-** Symbols
-#+BEGIN_SRC emacs-lisp
-(use-package xah-math-input
-  :pin "melpa"
-  :init
-  (add-hook 'text-mode-hook 'xah-math-input-mode)
-  (add-hook 'org-mode-hook 'xah-math-input-mode))
-#+END_SRC
+** TODO Symbols
 ** TODO Multiple languages
 We need ~aspell~ installed on the local machine - and I just have to do ~C-x i d~ to change the dictionary to the correct language.
 ** Fixing typos
@@ -1377,10 +1335,3 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
 #+BEGIN_SRC emacs-lisp
 (setq erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
 #+END_SRC
-* Dashboard
-This is the buffer I see when I start up emacs.
-#+begin_src emacs-lisp
-  (add-hook 'after-init-hook (lambda ()
-                               (org-agenda nil "g")
-                               (delete-other-windows)))
-#+end_src
