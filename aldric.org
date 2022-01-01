@@ -6,9 +6,9 @@
 Welcome to my emacs configuration.
 I tinker with this file a lot, so I need a quick way to get to it.
 I set a [[*Bookmarks][bookmark]] with =C-x r m= and I can get back here with =C-x r b=
-** TODO Minor modes?
-I could create here some empty minor modes based on how I think about a buffer, hook those to whatever major modes I care about, and then just hook to the minor mode everywhere else in my configuration.
-* External links
+** Personal information
+Stored in ~~/.emacs.d/.emacs.secrets~.
+* External references and directories
 This is here so it's easier for me to remember what Ι need to set up on a new machine. You'd think a script would be better. Yep. Script is next.
 #+begin_src emacs-lisp
 (setq stag-easy-hugo-basedir "~/src/projects/trevoke.github.io-source")
@@ -21,10 +21,29 @@ This is here so it's easier for me to remember what Ι need to set up on a new m
 (setq stag-org-roam-directory "~/my-life/orgnotes/roam")
 (setq stag-org-roam-db-location "~/.emacs.d/local-files/org-roam.db")
 (setq stag-bbdb-file "~/my-life/orgnotes/bbdb/big-brother-database")
-(setq stag-org-brain-directory "~/my-life/from-dropbox/orgnotes/brain")
 #+end_src
-* Personal information
-Stored in ~~/.emacs.d/.emacs.secrets~.
+* Package management
+** Quelpa & Use-package
+I use [[https://github.com/jwiegley/use-package][use-package]], because:
+1. it's got a nice and concise macro interface
+2. it allows me to set up emacs on any OS I desire more easily than other options I've encountered so far
+
+[[https://github.com/quelpa/quelpa][Quelpa]] lets me pull from specific source code repos and branches beyond the existing package repositories, which is sometimes convenient.
+
+See the [[init.el]] file for these things.
+
+** PATH
+OSX is not friendly. This makes sure emacs properly gets the full path from the user environment.
+#+begin_src emacs-lisp
+  (when (memq window-system '(mac ns))
+    (use-package exec-path-from-shell
+      :config
+      (exec-path-from-shell-initialize)))
+#+end_src
+** A new package browser
+#+BEGIN_SRC emacs-lisp
+(use-package paradox)
+#+END_SRC
 * General emacs config
 ** Low-level behavior
 #+begin_src emacs-lisp
@@ -34,7 +53,7 @@ Stored in ~~/.emacs.d/.emacs.secrets~.
 Keeping these separate makes life easier: they get modified when I load a theme and such, and I don't need that kind of hassle when maintaining my actual configuration, you know?
 In addition, I do keep some somewhat computer-specific stuff in there, like the font, and it's just easier to have this separated there.
 #+BEGIN_SRC emacs-lisp
-(setq custom-file "~/.emacs-custom.el")
+(setq custom-file "~/.emacs.d/local-files/emacs-custom.el")
 (load custom-file t) ;; t means no error if file does not exist
 #+END_SRC
 ** Additional paths
@@ -53,19 +72,9 @@ API keys, passwords, etc are kept in here. This file is .gitignored.
 (load "~/.emacs.secrets" t)
 #+END_SRC
 *** executable versioning (mostly programming languages)
-#+BEGIN_SRC elisp
+#+begin_src emacs-lisp
   (setenv "PATH" (concat (getenv "PATH") ":~/.asdf/shims"))
   (setq exec-path (append exec-path '("~/.asdf/shims")))
-#+END_SRC
-** Package management
-*** The package manager: =use-package=
-I use [[https://github.com/jwiegley/use-package][=use-package=]], because:
-1. it is integrated within emacs.
-2. it allows me to set up emacs on any OS I desire more easily than other options I've encountered so far
-3. it allows me to easily share / steal configuration snippets
-*** A new package browser
-#+BEGIN_SRC emacs-lisp
-(use-package paradox)
 #+END_SRC
 ** Quality of life
 *** Yes/No => y/n
@@ -79,44 +88,48 @@ Centralize emacs backups. This directory is gitignored.
 #+END_SRC
 And I'm not super-worried about old backups and other such things, so I'll just tell emacs to stop worrying about it.
 #+BEGIN_SRC emacs-lisp
-(setq delete-old-versions -1)
-(setq version-control t)
-(setq vc-make-backup-files t)
-(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/local-files/auto-save-list/" t)))
+  (setq delete-old-versions -1)
+  (setq version-control t)
+  (setq vc-make-backup-files t)
+  (setq auto-save-file-name-transforms
+        '((".*" "~/.emacs.d/local-files/auto-save-list/" t)))
+  (setq auto-save-list-file-prefix
+        "~/.emacs.d/local-files/auto-save-list/.saves-")
 #+END_SRC
 *** Recent files
 #+begin_src emacs-lisp
-(use-package recentf
-  :ensure nil
-  :init
-  (setq recentf-save-file "~/.emacs.d/local-files/recentf"))
+  (setq recentf-save-file "~/.emacs.d/local-files/recentf")
+  (require 'recentf)
 #+end_src
 *** History
 Stolen from https://www.wisdomandwonder.com/wp-content/uploads/2014/03/C3F.html
 #+BEGIN_SRC emacs-lisp
-(setq savehist-file "~/.emacs.d/local-files/savehist")
-(savehist-mode 1)
-(setq history-delete-duplicates t)
-(setq savehist-save-minibuffer-history 1)
-(setq savehist-additional-variables
-      '(kill-ring
-        search-ring
-        regexp-search-ring))
+  (setq savehist-file "~/.emacs.d/local-files/savehist")
+  (setq history-delete-duplicates t)
+  (setq savehist-save-minibuffer-history 1)
+  (setq savehist-additional-variables
+        '(kill-ring
+          search-ring
+          regexp-search-ring))
+  (savehist-mode 1)
 #+END_SRC
 *** Visual choices
 #+BEGIN_SRC emacs-lisp
-(setq inhibit-startup-screen t)
-(setq inhibit-startup-echo-area-message t)
-(setq inhibit-startup-message t)
-(setq initial-scratch-message nil)
-(setq inhibit-splash-screen t)
-(show-paren-mode t)
-(setq show-paren-delay 0)
-(global-hl-line-mode t)
-(setq column-number-mode t)
-(setq ring-bell-function 'ignore)
-(setq visible-bell t)
-(setq system-uses-terminfo nil)
+  (setq inhibit-startup-screen t)
+  (setq inhibit-startup-echo-area-message t)
+  (setq inhibit-startup-message t)
+  (setq initial-scratch-message nil)
+  (setq inhibit-splash-screen t)
+
+  (show-paren-mode t)
+  (setq show-paren-delay 0)
+
+  (global-hl-line-mode t)
+
+  (setq column-number-mode t)
+  (setq ring-bell-function 'ignore)
+  (setq visible-bell t)
+  (setq system-uses-terminfo nil)
 #+END_SRC
 
 This shows the file path in the GUI header
@@ -128,10 +141,8 @@ This shows the file path in the GUI header
 #+END_SRC
 *** Bookmarks
 #+begin_src emacs-lisp
-(use-package bookmark
-  :ensure nil
-  :init
-  (setq bookmark-default-file "~/.emacs.d/local-files/bookmarks"))
+  (setq bookmark-default-file "~/.emacs.d/local-files/bookmarks")
+  (require 'bookmark)
 #+end_src
 ** TODO Window config (Put OSX stuff somewhere else)
 I don't really care about any of the extra details - emacs helps me out enough in other ways.
@@ -148,9 +159,6 @@ And I've also added other OSX-specific stuff here... For now.
   (when (memq window-system '(mac ns))
     (setq mac-command-modifier 'super)
     (setq mac-option-modifier 'meta)
-    (use-package exec-path-from-shell
-      :config
-      (exec-path-from-shell-initialize))
     (setq ns-use-srgb-colorspace t)
     (menu-bar-mode t))
 #+END_SRC
@@ -200,29 +208,28 @@ Also, ibuffer is nicer than plain-old buffer window
 (setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
 (setq mouse-wheel-follow-mouse t) ;; scroll window under mouse
 #+END_SRC
-** Frame management
-*** Transparency
-#+BEGIN_SRC emacs-lisp
-(use-package seethru :pin "melpa")
-#+END_SRC
-** Window management
-*** Window layout manager (built-in to emacs)
+* Window management
+** Window layout manager (built-in to emacs)
 Prefix key is =C-x C-t=
-*** Winner-mode (undo/redo window changes)
+** Winner-mode (undo/redo window changes)
 Remember: =C-c <left>= and =C-c <right>=
 #+BEGIN_SRC emacs-lisp
 (winner-mode)
 #+END_SRC
-*** Windmove (move across windows with shift+arrow)
+** Windmove (move across windows with shift+arrow)
 #+BEGIN_SRC emacs-lisp
+(use-package windmove
+:ensure nil
+:after org
+:config
   (windmove-default-keybindings)
   (add-hook 'org-shiftup-final-hook 'windmove-up)
   (add-hook 'org-shiftleft-final-hook 'windmove-left)
   (add-hook 'org-shiftdown-final-hook 'windmove-down)
   (add-hook 'org-shiftright-final-hook 'windmove-right)
-
+)
 #+END_SRC
-*** Move to new window when splitting
+** Move to new window when splitting
 Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
 #+BEGIN_SRC emacs-lisp
 (defun stag-vsplit-last-buffer (prefix)
@@ -253,16 +260,21 @@ All it does is tell you what face is at point.
                   (get-char-property pos 'face))))
     (if face (message "Face: %s" face) (message "No face at %d" pos))))
 #+END_SRC
-*** evil-mode
-Because sometimes, vim.
-#+BEGIN_SRC emacs-lisp
-(use-package evil)
-#+END_SRC
 *** Disable C-z to minimize
 Suspend emacs？ I'll use C-x C-z.
 #+BEGIN_SRC emacs-lisp
 (global-unset-key (kbd "C-z"))
 (global-unset-key (kbd "C-x C-z"))
+#+END_SRC
+** evil-mode
+Because sometimes, vim.
+#+BEGIN_SRC emacs-lisp
+(use-package evil)
+#+END_SRC
+** Frame management
+*** Transparency
+#+BEGIN_SRC emacs-lisp
+(use-package seethru :pin "melpa")
 #+END_SRC
 ** text scaling
 This handy little package increases the size of the font in the whole frame.
@@ -325,6 +337,60 @@ avy is kinda badass.
     :bind (("C-c j" . avy-goto-char-2)
            ("C-x j" . avy-po-mark)))
 #+END_SRC
+* File system browsing
+** Dired
+dired-jump is awesome (C-x C-j in any buffer)
+#+BEGIN_SRC emacs-lisp
+(require 'dired-x)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+;; Changed my mind. I prefer seeing just the files:
+ (add-hook 'dired-mode-hook 'dired-hide-details-mode)
+
+;; Auto-refresh silently
+ (setq global-auto-revert-non-file-buffers t)
+ (setq auto-revert-verbose nil)
+#+END_SRC
+
+This will make dired behave kinda like a two-pane file manager: with two direds open, you can copy/rename and the default target will be the other pane.
+Using split-window-vertically from the first dired might be required to make this work.
+#+BEGIN_SRC emacs-lisp
+(setq dired-dwim-target t)
+#+END_SRC
+
+OSX.. Windows.. *sigh*.
+#+BEGIN_SRC emacs-lisp
+(setq ls-lisp-use-insert-directory-program nil)
+(require 'ls-lisp)
+#+END_SRC
+
+It's also nice to have dired with M-< and M-> take you to first and last file
+#+BEGIN_SRC emacs-lisp
+(require 'dired)
+(defun dired-back-to-top ()
+  (interactive)
+  (beginning-of-buffer)
+  (next-line 2))
+
+(define-key dired-mode-map
+  (vector 'remap 'beginning-of-buffer) 'dired-back-to-top)
+
+(defun dired-jump-to-bottom ()
+  (interactive)
+  (end-of-buffer)
+  (next-line -1))
+
+(define-key dired-mode-map
+  (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
+#+END_SRC
+** Tramp
+hadoop with tramp, please.
+=C-x C-f /hdfs:username@hadoop-server:/path/to/dir/or/file=
+#+BEGIN_SRC emacs-lisp
+(use-package tramp-hdfs :pin "melpa")
+#+END_SRC
+
 * Extending emacs with engines
 ** minibuffer
 #+begin_src emacs-lisp
@@ -353,14 +419,18 @@ avy is kinda badass.
     :custom
     (completion-styles '(flex basic partial-completion emacs22)))
 
-  (use-package selectrum-prescient
-    :after selectrum
+  (use-package prescient
     :init
-    (selectrum-prescient-mode +1)
-    (prescient-persist-mode +1)
+    (setq prescient-save-file "~/.emacs.d/local-files/prescient-save.el")
     :custom
     (prescient-sort-length-enable nil)
     (prescient-filter-method '(literal initialism anchored fuzzy)))
+
+  (use-package selectrum-prescient
+    :after (prescient selectrum)
+    :init
+    (selectrum-prescient-mode +1)
+    (prescient-persist-mode +1))
 #+END_SRC
 ** Input completion
 #+begin_src emacs-lisp
@@ -369,9 +439,10 @@ avy is kinda badass.
 #+end_src
 ** Actions
 #+begin_src emacs-lisp
-    (use-package embark)
+  (use-package embark)
+
   (use-package embark-consult
-  :after (embark consult))
+    :after (embark consult))
 #+end_src
 ** Text Completion
 *** company-mode
@@ -437,84 +508,28 @@ I forget the basic keybindings all the time: After a search using =ag=, use C-c 
     :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
     :config (autoload 'wgrep-ag-setup "wgrep-ag"))
 #+END_SRC
-* File system browsing
-** Dired
-dired-jump is awesome (C-x C-j in any buffer)
-#+BEGIN_SRC emacs-lisp
-(require 'dired-x)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-;; Changed my mind. I prefer seeing just the files:
- (add-hook 'dired-mode-hook 'dired-hide-details-mode)
-
-;; Auto-refresh silently
- (setq global-auto-revert-non-file-buffers t)
- (setq auto-revert-verbose nil)
-#+END_SRC
-
-This will make org-mode behave kinda like a two-pane file manager: with two direds open, you can copy/rename and the default target will be the other pane.
-Using split-window-vertically from the first dired might be required to make this work.
-#+BEGIN_SRC emacs-lisp
-(setq dired-dwim-target t)
-#+END_SRC
-
-OSX.. Windows.. *sigh*.
-#+BEGIN_SRC emacs-lisp
-(setq ls-lisp-use-insert-directory-program nil)
-(require 'ls-lisp)
-#+END_SRC
-
-It's also nice to have dired with M-< and M-> take you to first and last file
-#+BEGIN_SRC emacs-lisp
-(require 'dired)
-(defun dired-back-to-top ()
-  (interactive)
-  (beginning-of-buffer)
-  (next-line 2))
-
-(define-key dired-mode-map
-  (vector 'remap 'beginning-of-buffer) 'dired-back-to-top)
-
-(defun dired-jump-to-bottom ()
-  (interactive)
-  (end-of-buffer)
-  (next-line -1))
-
-(define-key dired-mode-map
-  (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
-#+END_SRC
-** Tramp
-hadoop with tramp, please.
-=C-x C-f /hdfs:username@hadoop-server:/path/to/dir/or/file=
-#+BEGIN_SRC emacs-lisp
-(use-package tramp-hdfs :pin "melpa")
-#+END_SRC
-
+** Menus
+#+begin_src emacs-lisp
+  (use-package transient
+    :init
+    (setq transient-history-file "~/.emacs.d/local-files/transient/history.el"
+          transient-levels-file "~/.emacs.d/local-files/transient/levels.el"
+          transient-values-file "~/.emacs.d/local-files/transient/values.el"))
+#+end_src
 * Org-mode
 org-mode itself is in the init.el file. here's additional config for it.
 I've been having some issues exporting, so I'm actively loading libraries here.
 #+BEGIN_SRC emacs-lisp
-
-;;  have to do this because org comes preinstalled with emacs
-  (advice-add 'package-installed-p :around 'package-from-archive)
-  (use-package org
-    :pin "gnu"
-    :init
-    (setq org-directory stag-org-directory)
-    (setq org-id-track-globally t)
-    (setq org-id-locations-file "~/.emacs.d/local-files/.org-id-locations"))
-  (advice-remove 'package-installed-p 'package-from-archive)
-
-  (use-package ol-notmuch)
-
+  (use-package ox :ensure nil :after org)
   (use-package org-macro :ensure nil :after org)
   (use-package ob-exp :ensure nil :after org)
   (use-package org-compat :ensure nil :after org)
-  (use-package ox :ensure nil :after org)
+
   (use-package ox-md :ensure nil :after ox)
 
-;  (use-package ox-pandoc)
+  ;; (use-package ox-pandoc :after ox)
+
+  (use-package ol-notmuch :after notmuch)
 #+END_SRC
 ** Generic org-mode configuration
 #+BEGIN_SRC emacs-lisp
@@ -528,14 +543,14 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 #+END_SRC
 ** Org bullets
 #+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
+  (use-package org-bullets :after org
     :init (add-hook 'org-mode-hook 'org-bullets-mode))
 #+END_SRC
 ** Adding images
 #+BEGIN_SRC emacs-lisp
-  (use-package org-download :pin "melpa")
+  (use-package org-download :pin "melpa" :after org)
 #+END_SRC
-** keybindings
+** global keybindings
 #+BEGIN_SRC emacs-lisp
   (global-set-key "\C-cl" 'org-store-link)
   (global-set-key "\C-cb" 'org-switchb)
@@ -546,53 +561,40 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 Note - package is downloaded manually
 source is https://github.com/misohena/el-igo
 #+begin_src emacs-lisp
-  (use-package igo-org
+  (use-package igo-org :after org
     :load-path "packages/el-igo-master"
     :config
     (igo-org-setup))
 #+end_src
 * GTD (Getting Things Done)
-#+begin_src emacs-lisp
-  (defun stag-gtd-sync()
-    (interactive)
-    (org-gcal-sync)
-    (notmuch-poll))
-#+end_src
 #+BEGIN_SRC emacs-lisp
-  (use-package org-gtd
-    :after org
-    :demand t
-    :load-path "~/src/projects/org-gtd.el"
-    :custom
-    ;; where org-gtd will put its files.
-    (org-gtd-directory stag-org-gtd-directory)
-    (org-agenda-property-position 'next-line)
-    (org-edna-use-inheritance t)
-    :config
-    (org-edna-mode)
-    :bind
-    (("C-c d c" . org-gtd-capture) ;; add item to inbox
-     ("C-c d p" . org-gtd-process-inbox) ;; process inbox
-     ("C-c d n" . org-gtd-show-all-next) ;; see all NEXT items
-     ("C-c d s" . org-gtd-show-stuck-projects)) ;; see projects that don't have a NEXT item
-    :init
-    ;; the keybinding to hit when you're done editing an item in the processing phase
-    :bind (:map org-gtd-process-map
-                ("C-c c" . org-gtd-choose)))
+      (use-package org-gtd
+        :after org
+        :quelpa ((org-gtd :fetcher github :repo "trevoke/org-gtd.el")
+                 :upgrade t)
+        :demand t
+        :custom
+        (org-gtd-directory stag-org-gtd-directory)
+        (org-agenda-property-position 'next-line)
+        (org-edna-use-inheritance t)
+        :config
+        (org-edna-mode)
+        :bind
+        (("C-c d c" . org-gtd-capture)
+         ("C-c d e" . org-gtd-engage)
+         ("C-c d p" . org-gtd-process-inbox)
+         ("C-c d n" . org-gtd-show-all-next)
+         ("C-c d s" . org-gtd-show-stuck-projects)
+         :map org-gtd-process-map
+         ("C-c c" . org-gtd-choose)))
+    (require 'org-gtd)
 #+END_SRC
 ** Agenda
 #+BEGIN_SRC emacs-lisp
-  (defun stag-org-agenda ()
-    (interactive)
-    (org-agenda nil "g"))
-
   (use-package org-agenda
     :ensure nil
     :no-require t
-    :after (org-gtd)
-    ;; :demand t
-    :bind
-    (("C-c d a" . stag-org-agenda))
+    :after org
     :custom
     (org-agenda-diary-file 'diary-file)
     (org-agenda-include-diary t)
@@ -601,9 +603,7 @@ source is https://github.com/misohena/el-igo
     (org-agenda-window-setup 'other-window)
     (org-agenda-skip-deadline-if-done t)
     (org-agenda-skip-scheduled-if-done t)
-    (org-agenda-start-on-weekday nil)
-    (org-agenda-files `(,org-gtd-directory))
-    (org-agenda-custom-commands '(("g" "Scheduled today and all NEXT items" ((agenda "" ((org-agenda-span 1))) (todo "NEXT|WAIT"))))))
+    (org-agenda-start-on-weekday nil))
 #+END_SRC
 ** Diary
 #+BEGIN_SRC emacs-lisp
@@ -631,8 +631,7 @@ source is https://github.com/misohena/el-igo
 
   (use-package calfw-org
     :after (org-gcal calfw)
-    :config
-    (require 'calfw-org))
+    :demand t)
 
   (use-package calfw
     :config
@@ -658,18 +657,9 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
 #+BEGIN_SRC emacs-lisp
   (use-package org-capture
     :ensure nil
-    :after org-gtd
+    :after org
     :config
-    (setq org-default-notes-file (concat org-directory "notes.org"))
-
-    (setq org-capture-templates `(("i" "Inbox"
-                                 entry (file ,(org-gtd-inbox-path))
-                                 "* %?\n%U\n\n  %i"
-                                 :kill-buffer t)
-                                ("t" "Todo with link"
-                                 entry (file ,(org-gtd-inbox-path))
-                                 "* %?\n%U\n\n  %i\n  %a"
-                                 :kill-buffer t))))
+    (setq org-default-notes-file (concat org-directory "notes.org")))
 #+END_SRC
 ** Refiling
 #+BEGIN_SRC emacs-lisp
@@ -739,9 +729,238 @@ With this configuration, using C-f in a status buffer will trigger the gitflow s
   :after magit
   :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
 #+END_SRC
+* Writing
+** TODO Symbols
+** TODO Multiple languages
+We need ~aspell~ installed on the local machine - and I just have to do ~C-x i d~ to change the dictionary to the correct language.
+#+begin_src emacs-lisp
+  (use-package ispell
+    :ensure nil
+    :demand t
+    :ensure-system-package aspell
+    :config
+    (setq ispell-program-name "aspell")
+    (setq ispell-dictionary "english"))
+#+end_src
+** Fixing typos
+
+Whenever I make a typo:
+
+1. Hit C-x C-i, instead of erasing the mistake;
+2. Select the appropriate correction (thanks to Ispell);
+3. Sleep easier at night knowing I'll never see that mistake again (thanks to abbrev).
+
+This is not intended to be a good way to work on multiple languages -- but using a spellchecker for the correct language tends to help.
+
+Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
+
+#+BEGIN_SRC emacs-lisp
+  (define-key ctl-x-map "\C-i"
+    #'stag/ispell-word-then-abbrev)
+
+  (defun stag/ispell-word-then-abbrev (p)
+    "Call `ispell-word', then create an abbrev for it.
+  With prefix P, create local abbrev. Otherwise it will
+  be global.
+  If there's nothing wrong with the word at point, keep
+  looking for a typo until the beginning of buffer. You can
+  skip typos you don't want to fix with `SPC', and you can
+  abort completely with `C-g'."
+    (interactive "P")
+    (let (bef aft)
+      (save-excursion
+        (while (if (setq bef (thing-at-point 'word))
+                   ;; Word was corrected or used quit.
+                   (if (ispell-word nil 'quiet)
+                       nil ; End the loop.
+                     ;; Also end if we reach `bob'.
+                     (not (bobp)))
+                 ;; If there's no word at point, keep looking
+                 ;; until `bob'.
+                 (not (bobp)))
+          (backward-word))
+        (setq aft (thing-at-point 'word)))
+      (if (and aft bef (not (equal aft bef)))
+          (let ((aft (downcase aft))
+                (bef (downcase bef)))
+            (define-abbrev
+              (if p local-abbrev-table global-abbrev-table)
+              bef aft)
+            (message "\"%s\" now expands to \"%s\" %sally"
+                     bef aft (if p "loc" "glob")))
+        (user-error "No typo at or before point"))))
+
+  (setq abbrev-file-name "~/.emacs.d/local-files/abbrev_defs")
+  (setq save-abbrevs 'silently)
+  (setq-default abbrev-mode t)
+#+END_SRC
+** TeX
+#+BEGIN_SRC emacs-lisp
+  (require 'flymake)
+
+  (defun flymake-get-tex-args (file-name)
+    (list "pdflatex"
+          (list "-file-line-error" "-draftmode" "-interaction=nonstopmode" file-name)))
+
+
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq TeX-save-query nil)
+
+  (add-hook 'LaTeX-mode-hook 'flymake-mode)
+
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-buffer)
+
+  (defun stag-turn-on-outline-minor-mode ()
+    (outline-minor-mode 1))
+
+  (add-hook 'LaTeX-mode-hook 'stag-turn-on-outline-minor-mode)
+  (add-hook 'latex-mode-hook 'stag-turn-on-outline-minor-mode)
+  (setq outline-minor-mode-prefix "\C-c \C-o") ; Or something else
+#+END_SRC
+** Presentations
+*** TODO Slides
+**** revealjs
+#+BEGIN_SRC emacs-lisp
+  (use-package htmlize)
+  (use-package ox-reveal
+    :after (htmlize ox)
+    :pin "melpa"
+    :config
+    (setq org-reveal-root stag-org-reveal-root))
+#+END_SRC
+** Email
+*** BBDB
+#+begin_src emacs-lisp
+(use-package bbdb
+  :after org
+  :config
+  (setq bbdb-file stag-bbdb-file)
+  (require 'ol-bbdb))
+#+end_src
+*** Sending email
+#+BEGIN_SRC emacs-lisp
+(setq mail-user-agent 'message-user-agent)
+
+(setq smtpmail-stream-type 'ssl
+      smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 465)
+#+END_SRC
+
+smtpmail-multi
+#+BEGIN_SRC emacs-lisp
+  (use-package smtpmail-multi
+    :pin "melpa"
+    :config
+    (setq smtpmail-multi-accounts
+          `((home . (,user-mail-address
+                     "smtp.gmail.com"
+                     587
+                     ,user-mail-address
+                     starttls
+                     nil nil nil))))
+
+    (setq smtpmail-multi-associations
+          `((,user-mail-address home)))
+
+    (setq smtpmail-multi-default-account 'home)
+
+    (setq message-send-mail-function 'smtpmail-multi-send-it)
+
+    (setq smtpmail-debug-info t)
+    (setq smtpmail-debug-verbose t))
+#+END_SRC
+*** TODO Sending/Reading/Encrypting email
+orgstruct++ was removed in org 9.2
+It seems I may want to use orgalist.
+#+BEGIN_SRC emacs-lisp
+  (use-package notmuch
+    :after org
+    :config
+    (defun stag-email-hook ()
+      (epa-mail-mode))
+
+    (add-hook 'notmuch-message-mode-hook 'stag-email-hook))
+
+  (use-package notmuch-transient
+    :after (transient notmuch))
+#+END_SRC
+** Blogging
+#+BEGIN_SRC emacs-lisp
+  (use-package easy-hugo
+    :after org
+    :init
+    (setq easy-hugo-org-header t)
+    (setq easy-hugo-default-ext ".org")
+    (setq easy-hugo-basedir stag-easy-hugo-basedir)
+    (setq easy-hugo-url "http://blog.trevoke.net")
+    (setq easy-hugo-root stag-easy-hugo-root)
+    (setq easy-hugo-previewtime "300"))
+#+END_SRC
+** Markdown
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :init
+    (add-hook 'markdown-mode-hook 'turn-on-orgtbl))
+#+END_SRC
+*** TODO Github-Flavored Markdown (requires backend config?)
+#+BEGIN_SRC emacs-lisp
+  (use-package ox-md
+    :ensure nil
+    :after ox)
+#+END_SRC
+*** TODO My orgtbl-to-gfm conversion (obsoleted by above?)
+It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table. use C-c C-c to generate / update GFM table.
+#+BEGIN_SRC emacs-lisp
+;;; orgtbl-to-gfm conversion function
+;; Usage Example:
+;;
+;; <!-- BEGIN RECEIVE ORGTBL ${1:YOUR_TABLE_NAME} -->
+;; <!-- END RECEIVE ORGTBL $1 -->
+;;
+;; <!--
+;; #+ORGTBL: SEND $1 orgtbl-to-gfm
+;; | $0 |
+;; -->
+
+(defun orgtbl-to-gfm (table params)
+  "Convert the Orgtbl mode TABLE to GitHub Flavored Markdown."
+  (let* ((alignment (mapconcat (lambda (x) (if x "|--:" "|---"))
+                               org-table-last-alignment ""))
+         (params2
+          (list
+           :splice t
+           :hline (concat alignment "|")
+           :lstart "| " :lend " |" :sep " | ")))
+           (orgtbl-to-generic table (org-combine-plists params2 params))))
+
+(defun stag-insert-org-to-gfm-table (table-name)
+  (interactive "*sEnter table name: ")
+  (insert "<!---
+#+ORGTBL: SEND " table-name " orgtbl-to-gfm
+
+-->
+<!--- BEGIN RECEIVE ORGTBL " table-name " -->
+<!--- END RECEIVE ORGTBL " table-name " -->")
+  (previous-line)
+  (previous-line)
+  (previous-line))
+
+  (global-set-key (kbd "C-c t") 'stag-insert-org-to-gfm-table)
+#+END_SRC
+* Shells
+** Fish
+#+BEGIN_SRC emacs-lisp
+(use-package fish-mode)
+#+END_SRC
+** Terminal
+#+begin_src emacs-lisp
+(use-package vterm :pin melpa)
+#+end_src
 * Programming
 ** TODO get a LSP configuration going in here
-#+begin_src elisp
+#+begin_src emacs-lisp
   (use-package lsp-mode
     :commands lsp
     :ensure t
@@ -881,7 +1100,7 @@ Auto-tail, please.
 *** Golang mode
 Let's run tests easily, shall we?
 And let's have gofmt chew my code when I save the file.
-#+BEGIN_SRC elisp
+#+begin_src emacs-lisp
   (use-package go-mode
     :bind (:map go-mode-map
                 ("C c r s" . go-test-current-file))
@@ -1097,15 +1316,6 @@ I use yasnippets, and I've downloaded a collection of snippets from here: https:
 - (use-package ruby-hash-syntax)
 - (use-package ruby-refactor)
 - (use-package yaml-mode)
-** Shells
-*** Fish
-#+BEGIN_SRC emacs-lisp
-(use-package fish-mode)
-#+END_SRC
-*** Terminal
-#+begin_src elisp
-(use-package vterm :pin melpa)
-#+end_src
 ** SQL
 *** sqlup                                                  :minor:external:
 auto-upcase SQL keywords as I type, please.
@@ -1120,216 +1330,6 @@ I maintain a tintin++ config, so this is at least convenient.
 #+BEGIN_SRC emacs-lisp
 ;; (use-package tintin-mode :pin "marmalade")
 #+END_SRC
-* Writing
-** TODO Symbols
-** TODO Multiple languages
-We need ~aspell~ installed on the local machine - and I just have to do ~C-x i d~ to change the dictionary to the correct language.
-** Fixing typos
-
-Whenever I make a typo:
-
-1. Hit C-x C-i, instead of erasing the mistake;
-2. Select the appropriate correction (thanks to Ispell);
-3. Sleep easier at night knowing I'll never see that mistake again (thanks to abbrev).
-
-This is not intended to be a good way to work on multiple languages -- but using a spellchecker for the correct language tends to help.
-
-Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
-
-#+BEGIN_SRC emacs-lisp
-  (define-key ctl-x-map "\C-i"
-    #'stag/ispell-word-then-abbrev)
-
-  (defun stag/ispell-word-then-abbrev (p)
-    "Call `ispell-word', then create an abbrev for it.
-  With prefix P, create local abbrev. Otherwise it will
-  be global.
-  If there's nothing wrong with the word at point, keep
-  looking for a typo until the beginning of buffer. You can
-  skip typos you don't want to fix with `SPC', and you can
-  abort completely with `C-g'."
-    (interactive "P")
-    (let (bef aft)
-      (save-excursion
-        (while (if (setq bef (thing-at-point 'word))
-                   ;; Word was corrected or used quit.
-                   (if (ispell-word nil 'quiet)
-                       nil ; End the loop.
-                     ;; Also end if we reach `bob'.
-                     (not (bobp)))
-                 ;; If there's no word at point, keep looking
-                 ;; until `bob'.
-                 (not (bobp)))
-          (backward-word))
-        (setq aft (thing-at-point 'word)))
-      (if (and aft bef (not (equal aft bef)))
-          (let ((aft (downcase aft))
-                (bef (downcase bef)))
-            (define-abbrev
-              (if p local-abbrev-table global-abbrev-table)
-              bef aft)
-            (message "\"%s\" now expands to \"%s\" %sally"
-                     bef aft (if p "loc" "glob")))
-        (user-error "No typo at or before point"))))
-
-  (setq abbrev-file-name "~/.emacs.d/local-files/abbrev_defs")
-  (setq save-abbrevs 'silently)
-  (setq-default abbrev-mode t)
-#+END_SRC
-** TeX
-#+BEGIN_SRC emacs-lisp
-  (require 'flymake)
-
-  (defun flymake-get-tex-args (file-name)
-    (list "pdflatex"
-          (list "-file-line-error" "-draftmode" "-interaction=nonstopmode" file-name)))
-
-
-  (setq TeX-auto-save t)
-  (setq TeX-parse-self t)
-  (setq TeX-save-query nil)
-
-  (add-hook 'LaTeX-mode-hook 'flymake-mode)
-
-  (setq ispell-program-name "aspell") ; could be ispell as well, depending on your preferences
-  (setq ispell-dictionary "english") ; this can obviously be set to any language your spell-checking program supports
-
-  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-  (add-hook 'LaTeX-mode-hook 'flyspell-buffer)
-
-  (defun stag-turn-on-outline-minor-mode ()
-    (outline-minor-mode 1))
-
-  (add-hook 'LaTeX-mode-hook 'stag-turn-on-outline-minor-mode)
-  (add-hook 'latex-mode-hook 'stag-turn-on-outline-minor-mode)
-  (setq outline-minor-mode-prefix "\C-c \C-o") ; Or something else
-#+END_SRC
-** Presentations
-*** TODO Slides
-**** revealjs
-#+BEGIN_SRC emacs-lisp
-  (use-package htmlize)
-  (use-package ox-reveal
-    :after htmlize
-    :pin "melpa"
-    :config
-    (setq org-reveal-root stag-org-reveal-root))
-#+END_SRC
-** Email
-*** Add BBDB
-#+begin_src emacs-lisp
-(use-package bbdb
-  :after org
-  :config
-  (setq bbdb-file stag-bbdb-file)
-  (require 'ol-bbdb))
-#+end_src
-*** Sending email
-#+BEGIN_SRC emacs-lisp
-(setq mail-user-agent 'message-user-agent)
-
-(setq smtpmail-stream-type 'ssl
-      smtpmail-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-service 465)
-#+END_SRC
-
-smtpmail-multi
-#+BEGIN_SRC emacs-lisp
-  (use-package smtpmail-multi
-    :pin "melpa"
-    :config
-    (setq smtpmail-multi-accounts
-          `((home . (,user-mail-address
-                     "smtp.gmail.com"
-                     587
-                     ,user-mail-address
-                     starttls
-                     nil nil nil))))
-
-    (setq smtpmail-multi-associations
-          `((,user-mail-address home)))
-
-    (setq smtpmail-multi-default-account 'home)
-
-    (setq message-send-mail-function 'smtpmail-multi-send-it)
-
-    (setq smtpmail-debug-info t)
-    (setq smtpmail-debug-verbose t))
-#+END_SRC
-*** TODO Sending/Reading/Encrypting email
-orgstruct++ was removed in org 9.2
-It seems I may want to use orgalist.
-#+BEGIN_SRC emacs-lisp
-(use-package notmuch
-  :after org
-  :config
-  (require 'ol-notmuch)
-  (defun stag-email-hook ()
-    (epa-mail-mode))
-
-  (add-hook 'notmuch-message-mode-hook 'stag-email-hook))
-#+END_SRC
-** Blogging
-#+BEGIN_SRC emacs-lisp
-  (use-package easy-hugo
-    :init
-    (setq easy-hugo-org-header t)
-    (setq easy-hugo-default-ext ".org")
-    (setq easy-hugo-basedir stag-easy-hugo-basedir)
-    (setq easy-hugo-url "http://blog.trevoke.net")
-    (setq easy-hugo-root stag-easy-hugo-root)
-    (setq easy-hugo-previewtime "300"))
-#+END_SRC
-** Markdown
-#+BEGIN_SRC emacs-lisp
-  (use-package markdown-mode
-    :init
-    (add-hook 'markdown-mode-hook 'turn-on-orgtbl))
-#+END_SRC
-*** TODO Github-Flavored Markdown (requires backend config?)
-#+BEGIN_SRC emacs-lisp
-(require 'ox-md)
-#+END_SRC
-*** TODO My orgtbl-to-gfm conversion (obsoleted by above?)
-It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table. use C-c C-c to generate / update GFM table.
-#+BEGIN_SRC emacs-lisp
-;;; orgtbl-to-gfm conversion function
-;; Usage Example:
-;;
-;; <!-- BEGIN RECEIVE ORGTBL ${1:YOUR_TABLE_NAME} -->
-;; <!-- END RECEIVE ORGTBL $1 -->
-;;
-;; <!--
-;; #+ORGTBL: SEND $1 orgtbl-to-gfm
-;; | $0 |
-;; -->
-
-(defun orgtbl-to-gfm (table params)
-  "Convert the Orgtbl mode TABLE to GitHub Flavored Markdown."
-  (let* ((alignment (mapconcat (lambda (x) (if x "|--:" "|---"))
-                               org-table-last-alignment ""))
-         (params2
-          (list
-           :splice t
-           :hline (concat alignment "|")
-           :lstart "| " :lend " |" :sep " | ")))
-           (orgtbl-to-generic table (org-combine-plists params2 params))))
-
-(defun stag-insert-org-to-gfm-table (table-name)
-  (interactive "*sEnter table name: ")
-  (insert "<!---
-#+ORGTBL: SEND " table-name " orgtbl-to-gfm
-
--->
-<!--- BEGIN RECEIVE ORGTBL " table-name " -->
-<!--- END RECEIVE ORGTBL " table-name " -->")
-  (previous-line)
-  (previous-line)
-  (previous-line))
-
-  (global-set-key (kbd "C-c t") 'stag-insert-org-to-gfm-table)
-#+END_SRC
-
 * Communication Clients
 ** IRC
 #+BEGIN_SRC emacs-lisp

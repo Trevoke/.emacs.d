@@ -46,11 +46,11 @@
   (custom-theme-set-faces
    'mejelly
    `(default                         ((,class (:foreground ,mejelly-fg
-                                               :background ,mejelly-bg))))
+                                                           :background ,mejelly-bg))))
 
    `(font-lock-builtin-face          ((,class (:foreground ,mejelly-blue-0))))
    `(font-lock-comment-face          ((,class (:slant italic
-                                               :foreground ,mejelly-grey-0))))
+                                                      :foreground ,mejelly-grey-0))))
 
    `(font-lock-constant-face         ((,class (:foreground ,mejelly-blue-1))))
    `(font-lock-doc-face              ((,class (:foreground ,mejelly-green-0))))

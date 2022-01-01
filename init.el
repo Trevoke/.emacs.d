@@ -1,46 +1,53 @@
-; (package-initialize)
-
 (setq package-enable-at-startup nil)
-(require 'package)
+
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ;; ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa-stable" . "https://stable.melpa.org/packages/")
                          ("gnu" . "https://elpa.gnu.org/packages/")))
-(package-initialize)
 
 (setq package-archive-priorities
       '(("melpa-stable" . 10000)))
+(require 'package)
+(package-initialize)
 
-;; Bootstrap `use-package'
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-(require 'use-package)
+(unless (package-installed-p 'quelpa)
+  (with-temp-buffer
+    (url-insert-file-contents "https://raw.githubusercontent.com/quelpa/quelpa/master/quelpa.el")
+    (eval-buffer)
+    (quelpa-self-upgrade)))
 
-;; staight.el is an alternative to package.el
-(setq straight-base-dir "~/.emacs.d/local-files/")
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" "~/.emacs.d/local-files/"))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+(quelpa 'use-package)
 
-;; ;; This lets use-package install packages that come built-in with emacs, like org-mode
-(defun package-from-archive (f &rest args)
-  (and (apply f args)
-       (assq (car args) package-alist)))
+(quelpa
+ '(quelpa-use-package
+   :fetcher git
+   :url "https://github.com/quelpa/quelpa-use-package.git"))
+(require 'quelpa-use-package)
+                                        ;(require 'use-package)
 
+(use-package use-package-ensure-system-package :ensure t :demand t)
 (setq use-package-always-pin "melpa-stable")
 (setq use-package-always-ensure t)
 
+;;  have to do this because org comes preinstalled with emacs
+(assq-delete-all 'org package--builtins)
+(assq-delete-all 'org package--builtin-versions)
+
+(use-package org
+             :pin "gnu"
+             :demand t
+             :ensure t
+             :init
+             (setq org-directory "~/my-life/orgnotes/")
+             (setq org-id-track-globally t)
+             (setq org-generic-id-locations-file
+                   "~/.emacs.d/local-files/org-generic-id-locations")
+             (setq org-id-locations-file
+                   "~/.emacs.d/local-files/org-id-locations"))
+(require 'org)
+
 (org-babel-load-file "~/.emacs.d/aldric.org")
+
 (put 'dired-find-alternate-file 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
