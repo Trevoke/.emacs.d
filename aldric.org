@@ -6,8 +6,6 @@
 Welcome to my emacs configuration.
 I tinker with this file a lot, so I need a quick way to get to it.
 I set a [[*Bookmarks][bookmark]] with =C-x r m= and I can get back here with =C-x r b=
-** Personal information
-Stored in ~~/.emacs.d/.emacs.secrets~.
 * External references and directories
 This is here so it's easier for me to remember what Ι need to set up on a new machine. You'd think a script would be better. Yep. Script is next.
 #+begin_src emacs-lisp
@@ -66,10 +64,10 @@ In addition, I do keep some somewhat computer-specific stuff in there, like the 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 ;; (load-theme 'mejelly t)
 #+END_SRC
-*** Secrets
+*** Secrets & personal information
 API keys, passwords, etc are kept in here. This file is .gitignored.
 #+BEGIN_SRC emacs-lisp
-(load "~/.emacs.secrets" t)
+(load "~/.emacs.d/.emacs.secrets" t)
 #+END_SRC
 *** executable versioning (mostly programming languages)
 #+begin_src emacs-lisp
@@ -472,7 +470,16 @@ Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes
 (use-package imenu-list
   :after imenu)
 #+end_src
-** Project navigation
+** Projects
+*** Project management
+**** Persist
+Small package meant to help variable persistence across emacs sessions
+#+begin_src emacs-lisp
+  (use-package persist
+    :init
+    (setq persist--directory-location "~/.emacs.d/local-files/"))
+#+end_src
+*** Project navigation
 Projectile is pretty sweet.
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
@@ -621,10 +628,10 @@ source is https://github.com/misohena/el-igo
 
   (use-package org-gcal
     :pin "melpa"
-    :after org-agenda
+    :after (org-agenda persist)
     :init
-    (setq persist--directory-location "~/.emacs.d/local-files/")
-    (setq org-gcal-dir "~/.emacs.d/local-files/org-gcal/"))
+    (setq org-gcal-dir "~/.emacs.d/local-files/org-gcal/")
+    (setq org-gcal-cancelled-todo-keyword "CNCL"))
 
   (use-package calfw-gcal :pin "melpa"
     :after calfw-org)
