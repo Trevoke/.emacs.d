@@ -1103,30 +1103,6 @@ Auto-tail, please.
     :init (add-hook 'scss-mode-hook 'flymake-mode))
 
 #+END_SRC
-** Golang
-*** Golang mode
-Let's run tests easily, shall we?
-And let's have gofmt chew my code when I save the file.
-#+begin_src emacs-lisp
-  (use-package go-mode
-    :bind (:map go-mode-map
-                ("C c r s" . go-test-current-file))
-    :init
-    (defun stag-go-mode ()
-      (add-hook 'before-save-hook 'gofmt-before-save nil t)) ;; chew my code
-    (add-hook 'go-mode-hook 'stag-go-mode))
-
-(use-package company-go
-  :after (go-mode company)
-  :config (set (make-local-variable 'company-backends) '(company-go)))
-#+END_SRC
-*** TODO Packages to be added
-- (use-package go-eldoc)
-- (use-package go-playground)
-- (use-package go-projectile)
-- (use-package gore-mode)
-- (use-package gorepl-mode)
-- (use-package gotest)
 ** HTML
 *** Web-mode                                               :external:major:
 Here are all the extensions where I want web-mode enabled
