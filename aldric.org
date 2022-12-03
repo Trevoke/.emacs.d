@@ -6,6 +6,9 @@
 Welcome to my emacs configuration.
 I tinker with this file a lot, so I need a quick way to get to it.
 I set a [[*Bookmarks][bookmark]] with =C-x r m= and I can get back here with =C-x r b=
+* External tools required
+- aspell
+
 * External references and directories
 This is here so it's easier for me to remember what Ι need to set up on a new machine. You'd think a script would be better. Yep. Script is next.
 #+begin_src emacs-lisp
@@ -472,12 +475,12 @@ Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes
 #+end_src
 ** Projects
 *** Project management
-**** Persist
+**** TODO Persist (this has disappeared?)
 Small package meant to help variable persistence across emacs sessions
 #+begin_src emacs-lisp
-  (use-package persist
-    :init
-    (setq persist--directory-location "~/.emacs.d/local-files/"))
+;;  (use-package persist
+;;    :init
+;;    (setq persist--directory-location "~/.emacs.d/local-files/"))
 #+end_src
 *** Project navigation
 Projectile is pretty sweet.
@@ -628,7 +631,7 @@ source is https://github.com/misohena/el-igo
 
   (use-package org-gcal
     :pin "melpa"
-    :after (org-agenda persist)
+    :after (org-agenda)
     :init
     (setq org-gcal-dir "~/.emacs.d/local-files/org-gcal/")
     (setq org-gcal-cancelled-todo-keyword "CNCL"))
@@ -686,8 +689,8 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
           org-roam-v2-ack t)
     :config
     (org-roam-db-autosync-mode)
-    :hook
-    (after-init . org-roam-mode)
+    ;:hook
+    ;(after-init . org-roam-mode)
     :custom
     (org-roam-directory stag-org-roam-directory)
     :bind
@@ -714,27 +717,61 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
     :after org-roam
     :config (org-roam-timestamps-mode))
 #+END_SRC
-* Version control
-** Git
-*** Walking through a file's history
+* Email
+** BBDB
+#+begin_src emacs-lisp
+(use-package bbdb
+  :after org
+  :config
+  (setq bbdb-file stag-bbdb-file)
+  (require 'ol-bbdb))
+#+end_src
+** Sending email
 #+BEGIN_SRC emacs-lisp
-(use-package git-timemachine)
+(setq mail-user-agent 'message-user-agent)
+
+(setq smtpmail-stream-type 'ssl
+      smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 465)
 #+END_SRC
-*** Magit
-Magit is a pretty amazing interface to git.
+
+smtpmail-multi
 #+BEGIN_SRC emacs-lisp
-(use-package magit
-  :bind ("C-c g" . magit-status)
-  :config (setq magit-last-seen-setup-instructions "1.4.0")
-          (setq magit-completing-read-function 'magit-builtin-completing-read)
-          (setq magit-popup-use-prefix-argument 'default))
+  (use-package smtpmail-multi
+    :pin "melpa"
+    :config
+    (setq smtpmail-multi-accounts
+          `((home . (,user-mail-address
+                     "smtp.gmail.com"
+                     587
+                     ,user-mail-address
+                     starttls
+                     nil nil nil))))
+
+    (setq smtpmail-multi-associations
+          `((,user-mail-address home)))
+
+    (setq smtpmail-multi-default-account 'home)
+
+    (setq message-send-mail-function 'smtpmail-multi-send-it)
+
+    (setq smtpmail-debug-info t)
+    (setq smtpmail-debug-verbose t))
 #+END_SRC
-**** Magit + gitflow
-With this configuration, using C-f in a status buffer will trigger the gitflow selectors.
+** TODO Sending/Reading/Encrypting email
+orgstruct++ was removed in org 9.2
+It seems I may want to use orgalist.
 #+BEGIN_SRC emacs-lisp
-(use-package magit-gitflow
-  :after magit
-  :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
+  (use-package notmuch
+    :after org
+    :config
+    (defun stag-email-hook ()
+      (epa-mail-mode))
+
+    (add-hook 'notmuch-message-mode-hook 'stag-email-hook))
+
+  (use-package notmuch-transient
+    :after (transient notmuch))
 #+END_SRC
 * Writing
 ** TODO Symbols
@@ -826,85 +863,6 @@ Source: http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct
   (add-hook 'latex-mode-hook 'stag-turn-on-outline-minor-mode)
   (setq outline-minor-mode-prefix "\C-c \C-o") ; Or something else
 #+END_SRC
-** Presentations
-*** TODO Slides
-**** revealjs
-#+BEGIN_SRC emacs-lisp
-  (use-package htmlize)
-  (use-package ox-reveal
-    :after (htmlize ox)
-    :pin "melpa"
-    :config
-    (setq org-reveal-root stag-org-reveal-root))
-#+END_SRC
-** Email
-*** BBDB
-#+begin_src emacs-lisp
-(use-package bbdb
-  :after org
-  :config
-  (setq bbdb-file stag-bbdb-file)
-  (require 'ol-bbdb))
-#+end_src
-*** Sending email
-#+BEGIN_SRC emacs-lisp
-(setq mail-user-agent 'message-user-agent)
-
-(setq smtpmail-stream-type 'ssl
-      smtpmail-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-service 465)
-#+END_SRC
-
-smtpmail-multi
-#+BEGIN_SRC emacs-lisp
-  (use-package smtpmail-multi
-    :pin "melpa"
-    :config
-    (setq smtpmail-multi-accounts
-          `((home . (,user-mail-address
-                     "smtp.gmail.com"
-                     587
-                     ,user-mail-address
-                     starttls
-                     nil nil nil))))
-
-    (setq smtpmail-multi-associations
-          `((,user-mail-address home)))
-
-    (setq smtpmail-multi-default-account 'home)
-
-    (setq message-send-mail-function 'smtpmail-multi-send-it)
-
-    (setq smtpmail-debug-info t)
-    (setq smtpmail-debug-verbose t))
-#+END_SRC
-*** TODO Sending/Reading/Encrypting email
-orgstruct++ was removed in org 9.2
-It seems I may want to use orgalist.
-#+BEGIN_SRC emacs-lisp
-  (use-package notmuch
-    :after org
-    :config
-    (defun stag-email-hook ()
-      (epa-mail-mode))
-
-    (add-hook 'notmuch-message-mode-hook 'stag-email-hook))
-
-  (use-package notmuch-transient
-    :after (transient notmuch))
-#+END_SRC
-** Blogging
-#+BEGIN_SRC emacs-lisp
-  (use-package easy-hugo
-    :after org
-    :init
-    (setq easy-hugo-org-header t)
-    (setq easy-hugo-default-ext ".org")
-    (setq easy-hugo-basedir stag-easy-hugo-basedir)
-    (setq easy-hugo-url "http://blog.trevoke.net")
-    (setq easy-hugo-root stag-easy-hugo-root)
-    (setq easy-hugo-previewtime "300"))
-#+END_SRC
 ** Markdown
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -956,6 +914,29 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
 
   (global-set-key (kbd "C-c t") 'stag-insert-org-to-gfm-table)
 #+END_SRC
+* Presentations
+** TODO Slides
+*** revealjs
+#+BEGIN_SRC emacs-lisp
+  (use-package htmlize)
+  (use-package ox-reveal
+    :after (htmlize ox)
+    :pin "melpa"
+    :config
+    (setq org-reveal-root stag-org-reveal-root))
+#+END_SRC
+* Blogging
+#+BEGIN_SRC emacs-lisp
+  (use-package easy-hugo
+    :after org
+    :init
+    (setq easy-hugo-org-header t)
+    (setq easy-hugo-default-ext ".org")
+    (setq easy-hugo-basedir stag-easy-hugo-basedir)
+    (setq easy-hugo-url "http://blog.trevoke.net")
+    (setq easy-hugo-root stag-easy-hugo-root)
+    (setq easy-hugo-previewtime "300"))
+#+END_SRC
 * Shells
 ** Fish
 #+BEGIN_SRC emacs-lisp
@@ -965,6 +946,28 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
 #+begin_src emacs-lisp
 (use-package vterm :pin melpa)
 #+end_src
+* Version control
+** Git
+*** Walking through a file's history
+#+BEGIN_SRC emacs-lisp
+(use-package git-timemachine)
+#+END_SRC
+*** Magit
+Magit is a pretty amazing interface to git.
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :bind ("C-c g" . magit-status)
+  :config (setq magit-last-seen-setup-instructions "1.4.0")
+          (setq magit-completing-read-function 'magit-builtin-completing-read)
+          (setq magit-popup-use-prefix-argument 'default))
+#+END_SRC
+**** Magit + gitflow
+With this configuration, using C-f in a status buffer will trigger the gitflow selectors.
+#+BEGIN_SRC emacs-lisp
+(use-package magit-gitflow
+  :after magit
+  :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
+#+END_SRC
 * Programming
 ** TODO get a LSP configuration going in here
 #+begin_src emacs-lisp
