@@ -1,5 +1,5 @@
 #+TITLE: Trevoke's emacs config
-#+OPTIONS: toc:4 h:4
+#+OPTIONS: toc:4
 
 * About
 <<babel-init>>
@@ -12,16 +12,18 @@ I set a [[*Bookmarks][bookmark]] with =C-x r m= and I can get back here with =C-
 * External references and directories
 This is here so it's easier for me to remember what Ι need to set up on a new machine. You'd think a script would be better. Yep. Script is next.
 #+begin_src emacs-lisp
-(setq stag-easy-hugo-basedir "~/src/projects/trevoke.github.io-source")
-(setq stag-easy-hugo-root "~/src/projects/trevoke.github.io")
-(setq stag-org-reveal-root "/home/stag/mnt/internal/src/vendor/reveal.js")
+  (setq stag-easy-hugo-basedir "~/src/projects/trevoke.github.io-source"
+        stag-easy-hugo-root "~/src/projects/trevoke.github.io"
+        stag-org-reveal-root "/home/stag/mnt/internal/src/vendor/reveal.js"
+        stag-org-directory "~/my-life/orgnotes/"
+        stag-org-gtd-directory "~/my-life/orgnotes/gtd"
+        stag-org-roam-directory "~/my-life/orgnotes/roam"
+        stag-org-roam-db-location "~/.emacs.d/local-files/org-roam.db"
+        stag-bbdb-file "~/my-life/orgnotes/bbdb/big-brother-database"
+        stag-bibliography-file "~/my-life/orgnotes/references/library.bib"
+        stag-cite-export-processors '((t . (csl "/home/trevoke/my-life/orgnotes/references/modern-language-association.csl")))
+        )
 
-(setq stag-org-directory "~/my-life/orgnotes/")
-
-(setq stag-org-gtd-directory "~/my-life/orgnotes/gtd")
-(setq stag-org-roam-directory "~/my-life/orgnotes/roam")
-(setq stag-org-roam-db-location "~/.emacs.d/local-files/org-roam.db")
-(setq stag-bbdb-file "~/my-life/orgnotes/bbdb/big-brother-database")
 #+end_src
 * Package management
 ** Quelpa & Use-package
@@ -31,7 +33,7 @@ I use [[https://github.com/jwiegley/use-package][use-package]], because:
 
 [[https://github.com/quelpa/quelpa][Quelpa]] lets me pull from specific source code repos and branches beyond the existing package repositories, which is sometimes convenient.
 
-See the [[init.el]] file for these things.
+See the [[./init.el]] file for these things.
 
 ** PATH
 OSX is not friendly. This makes sure emacs properly gets the full path from the user environment.
@@ -405,20 +407,27 @@ hadoop with tramp, please.
     :bind (("C-x C-m" . execute-extended-command)))
 
   (use-package marginalia
-    :after (selectrum embark consult)
+    :after (vertico embark consult)
     :init
     (marginalia-mode)
-    (advice-add #'marginalia-cycle :after
-                (lambda () (when (bound-and-true-p selectrum-mode) (selectrum-exhibit 'keep-selected)))))
+    ;; (advice-add #'marginalia-cycle :after
+    ;;             (lambda () (when (bound-and-true-p selectrum-mode) (selectrum-exhibit 'keep-selected))))
+    )
 #+end_src
 ** Command completion
 #+BEGIN_SRC emacs-lisp
-  (use-package selectrum
-    :after minibuffer
-    :init
-    (selectrum-mode +1)
-    :custom
-    (completion-styles '(flex basic partial-completion emacs22)))
+  (use-package vertico
+  :pin elpa
+  :init
+  (vertico-mode)
+  :custom
+  (completion-styles '(flex basic partial-completion emacs22)))
+
+  (use-package vertico-prescient
+  :after (vertico prescient)
+  :config
+  (vertico-prescient-mode +1)
+  (prescient-persist-mode +1))
 
   (use-package prescient
     :init
@@ -427,16 +436,10 @@ hadoop with tramp, please.
     (prescient-sort-length-enable nil)
     (prescient-filter-method '(literal initialism anchored fuzzy)))
 
-  (use-package selectrum-prescient
-    :after (prescient selectrum)
-    :init
-    (selectrum-prescient-mode +1)
-    (prescient-persist-mode +1))
 #+END_SRC
 ** Input completion
 #+begin_src emacs-lisp
-  (use-package consult
-  :after selectrum)
+  (use-package consult :after vertico)
 #+end_src
 ** Actions
 #+begin_src emacs-lisp
@@ -578,26 +581,28 @@ source is https://github.com/misohena/el-igo
 #+end_src
 * GTD (Getting Things Done)
 #+BEGIN_SRC emacs-lisp
-      (use-package org-gtd
-        :after org
-        :quelpa ((org-gtd :fetcher github :repo "trevoke/org-gtd.el")
-                 :upgrade t)
-        :demand t
-        :custom
-        (org-gtd-directory stag-org-gtd-directory)
-        (org-agenda-property-position 'next-line)
-        (org-edna-use-inheritance t)
-        :config
-        (org-edna-mode)
-        :bind
-        (("C-c d c" . org-gtd-capture)
-         ("C-c d e" . org-gtd-engage)
-         ("C-c d p" . org-gtd-process-inbox)
-         ("C-c d n" . org-gtd-show-all-next)
-         ("C-c d s" . org-gtd-show-stuck-projects)
-         :map org-gtd-process-map
-         ("C-c c" . org-gtd-choose)))
-    (require 'org-gtd)
+    (use-package org-gtd
+      :after org
+      :quelpa ((org-gtd :fetcher github :repo "trevoke/org-gtd.el")
+               :upgrade t)
+      :demand t
+      :init
+      (setq org-gtd-update-ack "2.1.0")
+      :custom
+      (org-gtd-directory stag-org-gtd-directory)
+      (org-agenda-property-position 'next-line)
+      (org-edna-use-inheritance t)
+      :config
+      (org-edna-mode)
+      :bind
+      (("C-c d c" . org-gtd-capture)
+       ("C-c d e" . org-gtd-engage)
+       ("C-c d p" . org-gtd-process-inbox)
+       ("C-c d n" . org-gtd-show-all-next)
+       ("C-c d s" . org-gtd-show-stuck-projects)
+       :map org-gtd-process-map
+       ("C-c c" . org-gtd-choose)))
+  (require 'org-gtd)
 #+END_SRC
 ** Agenda
 #+BEGIN_SRC emacs-lisp
@@ -678,7 +683,7 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
   (setq org-refile-allow-creating-parent-nodes nil)
   (setq org-log-refile 'time)
 #+END_SRC
-** references - org-roam
+* Zettelkasten
 #+BEGIN_SRC emacs-lisp
   (use-package org-roam
     :pin melpa
@@ -717,6 +722,66 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
     :after org-roam
     :config (org-roam-timestamps-mode))
 #+END_SRC
+
+** Citation management
+#+begin_src elisp
+  (use-package citar
+  :after org embark
+  :bind (("C-c b" . citar-insert-citation)
+         (:map org-mode-map :package org ("C-c b" . #'org-cite-insert))
+         :map minibuffer-local-map
+         ("M-b" . citar-insert-preset))
+  :custom
+  (org-cite-global-bibliography `(,stag-bibliography-file))
+  (org-cite-insert-processor 'citar)
+  (org-cite-follow-processor 'citar)
+  (org-cite-activate-processor 'citar)
+  (org-cite-export-processors stag-cite-export-processors)
+  (citar-notes-path (list org-roam-directory))
+  (citar-bibliography org-cite-global-bibliography)
+  (citar-at-point-function 'embark-act)           ; Use `embark'
+  )
+
+(use-package org-roam-bibtex
+  :after citar)
+
+(use-package citar-embark
+  :after citar embark
+  :no-require
+  :config (citar-embark-mode))
+
+(use-package citar-org-roam
+  :after citar org-roam
+  :no-require
+  :config (citar-org-roam-mode))
+
+(setq citar-org-roam-note-title-template "${author} - ${title}\n#+filetags: ${tags}")
+
+
+;; Create a new node from a bibliographic source. taken from
+;; https://jethrokuan.github.io/org-roam-guide/
+(defun kb/org-roam-node-from-cite (keys-entries)
+  (interactive (list (citar-select-refs)))
+  (let ((title (citar-format--entry (cdr keys-entries)
+                                              "${author editor}${date urldate} :: ${title}")))
+    (org-roam-capture- :templates
+                       '(("r" "reference" plain
+                          "%?"
+                          :if-new (file+head "references/${citekey}.org"
+                                             ":properties:
+:roam_refs: [cite:@${citekey}]
+:end:
+#+title: ${title}
+#+filetags: %(kb/insert-lit-category)\n")
+                          :immediate-finish t
+                          :unnarrowed t))
+                       :info (list :citekey (car keys-entries))
+                       :node (org-roam-node-create :title title)
+                       :props '(:finalize find-file))))
+
+(use-package citar-org-roam
+  :after citar org-roam)
+#+end_src
 * Email
 ** BBDB
 #+begin_src emacs-lisp
@@ -1022,19 +1087,19 @@ Makes it easy to type things like {} or [] or () and magically add an extra line
 
 Here's where I plug in every modification I want in a code buffer
 #+BEGIN_SRC emacs-lisp
-(use-package smartparens)
+  (use-package smartparens)
 
-(defun stag-code-modes-hook ()
-  "A couple of changes I like to make to my code buffers"
-;;    (projectile-mode)
-    (linum-mode t)
+  (defun stag-code-modes-hook ()
+    "A couple of changes I like to make to my code buffers"
+    ;;    (projectile-mode)
+    (display-line-numbers-mode t)
     (smartparens-mode)
     (yas-minor-mode)
-;;    (ggtags-mode)
+    ;;    (ggtags-mode)
     (add-hook 'before-save-hook 'whitespace-cleanup)
     (local-set-key "\C-m" 'stag-enter-key-dwim))
 
-(add-hook 'prog-mode-hook 'stag-code-modes-hook)
+  (add-hook 'prog-mode-hook 'stag-code-modes-hook)
 #+END_SRC
 ** 80-column limit
 #+BEGIN_SRC emacs-lisp
@@ -1092,7 +1157,7 @@ Auto-tail, please.
   (setq css-indent-offset 2)
 
   (use-package rainbow-mode
-    :pin "gnu"
+    :pin elpa
     :init
     (add-hook 'scss-mode-hook 'rainbow-mode)
     (add-hook 'css-mode-hook 'rainbow-mode))

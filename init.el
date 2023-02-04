@@ -3,7 +3,7 @@
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ;; ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa-stable" . "https://stable.melpa.org/packages/")
-                         ("gnu" . "https://elpa.gnu.org/packages/")))
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (setq package-archive-priorities
       '(("melpa-stable" . 10000)))
@@ -34,7 +34,7 @@
 (assq-delete-all 'org package--builtin-versions)
 
 (use-package org
-             :pin "gnu"
+             :pin elpa
              :demand t
              :ensure t
              :init
