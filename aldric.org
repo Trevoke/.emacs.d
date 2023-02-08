@@ -805,6 +805,7 @@ smtpmail-multi
   (use-package smtpmail-multi
     :pin "melpa"
     :config
+    (setq smtpmail-auth-credentials "~/.authinfo.gpg")
     (setq smtpmail-multi-accounts
           `((home . (,user-mail-address
                      "smtp.gmail.com"
@@ -823,16 +824,24 @@ smtpmail-multi
     (setq smtpmail-debug-info t)
     (setq smtpmail-debug-verbose t))
 #+END_SRC
-** TODO Sending/Reading/Encrypting email
+** Encrypting email
+#+begin_src elisp
+  (defun stag-email-hook ()
+      (epa-mail-mode))
+  (add-hook 'message-mode-hook 'stag-email-hook)
+#+end_src
+** Reading email
 orgstruct++ was removed in org 9.2
 It seems I may want to use orgalist.
 #+BEGIN_SRC emacs-lisp
+  (defun stag-trash-email ()
+    (interactive)
+    (notmuch-search-tag '("-inbox" "+trash")))
   (use-package notmuch
     :after org
+    :bind (:map notmuch-search-mode-map
+    ("C-c d" . stag-trash-email))
     :config
-    (defun stag-email-hook ()
-      (epa-mail-mode))
-
     (add-hook 'notmuch-message-mode-hook 'stag-email-hook))
 
   (use-package notmuch-transient
