@@ -4,4 +4,4 @@ Where the emacs config doth live
 
 ## Prereqs
 
-Go read `aldric.org`.
+Go read `config.org`.
