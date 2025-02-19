@@ -46,7 +46,7 @@
                    "~/.emacs.d/local-files/org-id-locations"))
 (require 'org)
 
-(org-babel-load-file "~/.emacs.d/aldric.org")
+(org-babel-load-file "~/.emacs.d/config.org")
 
 (put 'dired-find-alternate-file 'disabled nil)
 (put 'downcase-region 'disabled nil)

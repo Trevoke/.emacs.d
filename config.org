@@ -1,17 +1,24 @@
 #+TITLE: Trevoke's emacs config
 #+OPTIONS: toc:4
 
-* DONE About
+* TODO casual suite (or each package, one at a time)
+These are very cool transient menus surfacing the most useful features of various built-in features (calc, dired, re-builder, agenda, and plenty more) and not built-in (avy)
+
+* About
 <<babel-init>>
 Welcome to my emacs configuration.
 I tinker with this file a lot, so I need a quick way to get to it.
 I set a [[*Bookmarks][bookmark]] with =C-x r m= and I can get back here with =C-x r b=
-* DONE External tools required
+* External tools required
 - aspell
-
-* DONE External references and directories
-This is here so it's easier for me to remember what Ι need to set up on a new machine. You'd think a script would be better. Yep. Script is next.
-#+begin_src emacs-lisp
+- revealjs
+- hugo
+- bibtex
+- zotero?
+- tree-sitter
+- ... lsp servers
+* Variables, paths, etc.
+#+begin_src elisp
   (setq stag-easy-hugo-basedir "~/src/projects/trevoke.github.io-source"
         stag-easy-hugo-root "~/src/projects/trevoke.github.io"
         stag-org-reveal-root "/home/stag/mnt/internal/src/vendor/reveal.js"
@@ -22,10 +29,29 @@ This is here so it's easier for me to remember what Ι need to set up on a new m
         stag-bbdb-file "~/my-life/orgnotes/bbdb/big-brother-database"
         stag-bibliography-file "~/my-life/orgnotes/references/library.bib"
         stag-cite-export-processors '((t . (csl "/home/trevoke/my-life/orgnotes/references/modern-language-association.csl")))
+        stag-ledger-journal "~/my-life/accounting-personal/2025.ledger"
         )
-
 #+end_src
-* DONE Package management
+** Packages (without package management)
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/packages")
+#+END_SRC
+** Themes
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+;; (load-theme 'mejelly t)
+#+END_SRC
+** Secrets & personal information
+API keys, passwords, etc are kept in here. This file is .gitignored.
+#+BEGIN_SRC emacs-lisp
+(load "~/.emacs.d/.emacs.secrets" t)
+#+END_SRC
+** asdf (access to programming languages managed with asdf)
+#+begin_src emacs-lisp
+  (setenv "PATH" (concat (getenv "PATH") ":~/.asdf/shims"))
+  (setq exec-path (append exec-path '("~/.asdf/shims")))
+#+END_SRC
+* Package management
 ** Quelpa & Use-package
 I use [[https://github.com/jwiegley/use-package][use-package]], because:
 1. it's got a nice and concise macro interface
@@ -34,89 +60,36 @@ I use [[https://github.com/jwiegley/use-package][use-package]], because:
 [[https://github.com/quelpa/quelpa][Quelpa]] lets me pull from specific source code repos and branches beyond the existing package repositories, which is sometimes convenient.
 
 See the [[./init.el]] file for these things.
+* UI
+#+begin_src elisp
+  (customize-set-variable 'frame-background-mode 'auto)
+#+end_src
+This is first because nano-theme, while providing a gorgeous UI, has lots of opinions and makes some destructive changes.
+#+begin_src elisp
+  ;; (use-package nano-theme
+  ;;   :ensure nil
+  ;;   ;:defer t
+  ;;   :quelpa (nano-theme
+  ;;            :fetcher github
+  ;;            :repo "rougier/nano-theme")
+  ;;   :init
+  ;;   ;(load-theme 'modus-vivendi-tinted t)
+  ;;   :config
+  ;;   ;(nano-mode)
+  ;;   ;(load-theme 'nano-dark t)
+  ;;   )
+#+end_src
+** Override some nano-theme defaults
+#+begin_src elisp
+  (setq initial-major-mode 'emacs-lisp-mode)
+#+end_src
 
-** PATH
-OSX is not friendly. This makes sure emacs properly gets the full path from the user environment.
-#+begin_src emacs-lisp
-  (when (memq window-system '(mac ns))
-    (use-package exec-path-from-shell
-      :config
-      (exec-path-from-shell-initialize)))
+#+begin_src elisp
+  (setq-default cursor-type '(box .  2))
+  (setq-default cursor-in-non-selected-windows t)
+  (setq blink-cursor-mode t)
 #+end_src
-** A new package browser
-#+BEGIN_SRC emacs-lisp
-(use-package paradox)
-#+END_SRC
-* DONE General emacs config
-** Garbage collection
-#+begin_src emacs-lisp
-(setq gc-cons-threshold (* 100 1024 1024))
-#+end_src
-** Customizations from customization system
-Keeping these separate makes life easier: they get modified when I load a theme and such, and I don't need that kind of hassle when maintaining my actual configuration, you know?
-In addition, I do keep some somewhat computer-specific stuff in there, like the font, and it's just easier to have this separated there.
-#+BEGIN_SRC emacs-lisp
-(setq custom-file "~/.emacs.d/local-files/emacs-custom.el")
-(load custom-file t) ;; t means no error if file does not exist
-#+END_SRC
-** Additional paths
-*** Packages (without package management)
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/packages")
-#+END_SRC
-*** Themes
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-;; (load-theme 'mejelly t)
-#+END_SRC
-*** Secrets & personal information
-API keys, passwords, etc are kept in here. This file is .gitignored.
-#+BEGIN_SRC emacs-lisp
-(load "~/.emacs.d/.emacs.secrets" t)
-#+END_SRC
-*** executable versioning (mostly programming languages)
-#+begin_src emacs-lisp
-  (setenv "PATH" (concat (getenv "PATH") ":~/.asdf/shims"))
-  (setq exec-path (append exec-path '("~/.asdf/shims")))
-#+END_SRC
-** Quality of life
-*** Yes/No => y/n
-#+BEGIN_SRC emacs-lisp
-(fset 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
-*** Backups
-Centralize emacs backups. This directory is gitignored.
-#+BEGIN_SRC emacs-lisp
-(setq backup-directory-alist '(("." . "~/.emacs.d/local-files/backups")))
-#+END_SRC
-And I'm not super-worried about old backups and other such things, so I'll just tell emacs to stop worrying about it.
-#+BEGIN_SRC emacs-lisp
-  (setq delete-old-versions -1)
-  (setq version-control t)
-  (setq vc-make-backup-files t)
-  (setq auto-save-file-name-transforms
-        '((".*" "~/.emacs.d/local-files/auto-save-list/" t)))
-  (setq auto-save-list-file-prefix
-        "~/.emacs.d/local-files/auto-save-list/.saves-")
-#+END_SRC
-*** Recent files
-#+begin_src emacs-lisp
-  (setq recentf-save-file "~/.emacs.d/local-files/recentf")
-  (require 'recentf)
-#+end_src
-*** History
-Stolen from https://www.wisdomandwonder.com/wp-content/uploads/2014/03/C3F.html
-#+BEGIN_SRC emacs-lisp
-  (setq savehist-file "~/.emacs.d/local-files/savehist")
-  (setq history-delete-duplicates t)
-  (setq savehist-save-minibuffer-history 1)
-  (setq savehist-additional-variables
-        '(kill-ring
-          search-ring
-          regexp-search-ring))
-  (savehist-mode 1)
-#+END_SRC
-*** Visual choices
+
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-startup-screen t)
   (setq inhibit-startup-echo-area-message t)
@@ -142,29 +115,11 @@ This shows the file path in the GUI header
                              (abbreviate-file-name (buffer-file-name))
                            "%f"))))
 #+END_SRC
-*** Bookmarks
+* General emacs config
+** Garbage collection
 #+begin_src emacs-lisp
-  (setq bookmark-default-file "~/.emacs.d/local-files/bookmarks")
-  (require 'bookmark)
+(setq gc-cons-threshold (* 100 1024 1024))
 #+end_src
-** TODO Window config (Put OSX stuff somewhere else)
-I don't really care about any of the extra details - emacs helps me out enough in other ways.
-#+BEGIN_SRC emacs-lisp
-(when window-system
-  (tooltip-mode -1)
-  (tool-bar-mode -1)
-  (menu-bar-mode -1)
-  (scroll-bar-mode -1))
-#+END_SRC
-Although of course if you're on OSX, at least the menu bar can be enabled since the mighty OSX top bar won't ever disappear.
-And I've also added other OSX-specific stuff here... For now.
-#+BEGIN_SRC emacs-lisp
-  (when (memq window-system '(mac ns))
-    (setq mac-command-modifier 'super)
-    (setq mac-option-modifier 'meta)
-    (setq ns-use-srgb-colorspace t)
-    (menu-bar-mode t))
-#+END_SRC
 ** UTF-8
 #+BEGIN_SRC emacs-lisp
 ;; Activate UTF-8 mode:
@@ -189,6 +144,73 @@ And I've also added other OSX-specific stuff here... For now.
 ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
 (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 #+END_SRC
+** Customizations from customization system
+Keeping these separate makes life easier: they get modified when I load a theme and such, and I don't need that kind of hassle when maintaining my actual configuration, you know?
+In addition, I do keep some somewhat computer-specific stuff in there, like the font, and it's just easier to have this separated there.
+#+BEGIN_SRC emacs-lisp
+(setq custom-file "~/.emacs.d/local-files/emacs-custom.el")
+(load custom-file t) ;; t means no error if file does not exist
+#+END_SRC
+** Backups
+Centralize emacs backups. This directory is gitignored.
+#+BEGIN_SRC emacs-lisp
+(setq backup-directory-alist '(("." . "~/.emacs.d/local-files/backups")))
+#+END_SRC
+And I'm not super-worried about old backups and other such things, so I'll just tell emacs to stop worrying about it.
+#+BEGIN_SRC emacs-lisp
+  (setq delete-old-versions -1)
+  (setq version-control t)
+  (setq vc-make-backup-files t)
+  (setq auto-save-file-name-transforms
+        '((".*" "~/.emacs.d/local-files/auto-save-list/" t)))
+  (setq auto-save-list-file-prefix
+        "~/.emacs.d/local-files/auto-save-list/.saves-")
+#+END_SRC
+** Quality of life
+*** Yes/No => y/n
+#+BEGIN_SRC emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+*** Recent files
+#+begin_src emacs-lisp
+  (setq recentf-save-file "~/.emacs.d/local-files/recentf")
+  (require 'recentf)
+#+end_src
+*** History
+Stolen from https://www.wisdomandwonder.com/wp-content/uploads/2014/03/C3F.html
+#+BEGIN_SRC emacs-lisp
+  (setq savehist-file "~/.emacs.d/local-files/savehist")
+  (setq history-delete-duplicates t)
+  (setq savehist-save-minibuffer-history 1)
+  (setq savehist-additional-variables
+        '(kill-ring
+          search-ring
+          regexp-search-ring))
+  (savehist-mode 1)
+#+END_SRC
+*** Bookmarks
+#+begin_src emacs-lisp
+  (setq bookmark-default-file "~/.emacs.d/local-files/bookmarks")
+  (require 'bookmark)
+#+end_src
+** TODO Window config (Put OSX stuff somewhere else)
+I don't really care about any of the extra details - emacs helps me out enough in other ways.
+#+BEGIN_SRC emacs-lisp
+(when window-system
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1))
+#+END_SRC
+Although of course if you're on OSX, at least the menu bar can be enabled since the mighty OSX top bar won't ever disappear.
+And I've also added other OSX-specific stuff here... For now.
+#+BEGIN_SRC emacs-lisp
+  (when (memq window-system '(mac ns))
+    (setq mac-command-modifier 'super)
+    (setq mac-option-modifier 'meta)
+    (setq ns-use-srgb-colorspace t)
+    (menu-bar-mode t))
+#+END_SRC
 ** Buffer management
 I like unique buffer names. Enter uniquify.
 #+BEGIN_SRC emacs-lisp
@@ -211,7 +233,19 @@ Also, ibuffer is nicer than plain-old buffer window
 (setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
 (setq mouse-wheel-follow-mouse t) ;; scroll window under mouse
 #+END_SRC
-* DONE Window management
+* Frame management
+** Transparency
+#+BEGIN_SRC emacs-lisp
+(use-package seethru :pin "melpa")
+#+END_SRC
+** text scaling
+This handy little package increases the size of the font in the whole frame.
+#+BEGIN_SRC emacs-lisp
+(use-package default-text-scale
+  :bind (("C-x C-=" . default-text-scale-increase)
+         ("C-x C--" . default-text-scale-decrease)))
+#+END_SRC
+* Window management
 ** Window layout manager (built-in to emacs)
 Prefix key is =C-x C-t=
 ** Winner-mode (undo/redo window changes)
@@ -255,13 +289,20 @@ Taken from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tric
 ** Interacting with emacs
 *** Fonts and stuff
 I found this function online somewhere, before I thought tracking code origin for this config file might matter.
-All it does is tell you what face is at point.
+All it does is tell you what face is at point. It toggles hl-line-mode if needed.
 #+BEGIN_SRC emacs-lisp
-(defun stag-what-face (pos)
-  (interactive "d")
-  (let ((face (or (get-char-property pos 'read-face-name)
-                  (get-char-property pos 'face))))
-    (if face (message "Face: %s" face) (message "No face at %d" pos))))
+  (defun stag-what-face (pos)
+    (interactive "d")
+    (let* ((local-hl-p hl-line-mode)
+           (global-hl-p global-hl-line-mode)
+           (off (if local-hl-p (hl-line-mode -1)))
+           (off (if global-hl-p (global-hl-line-mode -1)))
+           (face (or (get-char-property pos 'read-face-name)
+                     (get-char-property pos 'face))))
+      (if face (message "Face: %s" face)
+        (message "No face at %d" pos))
+      (if local-hl-p (hl-line-mode))
+      (if global-hl-p (global-hl-line-mode))))
 #+END_SRC
 *** Disable C-z to minimize
 Suspend emacs？ I'll use C-x C-z.
@@ -269,36 +310,15 @@ Suspend emacs？ I'll use C-x C-z.
 (global-unset-key (kbd "C-z"))
 (global-unset-key (kbd "C-x C-z"))
 #+END_SRC
-** evil-mode
-Because sometimes, vim.
-#+BEGIN_SRC emacs-lisp
-(use-package evil)
-#+END_SRC
-** Frame management
-*** Transparency
-#+BEGIN_SRC emacs-lisp
-(use-package seethru :pin "melpa")
-#+END_SRC
-** text scaling
-This handy little package increases the size of the font in the whole frame.
-#+BEGIN_SRC emacs-lisp
-(use-package default-text-scale
-  :bind (("C-x C-=" . default-text-scale-increase)
-         ("C-x C--" . default-text-scale-decrease)))
-#+END_SRC
-** Color themes
-#+BEGIN_SRC emacs-lisp
-  (use-package solarized-theme :defer t)
-  (use-package modus-themes :defer t)
-#+END_SRC
-
 ** Define text interactions
 *** Use visual-line-mode
 #+BEGIN_SRC emacs-lisp
-(remove-hook 'text-mode-hook #'turn-on-auto-fill)
-(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+  (remove-hook 'text-mode-hook #'turn-on-auto-fill)
+  (add-hook 'text-mode-hook #'turn-on-visual-line-mode)
+  ; when in emacs 30 do this:
+  ; (add-hook 'text-mode-hook #'visual-wrap-prefix-mode)
 #+END_SRC
-*** Redefine kill-region and backward-kill-word
+*** TODO Redefine kill-region and backward-kill-word (decide whether to keep this?)
 I used Bash for a long time. This allows me to keep using Ctrl-w to delete a word backward.
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-w") 'backward-kill-word)
@@ -340,9 +360,420 @@ avy is kinda badass.
     :bind (("C-c j" . avy-goto-char-2)
            ("C-x j" . avy-po-mark)))
 #+END_SRC
-* DONE File system browsing
+* Engines
+** evil-mode
+Because sometimes, vim.
+#+BEGIN_SRC emacs-lisp
+(use-package evil)
+#+END_SRC
+** TODO Modeline (use nano-modeline?)
+#+begin_src elisp
+  ;; (use-package nano-modeline
+  ;;   :ensure nil
+  ;;   :quelpa (nano-modeline
+  ;;            :fetcher github
+  ;;            :repo "rougier/nano-modeline")
+  ;;   :hook
+  ;;   (prog-mode . nano-modeline-prog-mode)
+  ;;   (text-mode . nano-modeline-text-mode)
+  ;;   (org-mode . nano-modeline-org-mode)
+  ;;   (pdf-view-mode . nano-modeline-pdf-mode)
+  ;;   (mu4e-headers-mode . nano-modeline-mu4e-headers-mode)
+  ;;   (mu4e-view-mode . nano-modeline-mu4e-message-mode)
+  ;;   (elfeed-show-mode . nano-modeline-elfeed-entry-mode)
+  ;;   (elfeed-search-mode . nano-modeline-elfeed-search-mode)
+  ;;   (term-mode . nano-modeline-term-mode)
+  ;;   (xwidget-webkit-mode . nano-modeline-xwidget-mode)
+  ;;   (messages-buffer-mode . nano-modeline-message-mode)
+  ;;   (org-capture-mode . nano-modeline-org-capture-mode)
+  ;;   (org-agenda-mode . nano-modeline-org-agenda-mode))
+#+end_src
+** Minibuffer
+#+begin_src elisp
+  (use-package minibuffer
+    :ensure nil
+    :demand
+    :config
+    (file-name-shadow-mode 1)
+    (minibuffer-depth-indicate-mode 1)
+    (minibuffer-electric-default-mode 1)
+    :bind (("C-x C-m" . execute-extended-command)))
+
+  (use-package marginalia
+    :after (vertico embark consult)
+    :init
+    (marginalia-mode)
+    ;; (advice-add #'marginalia-cycle :after
+    ;;             (lambda () (when (bound-and-true-p selectrum-mode) (selectrum-exhibit 'keep-selected))))
+    )
+#+end_src
+*** UI
+#+begin_src elisp
+  (use-package nano-minibuffer
+    :ensure nil
+    :quelpa (nano-minibuffer
+             :fetcher github
+             :repo "rougier/nano-minibuffer")
+    ;:config
+    ;(nano-minibuffer-mode)
+    )
+#+end_src
+** Command completion
+#+BEGIN_SRC emacs-lisp
+  (use-package vertico
+    :pin elpa
+    :init
+    (vertico-mode)
+    :custom
+    (completion-styles '(flex basic partial-completion emacs22)))
+
+  (use-package vertico-prescient
+    :after (vertico prescient)
+    :config
+    (vertico-prescient-mode +1)
+    (prescient-persist-mode +1))
+
+  (use-package prescient
+    :init
+    (setq prescient-save-file "~/.emacs.d/local-files/prescient-save.el")
+    :custom
+    (prescient-sort-length-enable nil)
+    (prescient-filter-method '(literal initialism anchored fuzzy)))
+
+#+END_SRC
+** Actions
+#+begin_src emacs-lisp
+  (use-package embark)
+
+  (use-package embark-consult
+    :after (embark consult))
+#+end_src
+** Input completion
+#+begin_src emacs-lisp
+  (use-package consult :after vertico)
+#+end_src
+** Text completion
+*** company-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :hook (prog-mode . company-mode))
+#+END_SRC
+*** Snippets
+I don't use snippets at the moment but I should look into tempel:
+https://github.com/minad/tempel
+https://github.com/fejfighter/eglot-tempel
+https://github.com/Crandel/tempel-collection
+** Linting
+#+begin_src elisp
+  (use-package flycheck)
+#+end_src
+** LSP (Language Server Protocols)
+#+begin_src elisp
+        ;; TODO : elixir
+        ;; TODO : keymap prefix: C-c i ?
+        (use-package eglot
+          :ensure nil
+          :demand)
+
+        (use-package consult-eglot
+          :pin "melpa"
+          :after (consult eglot))
+
+        (use-package consult-eglot-embark
+          :pin "melpa"
+          :after (consult-eglot embark)
+          :config
+        (consult-eglot-embark-mode))
+
+        (use-package flycheck-eglot
+          :pin "melpa"
+          :after (flycheck eglot)
+          :config (global-flycheck-eglot-mode 1))
+#+end_src
+** Menus
+#+begin_src emacs-lisp
+  (assq-delete-all 'transient package--builtins)
+  (assq-delete-all 'transient package--builtin-versions)
+  (use-package transient
+    :init
+    (setq transient-history-file "~/.emacs.d/local-files/transient/history.el"
+          transient-levels-file "~/.emacs.d/local-files/transient/levels.el"
+          transient-values-file "~/.emacs.d/local-files/transient/values.el"))
+#+end_src
+** Searching
+*** Anzu (about search results)
+#+BEGIN_SRC emacs-lisp
+  (use-package anzu
+    :config (global-anzu-mode t)
+    :bind (("M-%" . anzu-query-replace)
+           ("C-M-%" . anzu-query-replace-regexp)))
+#+END_SRC
+*** Silver searcher + Wgrep-ag
+Sometimes after you've found a bunch of things, you want to edit.. Kind of a find-and-replace sort of deal, maybe?
+
+I forget the basic keybindings all the time: After a search using =ag=, use C-c C-p to start editing the results buffer, and use C-c C-c to save the changes and C-c C-k to cancel.
+#+BEGIN_SRC emacs-lisp
+(use-package ag
+  :config
+  (setq ag-reuse-buffers 't))
+
+(use-package wgrep-ag
+  :after ag
+    :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
+    :config (autoload 'wgrep-ag-setup "wgrep-ag"))
+#+END_SRC
+** Code Projects (is this the right place for this?)
+*** Project navigation
+Projectile is pretty sweet.
+#+BEGIN_SRC emacs-lisp
+(use-package projectile
+  :diminish projectile-mode
+  :init
+  (setq projectile-known-projects-file "~/.emacs.d/local-files/projectile-bookmarks.eld")
+  (setq projectile-cache-file "~/.emacs.d/local-files/projectile.cache")
+  :config
+  (projectile-global-mode)
+  (setq projectile-completion-system 'default)
+  :bind (("C-c p" . projectile-command-map)))
+#+END_SRC
+
+** File (text/code) Structure
+#+begin_src elisp
+(use-package imenu
+  :ensure nil
+  :demand
+  :config
+  (setq imenu-use-markers t)
+  (setq imenu-auto-rescan t)
+  (setq imenu-auto-rescan-maxout 600000)
+  (setq imenu-max-item-length 100)
+  (setq imenu-use-popup-menu nil)
+  (setq imenu-eager-completion-buffer t)
+  (setq imenu-space-replacement " ")
+  (setq imenu-level-separator "/"))
+
+(use-package imenu-list
+  :after imenu)
+#+end_src
+** Selecting text
+*** Expand region
+One of the features that makes IDEA's editors awesome is the way you can expand selection. This plugin replicates the feature.
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
+    :bind (("C-c <up>" . er/expand-region)
+           ("C-c <down>" . er/contract-region)))
+#+END_SRC
+
+* Org-mode
+The code to install org-mode itself is in the init.el file (because it is built-in and needs some love).
+Here is additional configuration for it.
+** libraries for exporting
+I've been having some issues exporting, so I'm actively loading libraries here.
+#+BEGIN_SRC emacs-lisp
+  (use-package ox :ensure nil :after org)
+  (use-package org-macro :ensure nil :after org)
+  (use-package ob-exp :ensure nil :after org)
+  (use-package org-compat :ensure nil :after org)
+
+  (use-package ox-md :ensure nil :after ox)
+
+  ;; (use-package ox-pandoc :after ox)
+
+  (use-package ol-notmuch :after notmuch)
+#+END_SRC
+** Generic org-mode configuration
+#+BEGIN_SRC emacs-lisp
+    (setq org-src-fontify-natively t)
+    (add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
+
+    (setq org-startup-indented t)
+    (setq org-cycle-separator-lines 0)
+    (setq org-goto-interface 'outline-path-completion) ;; useful with C-c C-j
+    (setq org-M-RET-may-split-line '((default .t) (headline . nil)))
+#+END_SRC
+** Org bullets
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets :after org
+    :init (add-hook 'org-mode-hook 'org-bullets-mode))
+#+END_SRC
+** Adding images
+#+BEGIN_SRC emacs-lisp
+  (use-package org-download :pin "melpa" :after org)
+#+END_SRC
+** global keybindings
+#+BEGIN_SRC emacs-lisp
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-cb" 'org-switchb)
+  (org-defkey org-mode-map "\C-cr" 'org-refile)
+#+END_SRC
+* GTD (Getting Things Done)
+** Org-gtd
+#+BEGIN_SRC emacs-lisp
+    (use-package org-gtd
+      :after org
+      :quelpa ((org-gtd :fetcher github :repo "trevoke/org-gtd.el")
+               :upgrade t)
+      :demand t
+      :init
+      (setq org-gtd-update-ack "3.0.0")
+      :custom
+      (org-gtd-directory stag-org-gtd-directory)
+      (org-agenda-property-position 'next-line)
+      (org-edna-use-inheritance t)
+      :config
+      (org-edna-mode 1)
+      :bind
+      (("C-c d c" . org-gtd-capture)
+       ("C-c d e" . org-gtd-engage)
+       ("C-c d p" . org-gtd-process-inbox)
+       ("C-c d n" . org-gtd-show-all-next)
+       ("C-c d s" . org-gtd-show-stuck-projects)
+       :map org-gtd-clarify-map
+       ("C-c c" . org-gtd-choose)))
+  (require 'org-gtd)
+#+END_SRC
+** Diary
+#+BEGIN_SRC emacs-lisp
+(setq diary-file (concat org-directory "diary-file.org"))
+
+(setq view-diary-entries-initially t
+      mark-diary-entries-in-calendar t
+      diary-number-of-entries 7)
+(add-hook 'diary-display-hook 'diary-fancy-display)
+#+END_SRC
+** Action Tags
+These are tags to add to tasks, such as types of action, mindset I need to be in, tool Ι need to have, emotional reward I'll get from doing the action, etc. Whatever helps me pick a task to accomplish.
+#+BEGIN_SRC emacs-lisp
+  (setq org-tag-alist '(("@home" . ?h)
+                        ("@work" . ?w)
+                        ("@nonet" . ?n)
+                        ("code")))
+#+END_SRC
+** Captures
+#+BEGIN_SRC emacs-lisp
+  (use-package org-capture
+    :ensure nil
+    :after org
+    :config
+    (setq org-default-notes-file (concat org-directory "notes.org")))
+#+END_SRC
+** Refiling
+#+BEGIN_SRC emacs-lisp
+  (setq org-refile-use-outline-path nil)
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-refile-allow-creating-parent-nodes nil)
+  (setq org-log-refile 'time)
+#+END_SRC
+* Zettelkasten
+#+BEGIN_SRC emacs-lisp
+  (use-package org-roam
+    :pin melpa
+    :after org
+    :ensure t
+    :init
+    (setq org-roam-db-location stag-org-roam-db-location
+          org-roam-v2-ack t)
+    :config
+    (org-roam-db-autosync-mode)
+    ;:hook
+    ;(after-init . org-roam-mode)
+    :custom
+    (org-roam-directory stag-org-roam-directory)
+    :bind
+    ("C-c n l" . org-roam-buffer-toggle)
+    ("C-c n t" . org-roam-dailies-goto-today)
+    ("C-c n f" . org-roam-node-find)
+    ("C-c n i" . org-roam-node-insert)
+    ("C-c n g" . org-roam-graph))
+
+  (use-package org-roam-ui
+    :pin "melpa"
+    :ensure t
+    :after org-roam
+    ;; uncomment if you want this to be turned on at emacs boot time.
+    ; :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+
+  (use-package org-roam-timestamps
+    :pin "melpa"
+    :after org-roam
+    :config (org-roam-timestamps-mode))
+#+END_SRC
+
+* Agenda
+#+BEGIN_SRC emacs-lisp
+  (use-package org-agenda
+    :ensure nil
+    :no-require t
+    :after org
+    :custom
+    (org-agenda-diary-file 'diary-file)
+    (org-agenda-include-diary t)
+    (org-agenda-restore-windows-after-quit t)
+    (org-agenda-sticky t)
+    (org-agenda-window-setup 'other-window)
+    (org-agenda-skip-deadline-if-done t)
+    (org-agenda-skip-scheduled-if-done t)
+    (org-agenda-start-on-weekday nil))
+#+END_SRC
+
+A quick and pretty agenda view
+#+begin_src elisp
+  (use-package nano-agenda
+    :after org-agenda
+    :ensure nil
+    :quelpa (nano-agenda
+             :fetcher github
+             :repo "rougier/nano-agenda"))
+#+end_src
+* Calendar, dates, times
+#+BEGIN_SRC emacs-lisp
+  (setq calendar-week-start-day 1) ;; Monday
+  (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
+
+  (use-package org-gcal
+    :pin "melpa"
+    :after (org-agenda)
+    :init
+    (setq org-gcal-dir "~/.emacs.d/local-files/org-gcal/")
+    (setq org-gcal-cancelled-todo-keyword "CNCL"))
+
+  (use-package calfw-gcal :pin "melpa"
+    :after calfw-org)
+
+  (use-package calfw-org
+    :after (org-gcal calfw)
+    :demand t)
+
+  (use-package calfw
+    :config
+    (setq cfw:fchar-junction ?╋
+          cfw:fchar-vertical-line ?┃
+          cfw:fchar-horizontal-line ?━
+          cfw:fchar-left-junction ?┣
+          cfw:fchar-right-junction ?┫
+          cfw:fchar-top-junction ?┯
+          cfw:fchar-top-left-corner ?┏
+          cfw:fchar-top-right-corner ?┓))
+#+END_SRC
+And a pretty calendar which, among other things, tells you how busy a given day is based on what's in your org-agenda-files.
+Note this is on hold due to a dependency on nano-theme.
+#+begin_src elisp
+  ;; (use-package nano-calendar
+  ;;   :ensure nil
+  ;;   :quelpa (nano-calendar
+  ;;            :fetcher github
+  ;;            :repo "rougier/nano-calendar")
+  ;;   :custom
+  ;;   (nano-calendar-show-busy t))
+#+end_src
+* File system browsing
 ** Dired
-dired-jump is awesome (C-x C-j in any buffer)
+dired-jump is awesome (=C-x C-j= in any buffer)
 #+BEGIN_SRC emacs-lisp
 (require 'dired-x)
 #+END_SRC
@@ -387,407 +818,12 @@ It's also nice to have dired with M-< and M-> take you to first and last file
 (define-key dired-mode-map
   (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
 #+END_SRC
-
-* DONE Extending emacs with engines
-** DONE minibuffer
-#+begin_src emacs-lisp
-  (use-package minibuffer
-    :ensure nil
-    :demand
-    :config
-    (file-name-shadow-mode 1)
-    (minibuffer-depth-indicate-mode 1)
-    (minibuffer-electric-default-mode 1)
-    :bind (("C-x C-m" . execute-extended-command)))
-
-  (use-package marginalia
-    :after (vertico embark consult)
-    :init
-    (marginalia-mode)
-    ;; (advice-add #'marginalia-cycle :after
-    ;;             (lambda () (when (bound-and-true-p selectrum-mode) (selectrum-exhibit 'keep-selected))))
-    )
-#+end_src
-** DONE Command completion
-#+BEGIN_SRC emacs-lisp
-  (use-package vertico
-  :pin elpa
-  :init
-  (vertico-mode)
-  :custom
-  (completion-styles '(flex basic partial-completion emacs22)))
-
-  (use-package vertico-prescient
-  :after (vertico prescient)
-  :config
-  (vertico-prescient-mode +1)
-  (prescient-persist-mode +1))
-
-  (use-package prescient
-    :init
-    (setq prescient-save-file "~/.emacs.d/local-files/prescient-save.el")
-    :custom
-    (prescient-sort-length-enable nil)
-    (prescient-filter-method '(literal initialism anchored fuzzy)))
-
-#+END_SRC
-** DONE Input completion
-#+begin_src emacs-lisp
-  (use-package consult :after vertico)
-#+end_src
-** DONE Actions
-#+begin_src emacs-lisp
-  (use-package embark)
-
-  (use-package embark-consult
-    :after (embark consult))
-#+end_src
-** DONE Text Completion
-*** company-mode
-#+BEGIN_SRC emacs-lisp
-(use-package company)
-#+END_SRC
-*** Snippets
-Snippets; when you've tried 'em, it's hard to do without 'em. I mean, keystrokes, who needs 'em, right?
-#+BEGIN_SRC emacs-lisp
-(use-package yasnippet :diminish yas-minor-mode)
-#+END_SRC
-** DONE In-buffer navigation
-#+begin_src emacs-lisp
-(use-package imenu
-  :ensure nil
-  :demand
-  :config
-  (setq imenu-use-markers t)
-  (setq imenu-auto-rescan t)
-  (setq imenu-auto-rescan-maxout 600000)
-  (setq imenu-max-item-length 100)
-  (setq imenu-use-popup-menu nil)
-  (setq imenu-eager-completion-buffer t)
-  (setq imenu-space-replacement " ")
-  (setq imenu-level-separator "/"))
-
-(use-package imenu-list
-  :after imenu)
-#+end_src
-** DONE Projects
-*** Project management
-**** TODO Persist (this has disappeared?)
-Small package meant to help variable persistence across emacs sessions
-#+begin_src emacs-lisp
-;;  (use-package persist
-;;    :init
-;;    (setq persist--directory-location "~/.emacs.d/local-files/"))
-#+end_src
-*** Project navigation
-Projectile is pretty sweet.
-#+BEGIN_SRC emacs-lisp
-(use-package projectile
-  :diminish projectile-mode
-  :init
-  (setq projectile-known-projects-file "~/.emacs.d/local-files/projectile-bookmarks.eld")
-  (setq projectile-cache-file "~/.emacs.d/local-files/projectile.cache")
-  :config
-  (projectile-global-mode)
-  (setq projectile-completion-system 'default)
-  :bind (("C-c p" . projectile-command-map)))
-#+END_SRC
-
-** DONE Searching
-*** Anzu (about search results)                            :external:minor:
-#+BEGIN_SRC emacs-lisp
-  (use-package anzu
-    :config (global-anzu-mode t)
-    :bind (("M-%" . anzu-query-replace)
-           ("C-M-%" . anzu-query-replace-regexp)))
-#+END_SRC
-*** Silver searcher + Wgrep-ag
-Sometimes after you've found a bunch of things, you want to edit.. Kind of a find-and-replace sort of deal, maybe?
-
-I forget the basic keybindings all the time: After a search using =ag=, use C-c C-p to start editing the results buffer, and use C-c C-c to save the changes and C-c C-k to cancel.
-#+BEGIN_SRC emacs-lisp
-(use-package ag
-  :config
-  (setq ag-reuse-buffers 't))
-
-(use-package wgrep-ag
-  :after ag
-    :init  (add-hook 'ag-mode-hook 'wgrep-ag-setup)
-    :config (autoload 'wgrep-ag-setup "wgrep-ag"))
-#+END_SRC
-** DONE Menus
-#+begin_src emacs-lisp
-  (use-package transient
-    :init
-    (setq transient-history-file "~/.emacs.d/local-files/transient/history.el"
-          transient-levels-file "~/.emacs.d/local-files/transient/levels.el"
-          transient-values-file "~/.emacs.d/local-files/transient/values.el"))
-#+end_src
-* DONE Org-mode
-org-mode itself is in the init.el file. here's additional config for it.
-I've been having some issues exporting, so I'm actively loading libraries here.
-#+BEGIN_SRC emacs-lisp
-  (use-package ox :ensure nil :after org)
-  (use-package org-macro :ensure nil :after org)
-  (use-package ob-exp :ensure nil :after org)
-  (use-package org-compat :ensure nil :after org)
-
-  (use-package ox-md :ensure nil :after ox)
-
-  ;; (use-package ox-pandoc :after ox)
-
-  (use-package ol-notmuch :after notmuch)
-#+END_SRC
-** Generic org-mode configuration
-#+BEGIN_SRC emacs-lisp
-    (setq org-src-fontify-natively t)
-    (add-to-list 'auto-mode-alist '(".org.txt$" . org-mode))
-
-    (setq org-startup-indented t)
-    (setq org-cycle-separator-lines 0)
-    (setq org-goto-interface 'outline-path-completion) ;; useful with C-c C-j
-    (setq org-M-RET-may-split-line '((default .t) (headline . nil)))
-#+END_SRC
-** Org bullets
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets :after org
-    :init (add-hook 'org-mode-hook 'org-bullets-mode))
-#+END_SRC
-** Adding images
-#+BEGIN_SRC emacs-lisp
-  (use-package org-download :pin "melpa" :after org)
-#+END_SRC
-** global keybindings
-#+BEGIN_SRC emacs-lisp
-  (global-set-key "\C-cl" 'org-store-link)
-  (global-set-key "\C-cb" 'org-switchb)
-  (org-defkey org-mode-map "\C-cr" 'org-refile)
-#+END_SRC
-
-** Weiqi
-Note - package is downloaded manually
-source is https://github.com/misohena/el-igo
-#+begin_src emacs-lisp
-  (use-package igo-org :after org
-    :load-path "packages/el-igo-master"
-    :config
-    (igo-org-setup))
-#+end_src
-* DONE GTD (Getting Things Done)
-#+BEGIN_SRC emacs-lisp
-    (use-package org-gtd
-      :after org
-      :quelpa ((org-gtd :fetcher github :repo "trevoke/org-gtd.el")
-               :upgrade t)
-      :demand t
-      :init
-      (setq org-gtd-update-ack "3.0.0")
-      :custom
-      (org-gtd-directory stag-org-gtd-directory)
-      (org-agenda-property-position 'next-line)
-      (org-edna-use-inheritance t)
-      :config
-      (org-edna-mode)
-      :bind
-      (("C-c d c" . org-gtd-capture)
-       ("C-c d e" . org-gtd-engage)
-       ("C-c d p" . org-gtd-process-inbox)
-       ("C-c d n" . org-gtd-show-all-next)
-       ("C-c d s" . org-gtd-show-stuck-projects)
-       :map org-gtd-clarify-map
-       ("C-c c" . org-gtd-choose)))
-  (require 'org-gtd)
-#+END_SRC
-** Agenda
-#+BEGIN_SRC emacs-lisp
-  (use-package org-agenda
-    :ensure nil
-    :no-require t
-    :after org
-    :custom
-    (org-agenda-diary-file 'diary-file)
-    (org-agenda-include-diary t)
-    (org-agenda-restore-windows-after-quit t)
-    (org-agenda-sticky t)
-    (org-agenda-window-setup 'other-window)
-    (org-agenda-skip-deadline-if-done t)
-    (org-agenda-skip-scheduled-if-done t)
-    (org-agenda-start-on-weekday nil))
-#+END_SRC
-** Diary
-#+BEGIN_SRC emacs-lisp
-(setq diary-file (concat org-directory "diary-file.org"))
-
-(setq view-diary-entries-initially t
-      mark-diary-entries-in-calendar t
-      diary-number-of-entries 7)
-(add-hook 'diary-display-hook 'diary-fancy-display)
-#+END_SRC
-** Calendar, dates, times
-#+BEGIN_SRC emacs-lisp
-  (setq calendar-week-start-day 1) ;; Monday
-  (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
-
-  (use-package org-gcal
-    :pin "melpa"
-    :after (org-agenda)
-    :init
-    (setq org-gcal-dir "~/.emacs.d/local-files/org-gcal/")
-    (setq org-gcal-cancelled-todo-keyword "CNCL"))
-
-  (use-package calfw-gcal :pin "melpa"
-    :after calfw-org)
-
-  (use-package calfw-org
-    :after (org-gcal calfw)
-    :demand t)
-
-  (use-package calfw
-    :config
-    (setq cfw:fchar-junction ?╋
-          cfw:fchar-vertical-line ?┃
-          cfw:fchar-horizontal-line ?━
-          cfw:fchar-left-junction ?┣
-          cfw:fchar-right-junction ?┫
-          cfw:fchar-top-junction ?┯
-          cfw:fchar-top-left-corner ?┏
-          cfw:fchar-top-right-corner ?┓))
-#+END_SRC
-
-** Action Tags
-These are tags to add to tasks, such as types of action, mindset I need to be in, tool Ι need to have, emotional reward I'll get from doing the action, etc. Whatever helps me pick a task to accomplish.
-#+BEGIN_SRC emacs-lisp
-  (setq org-tag-alist '(("@home" . ?h)
-                        ("@work" . ?w)
-                        ("@nonet" . ?n)
-                        ("code")))
-#+END_SRC
-** Captures
-#+BEGIN_SRC emacs-lisp
-  (use-package org-capture
-    :ensure nil
-    :after org
-    :config
-    (setq org-default-notes-file (concat org-directory "notes.org")))
-#+END_SRC
-** Refiling
-#+BEGIN_SRC emacs-lisp
-  (setq org-refile-use-outline-path nil)
-  (setq org-outline-path-complete-in-steps nil)
-  (setq org-refile-allow-creating-parent-nodes nil)
-  (setq org-log-refile 'time)
-#+END_SRC
-* DONE Shells
-** Fish
-#+BEGIN_SRC emacs-lisp
-(use-package fish-mode)
-#+END_SRC
-** Terminal
+* Terminal emulators
+** vterm
 #+begin_src emacs-lisp
 (use-package vterm :pin melpa)
 #+end_src
-* DONE Zettelkasten
-#+BEGIN_SRC emacs-lisp
-  (use-package org-roam
-    :pin melpa
-    :after org
-    :ensure t
-    :init
-    (setq org-roam-db-location stag-org-roam-db-location
-          org-roam-v2-ack t)
-    :config
-    (org-roam-db-autosync-mode)
-    ;:hook
-    ;(after-init . org-roam-mode)
-    :custom
-    (org-roam-directory stag-org-roam-directory)
-    :bind
-    ("C-c n l" . org-roam-buffer-toggle)
-    ("C-c n t" . org-roam-dailies-goto-today)
-    ("C-c n f" . org-roam-node-find)
-    ("C-c n i" . org-roam-node-insert)
-    ("C-c n g" . org-roam-graph))
-
-  (use-package org-roam-ui
-    :pin "melpa"
-    :ensure t
-    :after org-roam
-
-    :hook (after-init . org-roam-ui-mode)
-    :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
-
-  (use-package org-roam-timestamps
-    :pin "melpa"
-    :after org-roam
-    :config (org-roam-timestamps-mode))
-#+END_SRC
-
-** Citation management
-#+begin_src elisp
-    (use-package citar
-    :after org embark
-    :bind (("C-c b" . citar-insert-citation)
-           (:map org-mode-map :package org ("C-c b" . #'org-cite-insert))
-           :map minibuffer-local-map
-           ("M-b" . citar-insert-preset))
-    :custom
-    (org-cite-global-bibliography `(,stag-bibliography-file))
-    (org-cite-insert-processor 'citar)
-    (org-cite-follow-processor 'citar)
-    (org-cite-activate-processor 'citar)
-    (org-cite-export-processors stag-cite-export-processors)
-    (citar-notes-path (list org-roam-directory))
-    (citar-bibliography org-cite-global-bibliography)
-    (citar-at-point-function 'embark-act)           ; Use `embark'
-    )
-
-  (use-package biblio)
-
-  (use-package org-roam-bibtex
-    :after citar biblio)
-
-  (use-package citar-embark
-    :after citar embark
-    :no-require
-    :config (citar-embark-mode))
-
-  (use-package citar-org-roam
-    :after citar org-roam
-    :no-require
-    :config (citar-org-roam-mode))
-
-  (setq citar-org-roam-note-title-template "${author} - ${title}\n#+filetags: ${tags}")
-
-
-  ;; Create a new node from a bibliographic source. taken from
-  ;; https://jethrokuan.github.io/org-roam-guide/
-  (defun kb/org-roam-node-from-cite (keys-entries)
-    (interactive (list (citar-select-refs)))
-    (let ((title (citar-format--entry (cdr keys-entries)
-                                                "${author editor}${date urldate} :: ${title}")))
-      (org-roam-capture- :templates
-                         '(("r" "reference" plain
-                            "%?"
-                            :if-new (file+head "references/${citekey}.org"
-                                               ":properties:
-  :roam_refs: [cite:@${citekey}]
-  :end:
-  ,#+title: ${title}
-  ,#+filetags: %(kb/insert-lit-category)\n")
-                            :immediate-finish t
-                            :unnarrowed t))
-                         :info (list :citekey (car keys-entries))
-                         :node (org-roam-node-create :title title)
-                         :props '(:finalize find-file))))
-
-  (use-package citar-org-roam
-    :after citar org-roam)
-#+end_src
-* DONE Email
+* Email
 ** BBDB
 #+begin_src emacs-lisp
 (use-package bbdb
@@ -852,8 +888,10 @@ It seems I may want to use orgalist.
   (use-package notmuch-transient
     :after (transient notmuch))
 #+END_SRC
-* DONE Writing
+* Writing
 ** TODO Symbols
+=C-x 8 RET=
+Or =M-x set-input-method RET tex= then things like =\beta= or =\triangle= will work: β, ▵.
 ** TODO Multiple languages
 We need ~aspell~ installed on the local machine - and I just have to do ~C-x i d~ to change the dictionary to the correct language.
 #+begin_src emacs-lisp
@@ -1017,7 +1055,7 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
           (write-file path)))
       (xwidget-webkit-browse-url (format "file://%s" path))))
 #+end_src
-* DONE Presentations
+* Presentations
 ** TODO Slides
 *** revealjs
 #+BEGIN_SRC emacs-lisp
@@ -1028,7 +1066,7 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
     :config
     (setq org-reveal-root stag-org-reveal-root))
 #+END_SRC
-* DONE Blogging
+* Blogging
 #+BEGIN_SRC emacs-lisp
   (use-package easy-hugo
     :after org
@@ -1040,7 +1078,10 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
     (setq easy-hugo-root stag-easy-hugo-root)
     (setq easy-hugo-previewtime "300"))
 #+END_SRC
-* DONE Version control
+#+begin_src elisp
+  (use-package ox-hugo)
+#+end_src
+* Version control
 ** Git
 *** Walking through a file's history
 #+BEGIN_SRC emacs-lisp
@@ -1062,332 +1103,78 @@ With this configuration, using C-f in a status buffer will trigger the gitflow s
   :after magit
   :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
 #+END_SRC
-* DONE Communication Clients
+* Communication Clients
 ** IRC
 #+BEGIN_SRC emacs-lisp
 (setq erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
 #+END_SRC
 
-* Programming
-** DONE LSP: eglot
-#+begin_src emacs-lisp
-  ;; TODO : elixir
-  ;; TODO : keymap prefix: C-c i ?
-  (use-package eglot
-    :ensure nil
-    :demand)
-
-  (use-package consult-eglot
-    :pin "melpa"
-    :after (consult eglot embart))
-
-  (use-package consult-eglot-embark
-    :pin "melpa"
-    :after (consult-eglot))
-
-  (use-package flycheck-eglot
-    :pin "melpa"
-    :after (flycheck eglot))
+* Accounting
+#+begin_src elisp
+  (use-package hledger-mode :pin melpa
+    :after company
+    :mode "\\.ledger\\'"
+    :custom
+    (hledger-jfile stag-ledger-journal)
+    (hledger-currency-string "$")
+    (hledger-life-expectancy 100)
+    (hledger-year-of-birth user-birth-year)
+    :hook
+    (hledger-mode . company-mode)
+    (hledger-mode . flycheck-mode)
+    :config
+    (add-to-list 'company-backends 'hledger-company)
+    :bind (("C-c a e" . hledger-jentry)
+         ("C-c a r" . hledger-run-command)
+         :map hledger-mode-map
+         ("<kp-add>" . hledger-increment-entry-date)
+         ("<kp-subtract>" . hledger-decrement-entry-date)))
+  (use-package flycheck-hledger
+    :after (flycheck hledger-mode)
+    :custom
+    (flycheck-hledger-strict t))
 #+end_src
-** CNCL Folding code
-#+BEGIN_SRC emacs-lisp
-  (use-package origami
-    :pin "melpa"
-    :config (global-origami-mode))
-#+END_SRC
-** DONE Indentation
-Always spaces. Always.
-#+BEGIN_SRC emacs-lisp
-(setq-default indent-tabs-mode nil)
-(setq backward-delete-char-untabify-method 'untabify)
-#+END_SRC
-** CNCL code tagging
-This is using GNU Global.
-#+BEGIN_SRC emacs-lisp
-(use-package ggtags
-  :config
-  (setq tags-case-fold-search nil)
-  :bind ("<f7>" . ggtags-create-tags))
-#+END_SRC
-** DONE Basic changes I want made to any code buffer
-Makes it easy to type things like {} or [] or () and magically add an extra line between the two so you can type there
-#+BEGIN_SRC emacs-lisp
-;; This function comes from http://stackoverflow.com/a/22109370/234025
-(defun stag-enter-key-dwim ()
-  "Inserts an extra newline between matching separators(?) and indents it, if it can, otherwise behaves like normal enter key"
-  (interactive)
-  (let ((break-open-pair (or (and (looking-back "{") (looking-at "}"))
-                             (and (looking-back ">") (looking-at "<"))
-                             (and (looking-back "(") (looking-at ")"))
-                             (and (looking-back "\\[") (looking-at "\\]")))))
-    (comment-indent-new-line)
-    (when break-open-pair
-      (save-excursion
-        (comment-indent-new-line))
-       (indent-for-tab-command))))
-#+END_SRC
 
-Here's where I plug in every modification I want in a code buffer
-#+BEGIN_SRC emacs-lisp
-  (use-package smartparens)
-
-  (defun stag-code-modes-hook ()
-    "A couple of changes I like to make to my code buffers"
-    ;;    (projectile-mode)
-    (display-line-numbers-mode t)
-    (smartparens-mode)
-    (yas-minor-mode)
-    ;;    (ggtags-mode)
+* Programming
+** Generally, a code buffer
+Let's make it all spaces, and clean themup on save.
+#+begin_src elisp
+  (defun stag-code-mode-tweaks ()
     (add-hook 'before-save-hook 'whitespace-cleanup)
-    (local-set-key "\C-m" 'stag-enter-key-dwim))
+    (setq-local indent-tabs-mode nil)
+    (setq-local backward-delete-char-untabify-method 'untabify))
 
-  (add-hook 'prog-mode-hook 'stag-code-modes-hook)
-#+END_SRC
-** DONE 80-column limit
+  (add-hook 'prog-mode-hook 'stag-code-mode-tweaks)
+#+end_src
+** Quick docs
+#+begin_src elisp
+  (add-hook 'prog-mode-hook 'turn-on-eldoc-mode)
+#+end_src
+** Line numbers
+#+begin_src elisp
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+#+end_src
+** Balanced parens
+#+begin_src elisp
+(use-package smartparens
+  :ensure smartparens  ;; install the package
+  :hook (prog-mode . smartparens-strict-mode) ;; add `smartparens-mode` to these hooks
+  :config
+  ;; load default config
+  (require 'smartparens-config))
+#+end_src
+** 80-column limit
 #+BEGIN_SRC emacs-lisp
 (use-package fill-column-indicator
   :config
   (setq fci-rule-column 80)
   (add-hook 'prog-mode-hook 'fci-mode))
 #+END_SRC
-** DONE Expand region
-One of the features that makes IDEA's editors awesome is the way you can expand selection. This plugin replicates the feature.
-#+BEGIN_SRC emacs-lisp
-  (use-package expand-region
-    :bind (("C-c <up>" . er/expand-region)
-           ("C-c <down>" . er/contract-region)))
-#+END_SRC
-** Log files
-Auto-tail, please.
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-mode))
-#+END_SRC
-** Cucumber
-#+BEGIN_SRC emacs-lisp
-(use-package feature-mode)
-#+END_SRC
-** Docker
-#+BEGIN_SRC emacs-lisp
-(use-package docker-compose-mode)
-(use-package dockerfile-mode)
-#+END_SRC
-** DONE emacs lisp
+** Elisp
 #+BEGIN_SRC emacs-lisp
   (use-package paredit
-    :hook (lisp-mode emacs-lisp-mode))
-#+END_SRC
-Additional quickdocs
-#+begin_src elisp
-  (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+    :hook ((lisp-mode emacs-lisp-mode) . enable-paredit-mode))
+
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
-#+end_src
-** Elixir
-#+BEGIN_SRC emacs-lisp
-  (use-package elixir-mode
-    :after projectile
-    :config
-    (setq projectile-globally-ignored-directories
-    (cons ".elixir_ls" projectile-globally-ignored-directories)))
-
-  (use-package elixir-yasnippets
-    :after elixir-mode)
-#+END_SRC
-** Python
-#+BEGIN_SRC emacs-lisp
- (use-package elpy
-   :config
-   (add-hook 'python-mode-hook 'elpy-enable))
-(use-package auto-virtualenv
-  :pin "melpa"
-  :config
-  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
-  (add-hook 'projectile-after-switch-project-hook  'auto-virtualenv-set-virtualenv))
-#+END_SRC
-** Ruby
-*** Enh-ruby-mode
-There's a few extra things I want started when I open a Ruby buffer
-#+BEGIN_SRC emacs-lisp
-  (defun stag-ruby-mode-hook ()
-    (use-package ruby-refactor
-      :diminish "rrf"
-      :pin "melpa")
-    (ruby-refactor-mode-launch)
-    (inf-ruby-minor-mode)
-    (modify-syntax-entry ?: ".") ;; Adds ":" to the word definition
-    (rbenv-use-corresponding))
-
-  (use-package enh-ruby-mode
-    :pin "melpa"
-    :interpreter "ruby"
-    :mode "\\.rb$" "Guardfile" "\\.rake$" "\\.pryrc$" "Rakefile" "Capfile" "Gemfile" "\\.ru$"
-    :init
-    (setq enh-ruby-bounce-deep-indent t)
-    (add-hook 'enh-ruby-mode-hook 'stag-code-modes-hook)
-    (add-hook 'enh-ruby-mode-hook 'stag-ruby-mode-hook))
-#+END_SRC
-*** Project management
-**** rbenv
-#+BEGIN_SRC emacs-lisp
-(use-package rbenv)
-#+END_SRC
-**** Project navigation
-And I like projectile-rails to handle rails projects.
-#+BEGIN_SRC emacs-lisp
-(use-package projectile-rails
-  :init
-   (add-hook 'projectile-mode-hook 'projectile-rails-on))
-#+END_SRC
-*** Inferior Ruby
-And I like pry better than irb, so have inf-ruby use pry.
-#+BEGIN_SRC emacs-lisp
-  (use-package inf-ruby
-    :config
-    (setq inf-ruby-default-implementation "pry")
-    (use-package company-inf-ruby
-      :pin "melpa"
-      :config
-      (add-to-list 'company-backends 'company-inf-ruby)))
-#+END_SRC
-*** Snippets
-I use yasnippets, and I've downloaded a collection of snippets from here: https://github.com/bmaland/yasnippet-ruby-mode
-*** Testing
-**** rspec
-#+BEGIN_SRC emacs-lisp
-(use-package rspec-mode)
-#+END_SRC
-*** TODO packages to be added
-- (use-package bundler)
-- (use-package goto-gem)
-- (use-package haml-mode)
-- (use-package slim-mode)
-- (use-package minitest)
-- (use-package rbenv)
-- (use-package robe)
-- (use-package ruby-hash-syntax)
-- (use-package ruby-refactor)
-- (use-package yaml-mode)
-** HTML
-*** Web-mode                                               :external:major:
-Here are all the extensions where I want web-mode enabled
-#+BEGIN_SRC emacs-lisp
-  (use-package web-mode
-    :after flycheck
-    :mode "\\.mustache$" "\\.html$" "\\.erb$" "\\.jsx$" "\\.eex$" "\\.php$"
-    :config
-    (flycheck-define-checker eslint-checker
-      "A JSX syntax and style checker based on JSXHint."
-
-      :command ("eslint" source)
-      :error-patterns
-      ((error line-start (1+ nonl) ": line " line ", col " column ", " (message) line-end))
-      :modes (web-mode))
-
-    (add-hook 'web-mode-hook
-              (lambda ()
-                (when (equal web-mode-content-type "jsx")
-                  ;; enable flycheck
-                  (flycheck-select-checker 'eslint-checker)
-                  (flycheck-mode))))
-
-    ;; And I think all this should be indented with 2 spaces.
-    (setq web-mode-markup-indent-offset 2)
-    (setq web-mode-css-indent-offset 2)
-    (setq web-mode-code-indent-offset 2)
-    (setq web-mode-indent-style 2)
-
-    ;; for better jsx syntax-highlighting in web-mode
-    ;; - courtesy of Patrick @halbtuerke
-    (defadvice web-mode-highlight-part (around tweak-jsx activate)
-      (if (equal web-mode-content-type "jsx")
-        (let ((web-mode-enable-part-face nil))
-          ad-do-it)
-        ad-do-it)))
-
-(use-package company-web
-      :after web-mode
-      :config
-      (add-to-list 'company-backends 'company-web-html)
-      (add-to-list 'company-backends 'company-web-jade)
-      (add-to-list 'company-backends 'company-web-slim))
-
-  (use-package emmet-mode
-    :after web-mode
-    :init
-    (add-hook 'html-mode-hook 'emmet-mode)
-    (add-hook 'web-mode-hook 'emmet-mode))
-
-#+END_SRC
-** CSS
-#+BEGIN_SRC emacs-lisp
-  (setq css-indent-offset 2)
-
-  (use-package rainbow-mode
-    :pin elpa
-    :init
-    (add-hook 'scss-mode-hook 'rainbow-mode)
-    (add-hook 'css-mode-hook 'rainbow-mode))
-
-  (use-package scss-mode
-    :mode "\\.scss$"
-    :init (add-hook 'scss-mode-hook 'flymake-mode))
-
-#+END_SRC
-** Javascript
-*** Actual JS
-**** js2-mode                                             :major:external:
-#+BEGIN_SRC emacs-lisp
-  (use-package js2-mode
-    :mode "\\.js$"
-    :init
-    (add-hook 'js2-mode-hook 'stag-code-modes-hook)
-    :config
-    (setq js2-basic-offset 2)
-    (setq js2-bounce-indent-p nil) ;; if I want to toggle indentation
-    (setq js2-highlight-level 3))
-#+END_SRC
-**** tern-mode
-https://truongtx.me/2014/04/20/emacs-javascript-completion-and-refactoring
-#+BEGIN_SRC emacs-lisp
-(use-package tern
-  :init (add-hook 'js2-mode-hook 'tern-mode)
-  :config)
-
-(defun delete-tern-process ()
-  (interactive)
-  (delete-process "Tern"))
-#+END_SRC
-**** TODO inferior mode (Pick one? Keep both?)
-#+BEGIN_SRC emacs-lisp
-  (use-package js-comint)
-  (use-package nodejs-repl)
-#+END_SRC
-**** snippets
-#+BEGIN_SRC emacs-lisp
-  (use-package react-snippets
-    :pin "melpa")
-#+END_SRC
-*** json-mode
-#+BEGIN_SRC emacs-lisp
-(use-package json-mode :mode "\\.babelrc$")
-(use-package json-reformat)
-#+END_SRC
-** Lisp
-*** TODO Slime [ add quicklisp directory to the top of this file ]
-#+BEGIN_SRC emacs-lisp
-(use-package slime
-  :config
-  ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
-  ;; ;; Replace "sbcl" with the path to your implementation
-  ;; (setq inferior-lisp-program "clisp")
-  )
-#+END_SRC
-** SQL
-*** sqlup                                                  :minor:external:
-auto-upcase SQL keywords as I type, please.
-#+BEGIN_SRC emacs-lisp
-(use-package sqlup-mode
-  :init
-  (add-hook 'sql-mode-hook 'sqlup-mode)
-  (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 #+END_SRC
