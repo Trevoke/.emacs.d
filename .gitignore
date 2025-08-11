@@ -1,9 +1,11 @@
 *#
 *~
+#.elc
 local-files/
 .cask
 \#*
 aldric.el
+config.el
 elpa
 .emacs.secrets
 eshell/history
@@ -18,3 +20,11 @@ transient/
 straight/
 request/
 quelpa
+.cache/
+.ls-session-v1
+.org-id-locations
+elisa/
+ellama-sessions/
+eln-cache/
+elpy/
+nix-buffer/

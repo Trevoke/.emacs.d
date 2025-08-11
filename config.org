@@ -361,6 +361,47 @@ avy is kinda badass.
            ("C-x j" . avy-po-mark)))
 #+END_SRC
 * Engines
+** GenAI
+*** claude-code-ide
+#+begin_src elisp
+  (use-package claude-code-ide
+    :straight (:type git :host github :repo "manzaltu/claude-code-ide.el")
+    :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
+    :custom
+    (claude-code-ide-cli-path "~/.asdf/shims/claude")
+    :config
+    (claude-code-ide-emacs-tools-setup)) ;; Optionally enable Emacs MCP tools
+#+end_src
+*** gptel
+#+begin_src elisp
+  (use-package gptel
+    :quelpa (gptel :fetcher github :repo "karthink/gptel")
+    :config
+    (setq gptel-model 'gemma2:9b-instruct-q6_K)
+    (setq gptel-backend (gptel-make-ollama "Ollama"
+                     :host "localhost:11434"
+                     :stream t
+                     :models '(mistral-small))))
+#+end_src
+*** MCP - model context
+#+begin_src elisp
+  (use-package mcp
+    :vc (:url "https://github.com/lizqwerscott/mcp.el" :branch "master")
+    :custom
+    (mcp-hub-servers '()))
+#+end_src
+** combobulate (tree-sitter-based navigation)
+#+begin_src elisp
+(use-package combobulate
+   :custom
+   ;; You can customize Combobulate's key prefix here.
+   ;; Note that you may have to restart Emacs for this to take effect!
+   (combobulate-key-prefix "C-c o")
+   :hook ((prog-mode . combobulate-mode))
+   ;; Amend this to the directory where you keep Combobulate's source
+   ;; code.
+   :load-path ("/home/stag/src/vendor/combobulate"))
+#+end_src
 ** evil-mode
 Because sometimes, vim.
 #+BEGIN_SRC emacs-lisp
@@ -526,15 +567,21 @@ I forget the basic keybindings all the time: After a search using =ag=, use C-c 
 *** Project navigation
 Projectile is pretty sweet.
 #+BEGIN_SRC emacs-lisp
-(use-package projectile
-  :diminish projectile-mode
-  :init
-  (setq projectile-known-projects-file "~/.emacs.d/local-files/projectile-bookmarks.eld")
-  (setq projectile-cache-file "~/.emacs.d/local-files/projectile.cache")
-  :config
-  (projectile-global-mode)
-  (setq projectile-completion-system 'default)
-  :bind (("C-c p" . projectile-command-map)))
+  (use-package projectile
+    :diminish projectile-mode
+    :init
+    (setq projectile-known-projects-file "~/.emacs.d/local-files/projectile-bookmarks.eld")
+    (setq projectile-cache-file "~/.emacs.d/local-files/projectile.cache")
+    :config
+    (projectile-global-mode)
+    (setq projectile-completion-system 'default)
+    (projectile-register-project-type 'emacs-eask-buttercup '("Eask" "tests")
+                                  :project-file "Eask"
+                                  :compile "eask compile"
+                                  :test "eask test buttercup"
+                                  :test-suffix "-test")
+
+    :bind (("C-c p" . projectile-command-map)))
 #+END_SRC
 
 ** File (text/code) Structure
@@ -1178,3 +1225,19 @@ Let's make it all spaces, and clean themup on save.
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
 #+END_SRC
+** Rust
+#+begin_src elisp
+    (use-package cargo :after rust-mode)
+    (use-package cargo-transient :after rust-mode :pin melpa)
+    (use-package cargo-mode :after rust-mode)
+    (use-package rust-mode :after eglot
+      :hook ((rust-mode .  eglot)))
+    (use-package rust-playground :after rust-mode)
+    (use-package flycheck-rust
+      :after rust-mode
+      :hook ((flycheck-mode-hook . flycheck-rust-setup)))
+
+    (use-package ob-rust :after org :pin melpa)
+
+    (use-package rust-auto-use :after rust-mode :pin melpa)
+#+end_src

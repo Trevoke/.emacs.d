@@ -60,7 +60,7 @@
        (red-6    "#cf6a4c") ; constant
        (red-7    "#de5577") ; ruby predefined identifier
        (red-1    "#40000A") ; diff delete fg
-       (red-2    "#540063") ; spellrare, regexp delimiter
+       (red-2    "#540063") ; spellrare, regexp delimiter ; UNUSED
        (red-3    "#700009") ; diff delete bg
        (red-4    "#902020") ; errormsg, spellbad
        (red-9    "#dd0093") ; regexp
@@ -71,19 +71,13 @@
   (custom-theme-set-faces
    'mejelly
 
-   `(enh-ruby-regexp-delimiter-face ((,class :foreground ,red-2)))
-   `(enh-ruby-regexp-face ((,class :foreground ,red-9)))
-   `(enh-ruby-string-delimiter-face ((,class :foreground ,green-3)))
-
    ;; Basic
    `(default ((,class :foreground ,text-fg :background ,bg)))
    `(shadow ((,class :foreground ,gray-6)))
    `(cursor ((,class :background ,blue-8)))
    `(region ((,class :background ,gray-4 :extend t)))
    `(highlight ((,class :background ,black-3)))
-   `(hl-line ((,class :background ,black-3)))
    `(secondary-selection ((,class :background ,gray-3 :extend t)))
-   `(hi-yellow ((,class :background ,yellow-5 ,:foreground ,bg)))
 
    `(success ((,class :foreground ,green-4)))
    `(warning ((,class :foreground ,yellow-2)))
@@ -115,8 +109,6 @@
 
    `(show-paren-match ((,class :foreground ,white-9 :background ,gray-3)))
    `(show-paren-mismatch ((,class :foreground ,white-9 :background ,red-4)))
-
-   `(help-argument-name ((,class :inherit (italic) :foreground ,green-4)))
    `(help-key-binding ((,class :inherit (fixed-pitch)
                                :box (:line-width (-1 . -1) :color ,gray-6)
                                :foreground ,red-5
@@ -146,6 +138,7 @@
    `(font-lock-string-face ((,class :foreground ,yellow-0)))
    `(font-lock-type-face ((,class :foreground ,yellow-4)))
    `(font-lock-variable-name-face ((,class :foreground ,red-0)))
+   ;; `(help-argument-name )
    ;; `(flycheck-error )
    ;; `(flycheck-fringe-error )
    ;; `(flycheck-fringe-info )
@@ -189,10 +182,10 @@
    ;; `(custom-variable-obsolete )
    ;; `(custom-variable-tag )
    ;; `(ansi-color-black )
-   `(ansi-color-blue ((,class :background ,blue-2 :foreground ,blue-2)))
+   `(ansi-color-blue ((,class :foreground ,blue-2 :background ,blue-2)))
    ;; `(ansi-color-bold )
    ;; `(ansi-color-bright-black )
-   `(ansi-color-bright-blue ((,class :background ,blue-7 :foreground ,blue-7)))
+   ;; `(ansi-color-bright-blue )
    ;; `(ansi-color-bright-cyan )
    ;; `(ansi-color-bright-green )
    ;; `(ansi-color-bright-magenta )
@@ -842,6 +835,8 @@
    ;; `(woman-bold )
    ;; `(woman-italic )
    ;; `(woman-unknown )
+   `(elixir-ts-atom ((,class :foreground ,blue-5)))
+   `(elixir-ts-keyword-key ((,class :foreground ,red-0)))
    )
 
   (custom-theme-set-variables

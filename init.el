@@ -33,17 +33,33 @@
 (assq-delete-all 'org package--builtins)
 (assq-delete-all 'org package--builtin-versions)
 
+(defvar straight-bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (straight-bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
 (use-package org
-             :pin elpa
-             :demand t
-             :ensure t
-             :init
-             (setq org-directory "~/my-life/orgnotes/")
-             (setq org-id-track-globally t)
-             (setq org-generic-id-locations-file
-                   "~/.emacs.d/local-files/org-generic-id-locations")
-             (setq org-id-locations-file
-                   "~/.emacs.d/local-files/org-id-locations"))
+  :pin elpa
+  :demand t
+  :ensure t
+  :init
+  (setq org-directory "~/my-life/orgnotes/")
+  (setq org-id-track-globally t)
+  (setq org-generic-id-locations-file
+        "~/.emacs.d/local-files/org-generic-id-locations")
+  (setq org-id-locations-file
+        "~/.emacs.d/local-files/org-id-locations"))
 (require 'org)
 
 (org-babel-load-file "~/.emacs.d/config.org")
