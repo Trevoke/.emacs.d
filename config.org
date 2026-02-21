@@ -150,6 +150,7 @@ In addition, I do keep some somewhat computer-specific stuff in there, like the 
 #+BEGIN_SRC emacs-lisp
 (setq custom-file "~/.emacs.d/local-files/emacs-custom.el")
 (load custom-file t) ;; t means no error if file does not exist
+(add-to-list 'default-frame-alist '(font . "Geist Mono-14.3"))
 #+END_SRC
 ** Backups
 Centralize emacs backups. This directory is gitignored.
@@ -365,13 +366,207 @@ avy is kinda badass.
 *** claude-code-ide
 #+begin_src elisp
   (use-package claude-code-ide
-    :straight (:type git :host github :repo "manzaltu/claude-code-ide.el")
-    :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
+    :quelpa (claude-code-ide :fetcher github :repo "manzaltu/claude-code-ide.el")
+    :bind ("C-c C-'" . claude-code-ide-menu)
     :custom
-    (claude-code-ide-cli-path "~/.asdf/shims/claude")
+    (claude-code-ide-cli-path "~/.local/bin/claude")
     :config
-    (claude-code-ide-emacs-tools-setup)) ;; Optionally enable Emacs MCP tools
+    (claude-code-ide-emacs-tools-setup)
+
+    ;; Custom MCP tools for Emacs introspection
+
+    (defun my-mcp-elisp-apropos (pattern)
+      "Search for Emacs symbols matching PATTERN.
+  Returns symbol names with types (fn/var/face) and brief descriptions."
+      (require 'seq)
+      (let* ((symbols (apropos-internal pattern))
+             (max-results 100)
+             (limited (seq-take symbols max-results))
+             (results '()))
+        (dolist (sym limited)
+          (let ((types '())
+                (doc nil))
+            (when (fboundp sym)
+              (push "fn" types)
+              (setq doc (or doc (ignore-errors (documentation sym t)))))
+            (when (boundp sym)
+              (push "var" types)
+              (setq doc (or doc (ignore-errors
+                                  (documentation-property sym 'variable-documentation t)))))
+            (when (facep sym)
+              (push "face" types))
+            (let ((first-line (when (and doc (stringp doc))
+                                (car (split-string doc "\n")))))
+              (push (format "%s [%s]%s"
+                            sym
+                            (string-join (nreverse types) ",")
+                            (if first-line
+                                (format " - %s"
+                                        (truncate-string-to-width first-line 70 nil nil "..."))
+                              ""))
+                    results))))
+        (if results
+            (concat (format "Found %d symbols (showing %d):\n\n"
+                            (length symbols) (min (length symbols) max-results))
+                    (string-join (nreverse results) "\n"))
+          (format "No symbols matching '%s'" pattern))))
+
+    (defun my-mcp-describe-function (function-name)
+      "Get documentation for FUNCTION-NAME.
+  Returns signature, docstring, type, and definition location."
+      (let ((sym (intern-soft function-name)))
+        (cond
+         ((not sym)
+          (format "Symbol '%s' not found" function-name))
+         ((not (fboundp sym))
+          (format "'%s' is not a function" function-name))
+         (t
+          (let* ((doc (ignore-errors (documentation sym t)))
+                 (arglist (ignore-errors (help-function-arglist sym t)))
+                 (file (ignore-errors (find-lisp-object-file-name sym 'defun)))
+                 (interactive-p (commandp sym))
+                 (func (symbol-function sym))
+                 (type (cond
+                        ((subrp func) "built-in (C)")
+                        ((byte-code-function-p func) "byte-compiled")
+                        ((autoloadp func) "autoload")
+                        ((macrop sym) "macro")
+                        ((closurep func) "closure")
+                        (t "interpreted lisp"))))
+            (concat
+             (format "Function: %s\n" sym)
+             (format "Type: %s\n" type)
+             (format "Signature: (%s%s)\n"
+                     sym
+                     (if arglist
+                         (concat " " (mapconcat (lambda (a) (format "%s" a)) arglist " "))
+                       ""))
+             (if interactive-p "Interactive: yes\n" "")
+             (if file (format "Defined in: %s\n" file) "")
+             (format "\nDocumentation:\n%s" (or doc "No documentation available."))))))))
+
+    (defun my-mcp-describe-variable (variable-name)
+      "Get documentation for VARIABLE-NAME.
+  Returns current value, docstring, and definition location."
+      (let ((sym (intern-soft variable-name)))
+        (cond
+         ((not sym)
+          (format "Symbol '%s' not found" variable-name))
+         ((not (boundp sym))
+          (format "'%s' is not a bound variable" variable-name))
+         (t
+          (let* ((doc (ignore-errors
+                        (documentation-property sym 'variable-documentation t)))
+                 (val (symbol-value sym))
+                 (val-str (prin1-to-string val))
+                 (val-display (if (> (length val-str) 1000)
+                                  (concat (substring val-str 0 1000) "\n... [truncated]")
+                                val-str))
+                 (file (ignore-errors (find-lisp-object-file-name sym 'defvar)))
+                 (custom-p (ignore-errors (custom-variable-p sym)))
+                 (local-p (ignore-errors (local-variable-if-set-p sym))))
+            (concat
+             (format "Variable: %s\n" sym)
+             (if custom-p "Customizable: yes\n" "")
+             (if local-p "Buffer-local: yes\n" "")
+             (if file (format "Defined in: %s\n" file) "")
+             (format "\nCurrent value:\n%s\n" val-display)
+             (format "\nDocumentation:\n%s" (or doc "No documentation available."))))))))
+
+    (defun my-mcp-get-elisp-source (symbol-name)
+      "Get the source code definition of SYMBOL-NAME.
+  Works for functions, macros, and variables defined in Elisp files."
+      (let ((sym (intern-soft symbol-name)))
+        (cond
+         ((not sym)
+          (format "Symbol '%s' not found" symbol-name))
+
+         ;; Function/macro
+         ((fboundp sym)
+          (condition-case err
+              (progn
+                (require 'find-func)
+                (let* ((location (find-function-noselect sym t))
+                       (buffer (car location))
+                       (pos (cdr location)))
+                  (if (and buffer pos)
+                      (with-current-buffer buffer
+                        (save-excursion
+                          (goto-char pos)
+                          (let* ((start (point))
+                                 (end (save-excursion (forward-sexp) (point)))
+                                 (source (buffer-substring-no-properties start end)))
+                            (format ";;; Source from: %s\n;;; Lines: %d-%d\n\n%s"
+                                    (or buffer-file-name (buffer-name))
+                                    (line-number-at-pos start)
+                                    (line-number-at-pos end)
+                                    source))))
+                    (format "Could not locate source for '%s' (may be built-in or byte-compiled without source)"
+                            symbol-name))))
+            (error
+             (format "Error finding source for '%s': %s"
+                     symbol-name (error-message-string err)))))
+
+         ;; Variable
+         ((boundp sym)
+          (condition-case err
+              (progn
+                (require 'find-func)
+                (let* ((location (find-variable-noselect sym))
+                       (buffer (car location))
+                       (pos (cdr location)))
+                  (if (and buffer pos)
+                      (with-current-buffer buffer
+                        (save-excursion
+                          (goto-char pos)
+                          (let* ((start (point))
+                                 (end (save-excursion (forward-sexp) (point)))
+                                 (source (buffer-substring-no-properties start end)))
+                            (format ";;; Source from: %s\n;;; Lines: %d-%d\n\n%s"
+                                    (or buffer-file-name (buffer-name))
+                                    (line-number-at-pos start)
+                                    (line-number-at-pos end)
+                                    source))))
+                    (format "Could not locate source for variable '%s'" symbol-name))))
+            (error
+             (format "Error finding source for '%s': %s"
+                     symbol-name (error-message-string err)))))
+
+         (t
+          (format "'%s' is neither a function nor a bound variable" symbol-name)))))
+
+    ;; Register custom tools with MCP server
+    (setq claude-code-ide-mcp-server-tools
+          (append claude-code-ide-mcp-server-tools
+                  '((my-mcp-elisp-apropos
+                     :description "Search for Emacs Lisp symbols (functions, variables, faces) matching a pattern. Returns names with types and brief descriptions. Use for discovering available functions or exploring Emacs APIs."
+                     :parameters ((:name "pattern"
+                                   :type "string"
+                                   :required t
+                                   :description "Regular expression pattern to match against symbol names")))
+
+                    (my-mcp-describe-function
+                     :description "Get detailed documentation for an Emacs Lisp function or macro. Returns signature, docstring, whether it's interactive (a command), and where it's defined."
+                     :parameters ((:name "function_name"
+                                   :type "string"
+                                   :required t
+                                   :description "Name of the function to describe")))
+
+                    (my-mcp-describe-variable
+                     :description "Get detailed documentation for an Emacs Lisp variable. Returns current value, docstring, whether it's customizable, and where it's defined."
+                     :parameters ((:name "variable_name"
+                                   :type "string"
+                                   :required t
+                                   :description "Name of the variable to describe")))
+
+                    (my-mcp-get-elisp-source
+                     :description "Get the actual source code definition of an Emacs Lisp function, macro, or variable. Returns the complete sexp from the source file with location info."
+                     :parameters ((:name "symbol_name"
+                                   :type "string"
+                                   :required t
+                                   :description "Name of the symbol (function or variable) to get source for"))))))) ;; End of custom MCP tools
 #+end_src
+
 *** gptel
 #+begin_src elisp
   (use-package gptel
@@ -533,9 +728,10 @@ https://github.com/Crandel/tempel-collection
 #+end_src
 ** Menus
 #+begin_src emacs-lisp
-  (assq-delete-all 'transient package--builtins)
-  (assq-delete-all 'transient package--builtin-versions)
+
   (use-package transient
+    :ensure t
+    :demand t
     :init
     (setq transient-history-file "~/.emacs.d/local-files/transient/history.el"
           transient-levels-file "~/.emacs.d/local-files/transient/levels.el"
@@ -657,26 +853,48 @@ I've been having some issues exporting, so I'm actively loading libraries here.
 ** Org-gtd
 #+BEGIN_SRC emacs-lisp
     (use-package org-gtd
-      :after org
-      :quelpa ((org-gtd :fetcher github :repo "trevoke/org-gtd.el")
-               :upgrade t)
+      :after (org transient)
+      ;:quelpa ((org-gtd :fetcher github :repo "trevoke/org-gtd.el" :branch "org-gtd-4")
+      ;         :upgrade t)
       :demand t
       :init
-      (setq org-gtd-update-ack "3.0.0")
+      (setq org-gtd-update-ack "4.0.0")
       :custom
       (org-gtd-directory stag-org-gtd-directory)
-      (org-agenda-property-position 'next-line)
+      (org-agenda-files `(,stag-org-gtd-directory))
+      (org-todo-keywords '((sequence "TODO" "NEXT" "WAIT" "|" "DONE" "CNCL")))
+      (org-gtd-keyword-mapping '((todo . "TODO")
+                                 (next . "NEXT")
+                                 (wait . "WAIT")
+                                 (done . "DONE")
+                                 (canceled . "CNCL")))
+      (org-gtd-areas-of-focus '("FM" "Family" "Career" "Home" "Music" "Knowledge" "Health"
+                                "Storytelling" "Go" "Martial Arts"))
+      (org-gtd-organize-hooks
+       '(org-gtd-set-area-of-focus
+         (lambda () (unless (org-gtd-organize-type-member-p '(quick-action
+                                                              trash
+                                                              project-heading
+                                                              knowledge))
+           (org-set-tags-command)))))
+
+
+      (org-gtd-agenda-property-position 'next-line)
       (org-edna-use-inheritance t)
       :config
       (org-edna-mode 1)
+      (org-gtd-mode 1)
       :bind
       (("C-c d c" . org-gtd-capture)
        ("C-c d e" . org-gtd-engage)
        ("C-c d p" . org-gtd-process-inbox)
        ("C-c d n" . org-gtd-show-all-next)
-       ("C-c d s" . org-gtd-show-stuck-projects)
+       ("C-c d s" . org-gtd-reflect-stuck-projects)
+       ("C-c d ." . org-gtd-command-center)
        :map org-gtd-clarify-map
-       ("C-c c" . org-gtd-choose)))
+       ("C-c c" . org-gtd-organize)
+       :map org-agenda-mode-map
+       ("C-c ." . org-gtd-agenda-transient)))
   (require 'org-gtd)
 #+END_SRC
 ** Diary
@@ -1130,10 +1348,6 @@ It's quite nice to use an orgtbl, but GFM is weird. This converts to a GFM table
 #+end_src
 * Version control
 ** Git
-*** Walking through a file's history
-#+BEGIN_SRC emacs-lisp
-(use-package git-timemachine)
-#+END_SRC
 *** Magit
 Magit is a pretty amazing interface to git.
 #+BEGIN_SRC emacs-lisp
@@ -1225,6 +1439,11 @@ Let's make it all spaces, and clean themup on save.
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
 #+END_SRC
+*** e-unit
+#+begin_src emacs-lisp
+  ;; (use-package e-unit
+  ;;   :quelpa (e-unit :fetcher codeberg :repo "trevoke/e-unit.el"))
+#+end_src
 ** Rust
 #+begin_src elisp
     (use-package cargo :after rust-mode)

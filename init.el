@@ -1,5 +1,3 @@
-(setq package-enable-at-startup nil)
-
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ;; ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa-stable" . "https://stable.melpa.org/packages/")
@@ -16,16 +14,15 @@
     (eval-buffer)
     (quelpa-self-upgrade)))
 
-(quelpa 'use-package)
+;(quelpa 'use-package)
+(require 'use-package)
 
 (quelpa
  '(quelpa-use-package
    :fetcher git
    :url "https://github.com/quelpa/quelpa-use-package.git"))
 (require 'quelpa-use-package)
-                                        ;(require 'use-package)
 
-(use-package use-package-ensure-system-package :ensure t :demand t)
 (setq use-package-always-pin "melpa-stable")
 (setq use-package-always-ensure t)
 
@@ -33,21 +30,9 @@
 (assq-delete-all 'org package--builtins)
 (assq-delete-all 'org package--builtin-versions)
 
-(defvar straight-bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name
-        "straight/repos/straight.el/bootstrap.el"
-        (or (bound-and-true-p straight-base-dir)
-            user-emacs-directory)))
-      (straight-bootstrap-version 7))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+;; have to do this because transient comes preinstalled with emacs
+(assq-delete-all 'transient package--builtins)
+(assq-delete-all 'transient package--builtin-versions)
 
 (use-package org
   :pin elpa
