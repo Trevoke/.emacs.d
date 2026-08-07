@@ -75,13 +75,13 @@
    `(default ((,class :foreground ,text-fg :background ,bg)))
    `(shadow ((,class :foreground ,gray-6)))
    `(cursor ((,class :background ,blue-8)))
-   `(region ((,class :background ,gray-4 :extend t)))
-   `(highlight ((,class :background ,black-3)))
+   `(region ((,class :background ,gray-0 :extend t)))
+   `(highlight ((,class :background ,black-5 :extend t)))
    `(secondary-selection ((,class :background ,gray-3 :extend t)))
 
    `(success ((,class :foreground ,green-4)))
    `(warning ((,class :foreground ,yellow-2)))
-   `(error ((,class :foreground ,red-4)))
+   `(error ((,class :background ,red-4)))
 
    `(fringe ((,class :background ,black-7)))
 
@@ -100,7 +100,7 @@
 
    `(minibuffer-prompt ((,class :foreground ,red-8 :weight bold)))
 
-   `(isearch ((,class :foreground ,black-6 :background ,yellow-5)))
+   `(isearch ((,class :foreground ,red-8 :background ,black-6 :underline t)))
    `(lazy-highlight ((,class :foreground ,red-8 :background ,red-1 )))
    `(match ((,class :inherit (isearch))))
    `(isearch-fail ((,class :foreground ,bg :background ,red-8)))
@@ -118,21 +118,21 @@
    ;; `(marginalia-documentation )
 
    `(line-number ((,class :foreground ,gray-4)))
-   `(line-number-current-line ((,class :foreground ,white-1 :background ,black-3)))
+   `(line-number-current-line ((,class :foreground ,white-1 :background ,black-5)))
 
    `(link ((,class :foreground ,blue-7 :underline t)))
    `(link-visited ((,class :foreground ,red-0 :inherit (link))))
 
    ;; `(icon-button )
-   `(font-lock-builtin-face ((,class :foreground ,blue-7 )))
-   `(font-lock-comment-face ((,class :foreground ,gray-7)))
+   `(font-lock-builtin-face ((,class :foreground ,red-7 )))
+   `(font-lock-comment-face ((,class :foreground ,gray-6 :slant italic)))
    `(font-lock-constant-face ((,class :foreground ,blue-5)))
-   `(font-lock-doc-face ((,class :foreground ,green-3)))
+   ;;`(font-lock-doc-face ((,class :foreground ,green-3)))
    `(font-lock-function-name-face ((,class :foreground ,yellow-3)))
-   `(font-lock-keyword-face ((,class :foreground ,blue-5)))
-   `(font-lock-warning-face ((,class :foreground ,red-7)))
+   `(font-lock-keyword-face ((,class :foreground ,blue-6)))
+   `(font-lock-warning-face ((,class :foreground ,red-6 :weight bold)))
    ;; `(font-lock-negation-char-face )
-   ;; `(font-lock-preprocessor-face )
+   `(font-lock-preprocessor-face ((,class :foreground ,blue-7)))
    ;; `(font-lock-regexp-grouping-backslash )
    ;; `(font-lock-regexp-grouping-construct )
    `(font-lock-string-face ((,class :foreground ,yellow-0)))
@@ -605,7 +605,7 @@
    ;; `(org-level-7 )
    ;; `(org-level-8 )
    ;; `(org-done )
-   `(org-drawer ((,class :inherit (shadow))))
+   `(org-drawer ((,class :slant italic :inherit (shadow))))
    ;; `(org-ellipsis )
    ;; `(org-footnote )
    ;; `(org-formula )
@@ -841,6 +841,7 @@
 
   (custom-theme-set-variables
    'mejelly
+   '(frame-background-mode 'dark)
    ;; Add any theme-related variables here if necessary
    )
 

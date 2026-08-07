@@ -1460,3 +1460,9 @@ Let's make it all spaces, and clean themup on save.
 
     (use-package rust-auto-use :after rust-mode :pin melpa)
 #+end_src
+** racket
+#+begin_src emacs-lisp
+  (use-package racket-mode
+    :mode ("\\.rkt\\'" . racket-mode)
+    :hook (racket-mode . racket-xp-mode))
+#+end_src
