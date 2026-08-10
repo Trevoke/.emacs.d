@@ -364,12 +364,12 @@ avy is kinda badass.
 * Engines
 ** GenAI
 *** claude-code-ide
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (use-package claude-code-ide
     :quelpa (claude-code-ide :fetcher github :repo "manzaltu/claude-code-ide.el")
     :bind ("C-c C-'" . claude-code-ide-menu)
     :custom
-    (claude-code-ide-cli-path "~/.local/bin/claude")
+    (claude-code-ide-cli-path "~/bin/claude")
     :config
     (claude-code-ide-emacs-tools-setup)
 
@@ -587,15 +587,15 @@ avy is kinda badass.
 #+end_src
 ** combobulate (tree-sitter-based navigation)
 #+begin_src elisp
-(use-package combobulate
-   :custom
-   ;; You can customize Combobulate's key prefix here.
-   ;; Note that you may have to restart Emacs for this to take effect!
-   (combobulate-key-prefix "C-c o")
-   :hook ((prog-mode . combobulate-mode))
-   ;; Amend this to the directory where you keep Combobulate's source
-   ;; code.
-   :load-path ("/home/stag/src/vendor/combobulate"))
+  ;; (use-package combobulate
+  ;;    :custom
+  ;;    ;; You can customize Combobulate's key prefix here.
+  ;;    ;; Note that you may have to restart Emacs for this to take effect!
+  ;;    (combobulate-key-prefix "C-c o")
+  ;;    :hook ((prog-mode . combobulate-mode))
+  ;;    ;; Amend this to the directory where you keep Combobulate's source
+  ;;    ;; code.
+  ;;    :load-path ("/home/stag/src/vendor/combobulate"))
 #+end_src
 ** evil-mode
 Because sometimes, vim.
@@ -730,7 +730,7 @@ https://github.com/Crandel/tempel-collection
 #+begin_src emacs-lisp
 
   (use-package transient
-    :ensure t
+    :ensure nil
     :demand t
     :init
     (setq transient-history-file "~/.emacs.d/local-files/transient/history.el"
@@ -769,7 +769,7 @@ Projectile is pretty sweet.
     (setq projectile-known-projects-file "~/.emacs.d/local-files/projectile-bookmarks.eld")
     (setq projectile-cache-file "~/.emacs.d/local-files/projectile.cache")
     :config
-    (projectile-global-mode)
+    (projectile-mode +1)
     (setq projectile-completion-system 'default)
     (projectile-register-project-type 'emacs-eask-buttercup '("Eask" "tests")
                                   :project-file "Eask"
@@ -777,7 +777,7 @@ Projectile is pretty sweet.
                                   :test "eask test buttercup"
                                   :test-suffix "-test")
 
-    :bind (("C-c p" . projectile-command-map)))
+    :bind-keymap ("C-c p" . projectile-command-map))
 #+END_SRC
 
 ** File (text/code) Structure
@@ -877,10 +877,10 @@ I've been having some issues exporting, so I'm actively loading libraries here.
                                                               project-heading
                                                               knowledge))
            (org-set-tags-command)))))
-
-
       (org-gtd-agenda-property-position 'next-line)
       (org-edna-use-inheritance t)
+      (org-gtd-refile-to-any-target nil)
+      (org-gtd-refile-prompt-for-types '(someday))
       :config
       (org-edna-mode 1)
       (org-gtd-mode 1)
@@ -1086,7 +1086,8 @@ It's also nice to have dired with M-< and M-> take you to first and last file
 * Terminal emulators
 ** vterm
 #+begin_src emacs-lisp
-(use-package vterm :pin melpa)
+(unless (require 'vterm nil t)
+  (use-package vterm :pin melpa))
 #+end_src
 * Email
 ** BBDB
@@ -1463,6 +1464,7 @@ Let's make it all spaces, and clean themup on save.
 ** racket
 #+begin_src emacs-lisp
   (use-package racket-mode
+    :pin nongnu
     :mode ("\\.rkt\\'" . racket-mode)
     :hook (racket-mode . racket-xp-mode))
 #+end_src

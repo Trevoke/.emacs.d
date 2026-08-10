@@ -1,10 +1,14 @@
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ;; ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa-stable" . "https://stable.melpa.org/packages/")
+                         ("nongnu" . "https://elpa.nongnu.org/nongnu/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (setq package-archive-priorities
-      '(("melpa-stable" . 10000)))
+      '(("melpa-stable" . 10000)
+        ("nongnu" . 1000)
+        ("melpa" . 100)
+        ("elpa" . 10)))
 (require 'package)
 (package-initialize)
 
@@ -23,16 +27,14 @@
    :url "https://github.com/quelpa/quelpa-use-package.git"))
 (require 'quelpa-use-package)
 
+(setq package-install-upgrade-built-in t)
+(use-package use-package-ensure-system-package :ensure nil :demand t)
 (setq use-package-always-pin "melpa-stable")
 (setq use-package-always-ensure t)
 
 ;;  have to do this because org comes preinstalled with emacs
 (assq-delete-all 'org package--builtins)
 (assq-delete-all 'org package--builtin-versions)
-
-;; have to do this because transient comes preinstalled with emacs
-(assq-delete-all 'transient package--builtins)
-(assq-delete-all 'transient package--builtin-versions)
 
 (use-package org
   :pin elpa
