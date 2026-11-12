@@ -39,6 +39,9 @@ I set a [[*Bookmarks][bookmark]] with =C-x r m= and I can get back here with =C-
 ** Themes
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+;; Theme files `require' shared libraries (e.g. modus-jellybeans.el)
+;; that live next to them, so the directory must be on `load-path' too.
+(add-to-list 'load-path "~/.emacs.d/themes")
 ;; (load-theme 'mejelly t)
 #+END_SRC
 ** Secrets & personal information
