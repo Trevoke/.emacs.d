@@ -872,7 +872,7 @@ I've been having some issues exporting, so I'm actively loading libraries here.
                                  (done . "DONE")
                                  (canceled . "CNCL")))
       (org-gtd-areas-of-focus '("FM" "Family" "Career" "Home" "Music" "Knowledge" "Health"
-                                "Storytelling" "Go" "Martial Arts"))
+                                "Storytelling" "Go" "Martial Arts" "Lean Software Production"))
       (org-gtd-organize-hooks
        '(org-gtd-set-area-of-focus
          (lambda () (unless (org-gtd-organize-type-member-p '(quick-action
@@ -915,7 +915,13 @@ These are tags to add to tasks, such as types of action, mindset I need to be in
   (setq org-tag-alist '(("@home" . ?h)
                         ("@work" . ?w)
                         ("@nonet" . ?n)
-                        ("code")))
+                        ("code")
+                        (:newline . nil)
+                        ("marketing")
+                        ("maven")
+                        ("bb")
+                        ("course material")
+                        ("project management")))
 #+END_SRC
 ** Captures
 #+BEGIN_SRC emacs-lisp
